@@ -6,16 +6,32 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@casl/ability": "^6.7.1",
+    "@casl/vue": "^2.2.2",
+    "@ckeditor/ckeditor5-vue": "^7.2.0",
     "axios": "^1.6.8",
+    "bootstrap": "^5.3.3",
+    "ckeditor5": "^43.3.0",
+    "crypto-js": "^4.2.0",
+    "dropzone": "^6.0.0-beta.2",
+    "moment": "^2.30.1",
     "pinia": "^2.1.7",
+    "sweetalert2": "^11.6.13",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.0.13",
+    "vue-toast-notification": "^3.1.2",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@tabler/core": "^1.0.0-beta20",
     "@vitejs/plugin-vue": "^5.0.4",
+    "patch-package": "^8.0.0",
+    "sass": "^1.77.8",
+    "sass-loader": "^14.2.1",
     "vite": "^5.2.0"
   }
 }

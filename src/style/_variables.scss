@@ -1,0 +1,25 @@
+// // FONTS
+// $font-google: null !default;
+// $font-google-monospaced: null !default;
+// $font-local: null !default;
+// $font-icons: () !default;
+
+// /* prettier-ignore */
+// $font-family-sans-serif: unquote("#{if($font-local, "#{$font-local}, ", ' ')}#{if($font-google, "#{$font-google}, ", ' ')}") -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif !default;
+// /* prettier-ignore */
+// $font-family-monospace: unquote("#{if($font-google-monospaced, "#{$font-google-monospaced}, ", '')}") Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+// $font-family-serif: "Georgia", "Times New Roman", times, serif !default;
+
+// // COLORS
+$blue: #005eb8 !default;
+// $azure: #4299e1 !default;
+// $indigo: #4263eb !default;
+// $purple: #ae3ec9 !default;
+// $pink: #d6336c !default;
+// $red: #d63939 !default;
+$orange: #ff8800 !default;
+// $yellow: #f59f00 !default;
+// $lime: #74b816 !default;
+// $green: #2fb344 !default;
+// $teal: #0ca678 !default;
+// $cyan: #17a2b8 !default;

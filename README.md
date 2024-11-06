@@ -1,7 +1,32 @@
-# Vue 3 + Vite
+# Laravel-Vue-Web
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## Instalación
 
-## Recommended IDE Setup
+### Backend (Laravel)
+1. Clonar el repositorio:
+   git clone https://github.com/Oscar963/app-backend.git
+   cd app-backend
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (previously Volar) and disable Vetur
+2. Instalar dependencias:
+   composer install
+
+3. Configurar .env:
+   cp .env.example .env
+   php artisan key:generate
+
+4. Migrar la base de datos:
+   php artisan migrate
+
+5. Iniciar el servidor:
+   php artisan serve
+
+### Frontend (Vue.js con Vite y Pinia)
+1. Clonar el repositorio:
+   git clone https://github.com/Oscar963/app-front.git
+   cd app-front
+
+2. Instalar dependencias:
+   npm install
+
+3. Configurar .env:
+   npm run dev
