@@ -77,7 +77,8 @@
             </a>
           </router-link>
           <h6 class="ms-3 dropdown-header mb-1 mt-3">Administración del Sistema</h6>
-          <router-link v-if="$can('banner', 'list')" class="nav-item" :to="{ name: 'Banner' }" class-active="active">
+          <router-link v-if="$can('banner', 'list')" :class="['nav-item', { active: isBannerActive }]"
+            :to="{ name: 'Banner' }">
             <a class="nav-link" href="#">
               <span
                 class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -91,7 +92,8 @@
               <span class="nav-link-title"> Banners </span>
             </a>
           </router-link>
-          <router-link v-if="$can('page', 'list')" class="nav-item" :to="{ name: 'Page' }" class-active="active">
+          <router-link v-if="$can('page', 'list')" :class="['nav-item', { active: isPageActive }]"
+            :to="{ name: 'Page' }">
             <a class="nav-link" href="#">
               <span
                 class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
@@ -103,6 +105,21 @@
                 </svg>
               </span>
               <span class="nav-link-title"> Page </span>
+            </a>
+          </router-link>
+          <router-link v-if="$can('popup', 'list')" :class="['nav-item', { active: isPopupActive }]"
+            :to="{ name: 'Popup' }">
+            <a class="nav-link" href="#">
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"
+                  class="icon icon-tabler icons-tabler-filled icon-tabler-info-square">
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M19 2a3 3 0 0 1 2.995 2.824l.005 .176v14a3 3 0 0 1 -2.824 2.995l-.176 .005h-14a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-14a3 3 0 0 1 2.824 -2.995l.176 -.005h14zm-7 9h-1l-.117 .007a1 1 0 0 0 0 1.986l.117 .007v3l.007 .117a1 1 0 0 0 .876 .876l.117 .007h1l.117 -.007a1 1 0 0 0 .876 -.876l.007 -.117l-.007 -.117a1 1 0 0 0 -.764 -.857l-.112 -.02l-.117 -.006v-3l-.007 -.117a1 1 0 0 0 -.876 -.876l-.117 -.007zm.01 -3l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" />
+                </svg>
+              </span>
+              <span class="nav-link-title"> Popups </span>
             </a>
           </router-link>
           <h6 class="ms-3 dropdown-header mb-1 mt-3">Administración de Usuarios</h6>
@@ -167,6 +184,31 @@
     </div>
   </aside>
 </template>
+<script setup>
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+
+// Computed para el menú Page
+const isPageActive = computed(() => {
+  const pageRoutes = ['Page', 'PageStore', 'PageUpdate', 'PageList', 'PageFile'];
+  return pageRoutes.includes(route.name);
+});
+
+// Computed para el menú Banner
+const isBannerActive = computed(() => {
+  const bannerRoutes = ['Banner', 'BannerStore', 'BannerUpdate', 'BannerList'];
+  return bannerRoutes.includes(route.name);
+});
+
+const isPopupActive = computed(() => {
+  const popupRoutes = ['Popup', 'PopupStore', 'PopupUpdate', 'PopupList'];
+  return popupRoutes.includes(route.name);
+});
+
+</script>
+
 <style scoped>
 .navbar-vertical.navbar-expand-lg {
   z-index: 1010;

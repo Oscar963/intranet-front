@@ -100,8 +100,6 @@ const onInputChange = (editorInstance) => {
 const getImageUrl = (imagePath) => {
     return `${import.meta.env.VITE_APP_API_BASE_URL}${imagePath}`;
 };
-console.log(getImageUrl('/pages/files/ckeditor'));
-
 // Mount the editor and configure it
 onMounted(() => {
     config.value = {

@@ -5,7 +5,7 @@
         <div class="row g-2 align-items-center">
           <div class="col"><!-- Page pre-title -->
             <div class="page-pretitle">Módulo</div>
-            <h2 class="page-title">Banners</h2>
+            <h2 class="page-title">Páginas</h2>
           </div>
         </div>
       </div>
@@ -16,19 +16,27 @@
           <div class="col-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Banners registrados</h3>
+                <h3 class="card-title">Páginas registradas</h3>
                 <div class="card-actions">
                   <div class="btn-list">
-                    <RegistrarBanner v-if="$can('banner', 'create')" @listar-datos="listarDatos()"></RegistrarBanner>
-                    <EditarBanner v-if="$can('banner', 'edit')" @listar-datos="listarDatos()" ref="editarBannerRef">
-                    </EditarBanner>
+                    <router-link v-if="$can('page', 'create')" class="btn btn-primary d-none d-sm-inline-block"
+                      :to="{ name: 'PageStore' }">
+                      <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                        stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M12 5l0 14"></path>
+                        <path d="M5 12l14 0"></path>
+                      </svg>
+                      Registrar Página
+                    </router-link>
                   </div>
                 </div>
               </div>
               <div v-if="loading" class="progress progress-sm">
                 <div class="progress-bar progress-bar-indeterminate"></div>
               </div>
-
               <div class="table-responsive">
                 <table class="table card-table text-nowrap table-hover">
                   <thead>
@@ -46,28 +54,30 @@
                         Cargando datos...
                       </td>
                     </tr>
-                    <tr v-else-if="!listadoBanners.length">
+                    <tr v-else-if="!listadoPages.length">
                       <td colspan="5" class="text-secondary text-center">
                         No se encontraron registros
                       </td>
                     </tr>
-                    <tr v-else v-for="(item, index) in listadoBanners" :key="index">
+                    <tr v-else v-for="(item, index) in listadoPages" :key="index">
                       <td>
-                        <img class="w-25" :src="getImageUrl(item.imagen)" alt="">
+                        <img class="w-25 rounded" :src="item.image_banner" alt="">
                       </td>
                       <td>
-                        <span class="text-secondary">{{ item.titulo }}</span>
+                        <span class="text-secondary">{{ item.title }}</span>
                       </td>
                       <td>
-                        <span class="text-secondary">{{ item.estado }}</span>
+                        <span v-if="item.status === 'published'" class="badge badge-outline text-lime">publicado</span>
+                        <span v-if="item.status === 'hidden'" class="badge badge-outline text-indigo">oculto</span>
                       </td>
                       <td>
-                        <span class="text-secondary">{{ item.fecha }}</span>
+                        <span class="text-secondary">{{ item.date }}</span>
                       </td>
                       <td>
-                        <a v-if="$can('page', 'edit')" @click="openEditModal(item)" class="text-dark px-1 cursor-pointer"
-                          aria-label="Button" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
-                          <!-- SVG icon from http://tabler-icons.io/i/git-merge -->
+                        <router-link v-if="$can('page', 'edit')" class="text-dark px-1 cursor-pointer"
+                          aria-label="Button" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"
+                          :to="{ name: 'PageUpdate', params: { slug: item.slug } }">
+                          <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
@@ -76,9 +86,22 @@
                             <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
                             <path d="M16 5l3 3" />
                           </svg>
-                        </a>
+                        </router-link>
 
-                        <a v-if="$can('page', 'delete')" @click="eliminarBanner(item)"
+                        <router-link v-if="$can('page', 'file')" :to="{ name: 'PageFile', params: { slug: item.slug } }"
+                          class="text-dark px-1 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top"
+                          title="Documentos de la página">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-file-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                            <path d="M10 12l4 4m0 -4l-4 4" />
+                          </svg>
+                        </router-link>
+
+                        <a v-if="$can('page', 'delete')" @click="deletePages(item)"
                           class="text-dark px-1 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top"
                           title="Eliminar">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -105,45 +128,34 @@
   </div>
 </template>
 <script setup>
-import RegistrarBanner from "@/components/Banner/RegistrarBanner.vue";
-import EditarBanner from "@/components/Banner/EditarBanner.vue";
 import { ref, onMounted } from "vue";
 import { axiosInstance } from '@/plugins/axios';
 import Swal from "sweetalert2";
 
-const listadoBanners = ref([]);
+const listadoPages = ref([]);
 const loading = ref(false);
-const editarBannerRef = ref(null);
 
 onMounted(() => {
   listarDatos();
 });
 
 const listarDatos = async () => {
+  loading.value = true;
   try {
-    loading.value = true;
-    const response = await axiosInstance.get("/api/banners");
-    listadoBanners.value = response.data;
+    const response = await axiosInstance.get("/api/pages");
+    listadoPages.value = response.data.data;
   } catch (error) {
     console.log(error);
   } finally {
     loading.value = false;
   }
 };
-const openEditModal = (banner) => {
-  if (editarBannerRef.value) {
-    editarBannerRef.value.openModal(banner);
-  }
-};
 
-const getImageUrl = (imagePath) => {
-  return `${import.meta.env.VITE_APP_API_BASE_URL}${imagePath}`;
-};
 
-const eliminarBanner = async (banner) => {
+const deletePages = async (page) => {
   try {
     const result = await Swal.fire({
-      title: "¿Estás seguro que desea eliminar el banner?",
+      title: "¿Estás seguro que desea eliminar la página?",
       text: "¡Esta acción no podrá ser revertida!",
       icon: "warning",
       showCancelButton: true,
@@ -152,18 +164,44 @@ const eliminarBanner = async (banner) => {
       cancelButtonColor: "#d63939",
       cancelButtonText: "No, cancelar",
     });
+
     if (result.isConfirmed) {
+      const loadingSwal = Swal.fire({
+        title: 'Procesando...',
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        text: 'Eliminando la página, por favor espera...',
+        allowOutsideClick: false,
+      });
+
+      // Llamar a la API para eliminar la página
+      await axiosInstance.delete("/api/pages/" + page.id);
+
+      // Cerrar el Swal de carga
+      loadingSwal.close();
+
+      // Mostrar mensaje de éxito
       await Swal.fire({
-        title: "Banner eliminado!",
+        title: "Página eliminada!",
         icon: "success",
         confirmButtonColor: "#004693",
         confirmButtonText: "Cerrar",
       });
-      await axiosInstance.delete("/api/banners/" + banner.id);
-      listarDatos();
+
+      await listarDatos();
     }
   } catch (error) {
     console.log(error);
+    // Manejo de errores
+    Swal.fire({
+      title: "Error",
+      text: "Ocurrió un error al eliminar la página.",
+      icon: "error",
+      confirmButtonColor: "#004693",
+      confirmButtonText: "Cerrar",
+    });
   }
 };
 </script>

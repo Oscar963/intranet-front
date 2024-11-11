@@ -110,7 +110,6 @@ const logout = async () => {
 
     } finally { }
 };
-
 </script>
 <style scoped>
 .navbar-brand-image {

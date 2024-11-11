@@ -13,6 +13,7 @@
     "@casl/ability": "^6.7.1",
     "@casl/vue": "^2.2.2",
     "@ckeditor/ckeditor5-vue": "^7.2.0",
+    "@vuepic/vue-datepicker": "^10.0.0",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "ckeditor5": "^43.3.0",

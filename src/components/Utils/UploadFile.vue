@@ -38,21 +38,7 @@ const submitFile = () => {
         const formData = new FormData();
         formData.append('file', file.value);
         formData.append('name', fileName.value);
-        formData.append('idPage', props.idPage); // Añadir idPage al FormData
-
-        // Aquí puedes hacer la solicitud HTTP para subir el archivo
-        // Ejemplo usando Axios:
-        // axios.post('/upload', formData)
-        //   .then(response => {
-        //     console.log('Archivo subido:', response.data);
-        //   })
-        //   .catch(error => {
-        //     console.error('Error al subir el archivo:', error);
-        //   });
-
-        console.log('Archivo:', file.value);
-        console.log('Nombre del archivo:', fileName.value);
-        console.log('ID de la página:', props.idPage); // Imprimir idPage
+        formData.append('idPage', props.idPage);
     }
 };
 </script>
