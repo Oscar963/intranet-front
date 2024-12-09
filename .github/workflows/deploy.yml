@@ -3,7 +3,7 @@ name: Deploy Vue.js App to cPanel
 on:
   push:
     branches:
-      - main # Cambia a la rama que desees implementar
+      - main # Cambia a la rama que deseas monitorear para el despliegue
 
 jobs:
   deploy:
@@ -13,16 +13,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install dependencies and build
+    - name: Install dependencies and build project
       run: |
         npm install
         npm run build
 
+    - name: Clean server directory
+      run: |
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa usuario_cpanel@cpanel.example.com "rm -rf /home/usuario/public_html/*"
+
     - name: Deploy to cPanel
       uses: appleboy/scp-action@v0.2.1
       with:
-        host: cpanel.example.com # Cambia a tu dominio o IP del servidor cPanel
+        host: cpanel.example.com # Cambia por tu dominio o IP
         username: usuario_cpanel # Tu usuario de cPanel
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        target: /home/usuario/public_html/ # Asegúrate de que apunta a public_html
-        source: ./dist/ # Solo sube la carpeta dist
+        target: /home/usuario/public_html/
+        source: ./dist/
