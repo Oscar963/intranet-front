@@ -1,0 +1,21 @@
+---
+deployment:
+  tasks:
+    - export DEPLOY_PATH=/home/usuario/public_html # Cambia "usuario" por tu usuario de cPanel
+    - echo "Iniciando despliegue en $DEPLOY_PATH"
+
+    # Paso 1: Instalar dependencias
+    - /opt/cpanel/ea-nodejs18/bin/npm install --prefix=$PWD
+
+    # Paso 2: Construir el proyecto
+    - /opt/cpanel/ea-nodejs18/bin/npm run build --prefix=$PWD
+
+    # Paso 3: Limpiar contenido antiguo en public_html
+    - rm -rf $DEPLOY_PATH/*
+
+    # Paso 4: Copiar los archivos construidos de la carpeta dist
+    - cp -r $PWD/dist/* $DEPLOY_PATH/
+
+    # Paso 5: Permisos correctos para public_html
+    - chmod -R 755 $DEPLOY_PATH
+    - echo "¡Despliegue completado con éxito!"
