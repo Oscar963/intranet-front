@@ -1,8 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOY_PATH=/home/usuario/public_html # Cambia "usuario" por tu usuario de cPanel
+    - export DEPLOY_PATH=/home/devima/public_html # Cambia "usuario" por tu usuario de cPanel
     - echo "Iniciando despliegue en $DEPLOY_PATH"
-
-    # Paso 3: Limpiar contenido antiguo en public_html
-    - rm -rf $DEPLOY_PATH/*
