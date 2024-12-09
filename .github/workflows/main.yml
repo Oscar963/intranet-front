@@ -1,0 +1,28 @@
+name: Deploy Vue.js App to cPanel
+
+on:
+  push:
+    branches:
+      - main # Cambia a la rama que desees implementar
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies and build
+      run: |
+        npm install
+        npm run build
+
+    - name: Deploy to cPanel
+      uses: appleboy/scp-action@v0.2.1
+      with:
+        host: cpanel.example.com # Cambia a tu dominio o IP del servidor cPanel
+        username: usuario_cpanel # Tu usuario de cPanel
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        target: /home/usuario/public_html/ # Asegúrate de que apunta a public_html
+        source: ./dist/ # Solo sube la carpeta dist
