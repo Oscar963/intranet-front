@@ -23,7 +23,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa devima@cpanel.example.com "rm -rf /home/devima/public_html/*"
 
     - name: Deploy to cPanel
-      uses: appleboy/scp-action@master
+      uses: appleboy/scp-action@v0.1.7
       with:
         host: dev.imaarica.cl # Cambia por tu dominio o IP
         username: devima # Tu usuario de cPanel
