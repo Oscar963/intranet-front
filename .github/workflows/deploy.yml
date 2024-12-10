@@ -16,4 +16,4 @@ jobs:
         server: dev.imaarica.cl
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /home/devima/public_html
+        server-dir: /home/devima/public_html/
