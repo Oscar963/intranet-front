@@ -20,13 +20,13 @@ jobs:
 
     - name: Clean server directory
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa usuario_cpanel@cpanel.example.com "rm -rf /home/usuario/public_html/*"
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa devima@cpanel.example.com "rm -rf /home/devima/public_html/*"
 
     - name: Deploy to cPanel
       uses: appleboy/scp-action@v0.2.1
       with:
-        host: cpanel.example.com # Cambia por tu dominio o IP
-        username: usuario_cpanel # Tu usuario de cPanel
+        host: dev.imaarica.cl # Cambia por tu dominio o IP
+        username: devima # Tu usuario de cPanel
         key: ${{ secrets.CPANEL_SSH_KEY }}
-        target: /home/usuario/public_html/
+        target: /home/devima/public_html/
         source: ./dist/
