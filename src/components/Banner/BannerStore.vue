@@ -74,9 +74,9 @@
                                         <div class="mb-3">
                                             <div class="form-label required">Fecha Expiración</div>
                                             <VueDatePicker v-model="date_expiration"
-                                                :class="{ 'is-invalid': validationErrors.date_expiration }" format="dd/MM/yyyy HH:mm" 
-                                                :format-locale="es" cancel-text="Cerrar" auto-apply
-                                                select-text="Seleccionar">
+                                                :class="{ 'is-invalid': validationErrors.date_expiration }"
+                                                format="dd/MM/yyyy HH:mm" :format-locale="es" cancel-text="Cerrar"
+                                                auto-apply select-text="Seleccionar">
                                             </VueDatePicker>
 
                                             <!-- Mostrar mensaje de error si existe -->
