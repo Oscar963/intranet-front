@@ -24,7 +24,3 @@ jobs:
         password: ${{ secrets.ftp_password }}
         local-dir: ./dist
         server-dir: ./dist/
-        exclude: |
-          **/*
-        include: |
-          ./dist/** # Incluye solo la carpeta dist y su contenido
