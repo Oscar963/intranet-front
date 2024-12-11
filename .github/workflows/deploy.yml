@@ -15,10 +15,6 @@ jobs:
       run: |
         npm install
         npm run build
-
-        
-    - name: Clean server directory
-      run: sshpass -p "${{ secrets.ftp_password }}" ssh -o StrictHostKeyChecking=no ${{ secrets.ftp_username }}@dev.imaarica.cl "rm -rf /home/devima/public_html/*"        
     
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -26,4 +22,9 @@ jobs:
         server: dev.imaarica.cl
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
+        local-dir: ./dist
         server-dir: ./dist/
+        exclude: |
+          **/*
+        include: |
+          ./dist/** # Incluye solo la carpeta dist y su contenido
