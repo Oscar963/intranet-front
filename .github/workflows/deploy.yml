@@ -5,7 +5,7 @@ on:
 name: 🚀 Despliege website on push
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Despliege
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
