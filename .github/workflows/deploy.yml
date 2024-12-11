@@ -2,10 +2,10 @@ on:
   push:
     branches:
       - main
-name: 🚀 Despliege website on push
+name: 🚀 Despliege sitioweb on push
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Despliege
     runs-on: ubuntu-latest
     steps:
     - name: 🚚 Get latest code
