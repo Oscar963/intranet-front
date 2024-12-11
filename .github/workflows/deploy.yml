@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-name: 🚀 Despliege website on push
+name: 🚀 Despliege sitioweb on push
 jobs:
   web-deploy:
     name: 🎉 Despliege
