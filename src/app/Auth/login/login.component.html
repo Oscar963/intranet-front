@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+  <body class="d-flex flex-column bg-white">
+    <div class="row g-0 flex-fill">
+      <div
+        class="col-12 col-lg-6 col-xl-4 border-top-wide border-primary d-flex flex-column justify-content-center"
+      >
+        <div class="container container-tight my-5 px-lg-5">
+          <h2 class="h2 text-center">Iniciar Sesión</h2>
+          <form [formGroup]="form" (ngSubmit)="login()">
+            <div class="mb-2">
+              @if(errorMessage){
+              <div
+                class="alert alert-important alert-danger alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon alert-icon"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <div [innerHTML]="errorMessage" class="ms-1"></div>
+                  </div>
+                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
+              </div>
+              } @if(successMessage){
+              <div
+                class="alert alert-important alert-success alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l5 5l10 -10" />
+                    </svg>
+                  </div>
+                  <span class="ms-1">{{ successMessage }}</span>
+                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
+              </div>
+              }
+              <label for="label-rut" class="form-label">Rut (12345678-K)</label>
+              <input
+                formControlName="rut"
+                type="text"
+                class="form-control"
+                placeholder="12345678-K"
+                id="label-rut"
+                [class.is-invalid]="
+                  form.get('rut')?.invalid &&
+                  (form.get('rut')?.touched || form.get('rut')?.dirty)
+                "
+                [class.is-valid]="
+                  form.get('rut')?.valid &&
+                  (form.get('rut')?.touched || form.get('rut')?.dirty)
+                "
+              />
+              @if(form.get('rut')?.invalid && form.get('rut')?.touched ||
+              form.get('rut')?.dirty){
+              @if(form.get('rut')?.hasError('required')){
+              <span class="invalid-input">El rut es obligatorio</span>
+              } @if(form.get('rut')?.hasError('pattern')){
+              <span class="invalid-input">
+                El formato del RUT es inválido.</span
+              >
+              } @if(form.get('rut')?.hasError('invalidRut')){
+              <span class="invalid-input">El RUT ingresado no es válido.</span>
+              } } @else {
+              <span class="invalid-input">&nbsp;</span>
+              }
+            </div>
+            <div class="mb-2">
+              <label for="label-password" class="form-label"
+                >Contraseña
+                <span class="form-label-description">
+                  <a [routerLink]="['/forgot-password']"
+                    >Olvidé mi contraseña</a
+                  >
+                </span>
+              </label>
+              <div class="row g-2">
+                <div class="col">
+                  <input
+                    formControlName="password"
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-control"
+                    id="label-password"
+                    [class.is-invalid]="
+                      form.get('password')?.invalid &&
+                      (form.get('password')?.touched ||
+                        form.get('password')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('password')?.valid &&
+                      (form.get('password')?.touched ||
+                        form.get('password')?.dirty)
+                    "
+                  />
+                  @if(form.get('password')?.invalid &&
+                  form.get('password')?.touched || form.get('password')?.dirty){
+                  @if(form.get('password')?.hasError('required')){
+                  <span class="invalid-input"
+                    >La contraseña es obligatoria.</span
+                  >
+                  } } @else {
+                  <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+                <div class="col-auto">
+                  <a
+                    (click)="toggleShowPassword()"
+                    title="Mostrar contraseña"
+                    class="btn btn-icon"
+                    aria-label="Button"
+                  >
+                    @if(showPassword){
+                    <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                      <path
+                        d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+                      />
+                    </svg>
+                    } @if(!showPassword){
+                    <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-eye-closed"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path
+                        d="M21 9c-2.4 2.667 -5.4 4 -9 4c-3.6 0 -6.6 -1.333 -9 -4"
+                      />
+                      <path d="M3 15l2.5 -3.8" />
+                      <path d="M21 14.976l-2.492 -3.776" />
+                      <path d="M9 17l.5 -4" />
+                      <path d="M15 17l-.5 -4" />
+                    </svg>
+                    }
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-check">
+                <input
+                  formControlName="remember"
+                  type="checkbox"
+                  class="form-check-input"
+                />
+                <span class="form-check-label"
+                  >Recordarme en este dispositivo</span
+                >
+              </label>
+            </div>
+            <div class="form-footer">
+              @if(loading){
+              <button type="button" class="btn btn-primary w-100" disabled>
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                Cargando...
+              </button>
+              } @else {
+              <button
+                type="submit"
+                [disabled]="form.invalid"
+                class="btn btn-primary w-100"
+              >
+                Iniciar Sesión
+              </button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="container-logo col-12 col-lg-6 col-xl-8 d-none d-lg-block">
+        <img src="/assets/img/logos/logo-blanco.png" alt="Logo-muniarica" />
+      </div>
+    </div>
+  </body>
+</html>
