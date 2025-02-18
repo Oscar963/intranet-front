@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,7 +7,7 @@ import {
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 @Component({
@@ -24,6 +24,10 @@ export class ResetPasswordComponent {
   public token: string = '';
   public email: string = '';
 
+  public authService = inject(AuthService);
+
+  constructor(private route: ActivatedRoute) {}
+
   form: FormGroup = new FormGroup(
     {
       password: new FormControl('', [
@@ -31,16 +35,10 @@ export class ResetPasswordComponent {
         Validators.minLength(8),
         this.passwordValidator(),
       ]),
-
       password_confirmation: new FormControl('', [Validators.required]),
     },
     { validators: this.passwordsMatch.bind(this) }
   );
-
-  constructor(
-    private authService: AuthService,
-    private route: ActivatedRoute
-  ) {}
 
   resetPassword(): void {
     this.loading = true;
@@ -77,7 +75,7 @@ export class ResetPasswordComponent {
       });
   }
 
-  public toggleShowPassword(): void {
+  toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
   }
 
@@ -115,17 +113,8 @@ export class ResetPasswordComponent {
       // Validar que la contraseña tenga al menos un carácter especial
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-      // Validar que la contraseña tenga una longitud mínima de 8 caracteres
-      const isValidLength = password.length >= 8;
-
       // Verificar que todas las condiciones se cumplan
-      if (
-        hasUpperCase &&
-        hasLowerCase &&
-        hasNumber &&
-        hasSpecialChar &&
-        isValidLength
-      ) {
+      if (hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
         return null; // Si la contraseña cumple con todos los requisitos, es válida
       } else {
         return {

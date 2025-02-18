@@ -44,37 +44,6 @@
                   aria-label="close"
                 ></a>
               </div>
-              } @if(successMessage){
-              <div
-                class="alert alert-important alert-success alert-dismissible"
-                role="alert"
-              >
-                <div class="d-flex">
-                  <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="icon icon-tabler icons-tabler-outline icon-tabler-check"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M5 12l5 5l10 -10" />
-                    </svg>
-                  </div>
-                  <span class="ms-1">{{ successMessage }}</span>
-                </div>
-                <a
-                  class="btn-close btn-close-white"
-                  data-bs-dismiss="alert"
-                  aria-label="close"
-                ></a>
-              </div>
               }
               <label for="label-rut" class="form-label">Rut (12345678-K)</label>
               <input
@@ -95,13 +64,9 @@
               @if(form.get('rut')?.invalid && form.get('rut')?.touched ||
               form.get('rut')?.dirty){
               @if(form.get('rut')?.hasError('required')){
-              <span class="invalid-input">El rut es obligatorio</span>
-              } @if(form.get('rut')?.hasError('pattern')){
-              <span class="invalid-input">
-                El formato del RUT es inválido.</span
-              >
-              } @if(form.get('rut')?.hasError('invalidRut')){
-              <span class="invalid-input">El RUT ingresado no es válido.</span>
+              <span class="invalid-input">El rut es obligatorio.</span>
+              } @else if(form.get('rut')?.hasError('invalidRut')){
+              <span class="invalid-input">El rut ingresado no es válido.</span>
               } } @else {
               <span class="invalid-input">&nbsp;</span>
               }

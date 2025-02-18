@@ -1,11 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-dashboard',
   imports: [],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
+  private notificationService = inject(NotificationService);
+  public successMessage: string | null = null;
 
+  ngOnInit() {
+    // Escuchar mensajes de éxito y error
+    this.notificationService.successMessage$.subscribe(
+      (message) => (this.successMessage = message)
+    );
+  }
 }

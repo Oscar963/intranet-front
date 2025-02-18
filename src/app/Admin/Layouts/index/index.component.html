@@ -1,1 +1,7 @@
-<p>index  admin works!</p>
+<div class="page">
+  <app-header [user]="user" [nameAvatar]="nameAvatar" />
+  <app-navbar />
+  <div class="page-wrapper">
+    <router-outlet />
+  </div>
+</div>

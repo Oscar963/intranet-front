@@ -1,3 +1,7 @@
+header {
+  height: 50px;
+}
+
 .img-logo-desktop {
   max-width: 255px;
   height: auto;

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { Component, inject, OnInit } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
 import {
   AbstractControl,
   FormControl,
@@ -18,66 +18,55 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
+  public authService = inject(AuthService);
+  public router = inject(Router);
+
   public loading: boolean = false;
   public validationErrors: string[] = [];
   public showPassword: boolean = false;
   public errorMessage: string = '';
   public successMessage: string = '';
 
-  form: FormGroup = new FormGroup({
-    rut: new FormControl('68243787-1', [
-      Validators.required,
-      Validators.pattern(/^[0-9]{7,8}-[0-9Kk]{1}$/),
-      RutValidator,
-    ]),
+  form = new FormGroup({
+    rut: new FormControl('68243787-1', [Validators.required, RutValidator]),
     password: new FormControl('password123', [Validators.required]),
     remember: new FormControl(false),
   });
 
-  constructor(private authService: AuthService, private router: Router) {}
-
-  public login() {
-    if (this.form.invalid) {
-      // Si el formulario es inválido, mostramos errores de validación
+  login(): void {
+    if (this.form.valid) {
+      this.loading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
       this.validationErrors = [];
-      if (this.form.controls['rut'].errors) {
-        this.validationErrors.push('El RUT es inválido.');
-      }
-      if (this.form.controls['password'].errors) {
-        this.validationErrors.push('La contraseña es demasiado corta.');
-      }
-      return;
+
+      this.authService.getCsrfCookie().subscribe(() => {
+        this.authService
+          .login(
+            this.form.value.rut ?? '',
+            this.form.value.password ?? '',
+            this.form.value.remember ?? false
+          )
+          .subscribe({
+            next: (response: string) => {
+              this.loading = false;
+              this.successMessage = response;
+              this.router.navigate(['/admin/dashboard']);
+            },
+            error: (error) => {
+              this.loading = false;
+              if (error.status === 422) {
+                this.errorMessage = this.processErrors(error.error.errors);
+              } else {
+                this.errorMessage = error;
+              }
+            },
+          });
+      });
     }
-
-    this.loading = true;
-    this.validationErrors = [];
-
-    this.authService.getCsrfCookie().subscribe(() => {
-      this.authService
-        .login({
-          rut: this.form.value.rut,
-          password: this.form.value.password,
-          remember: this.form.value.remember,
-        })
-        .subscribe({
-          next: (response: string) => {
-            this.loading = false;
-            this.successMessage = response;
-            this.router.navigate(['/admin/dashboard']);
-          },
-          error: (error) => {
-            this.loading = false;
-            if (error.status === 422) {
-              this.errorMessage = this.processErrors(error.error.errors);
-            } else {
-              this.errorMessage = error.error;
-            }
-          },
-        });
-    });
   }
 
-  public toggleShowPassword(): void {
+  toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
   }
 

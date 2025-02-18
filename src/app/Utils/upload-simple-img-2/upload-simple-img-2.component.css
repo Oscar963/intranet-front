@@ -1,0 +1,17 @@
+.dropzone.dz-clickable {
+    cursor: pointer;
+  }
+  
+  .dropzone {
+    border: 1px dashed #dce1e7;
+    color: #6c7a91;
+    padding: 1rem;
+    min-height: 150px;
+    border-radius: 5px;
+    transition: border-color 0.3s ease; /* Transición para el color del borde */
+  }
+  
+  .dropzone:hover {
+    border: 1px dashed #006bd2;
+  }
+  
