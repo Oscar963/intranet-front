@@ -49,6 +49,7 @@ export class NavbarComponent {
         next: (response) => {
           if (!response || response.length === 0) {
             this.successMessage = 'No se encontraron resultados';
+            this.files = [];
           } else {
             this.files = response;
             this.successMessage = ''; // Limpiar mensaje si hay resultados

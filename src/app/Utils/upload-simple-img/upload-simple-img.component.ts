@@ -50,13 +50,13 @@ export class UploadSimpleImgComponent {
   }
 
   // Exponer el archivo seleccionado
-  getFile(): File | null {
+  public getFile(): File | null {
     const acceptedFiles = this.dropzoneInstance.getAcceptedFiles();
     return acceptedFiles.length > 0 ? acceptedFiles[0] : null;
   }
 
   // Eliminar todos los archivos del Dropzone
-  removeAllFiles(): void {
+  public removeAllFiles(): void {
     this.dropzoneInstance.removeAllFiles();
   }
 }

@@ -144,6 +144,8 @@ export class IndexFileComponent implements OnInit {
 
   onChange(e: any) {
     this.show = e.target.value;
+    this.router.navigate(['admin/files/page', 1]);
+    this.currentPage = 1
     this.loadFiles(this.currentPage, this.show);
   }
 

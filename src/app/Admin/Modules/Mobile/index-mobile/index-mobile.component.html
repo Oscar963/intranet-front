@@ -1,0 +1,305 @@
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <!-- Page pre-title -->
+        <div class="page-pretitle">Módulo</div>
+        <h2 class="page-title">Móvil</h2>
+      </div>
+      <!-- Page title actions -->
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <app-import-mobile />
+          <a
+            [routerLink]="['/admin/mobiles/store']"
+            class="btn btn-primary d-none d-sm-inline-block"
+          >
+            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M12 5l0 14"></path>
+              <path d="M5 12l14 0"></path>
+            </svg>
+            Nuevo Móvil
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Content here -->
+    <div class="row row-cards">
+      <div class="col-12">
+        @if(successMessage){
+        <div
+          class="alert alert-important alert-success alert-dismissible"
+          role="alert"
+        >
+          <div class="d-flex">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12l5 5l10 -10" />
+              </svg>
+            </div>
+            <span class="ms-1">{{ successMessage }}</span>
+          </div>
+          <a
+            class="btn-close btn-close-white"
+            data-bs-dismiss="alert"
+            aria-label="close"
+          ></a>
+        </div>
+        }
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Listado de Móviles</h3>
+          </div>
+          <div class="card-body border-bottom py-3">
+            <form [formGroup]="form">
+              <div class="d-flex">
+                <div class="text-secondary">
+                  Mostrar
+                  <div class="mx-2 d-inline-block">
+                    <select
+                      formControlName="show"
+                      (change)="onChange($event)"
+                      class="form-select form-select-sm"
+                    >
+                      @for( value of values; track value.value; let idx =
+                      $index) {
+                      <option value="{{ value.value }}">
+                        {{ value.label }}
+                      </option>
+                      }
+                    </select>
+                  </div>
+                  Registros
+                </div>
+                <div class="ms-auto text-secondary">
+                  Buscar:
+                  <div class="ms-2 d-inline-block">
+                    <input type="text" class="form-control form-control-sm" />
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          @if(loading){
+          <div class="progress progress-sm">
+            <div class="progress-bar progress-bar-indeterminate"></div>
+          </div>
+          }
+          <div class="table-responsive">
+            <table class="table card-table text-nowrap table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Número</th>
+                  <th>Oficina</th>
+                  <th>Dirección</th>
+                  <th>Persona</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody class="align-middle">
+                @if(loading){
+                <tr>
+                  <td colspan="8" class="text-secondary text-center">
+                    Cargando datos...
+                  </td>
+                </tr>
+                } @else if (!mobiles.length) {
+                <tr>
+                  <td colspan="8" class="text-secondary text-center">
+                    No se encontraron registros
+                  </td>
+                </tr>
+                } @else { @for (item of mobiles; track item.id) {
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td>
+                    <span class="text-secondary">{{
+                      item.number
+                    }}</span>
+                  </td>
+                  <td>
+                    <span class="text-secondary">{{ item.office }}</span>
+                  </td>
+                  <td>
+                    <span class="text-secondary">{{ item.direction }}</span>
+                  </td>
+                  <td>
+                    <span class="text-secondary">{{ item.person }}</span>
+                  </td>
+                  <td>
+                    <a
+                      class="text-dark px-1 cursor-pointer"
+                      aria-label="Button"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="Editar"
+                      [routerLink]="['/admin/mobiles/update/' + item.id]"
+                    >
+                      <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-edit"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path
+                          d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"
+                        />
+                        <path
+                          d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"
+                        />
+                        <path d="M16 5l3 3" />
+                      </svg>
+                    </a>
+                    <a
+                      class="text-dark px-1 cursor-pointer"
+                      data-bs-toggle="tooltip" 
+                      data-bs-placement="top"
+                      title="Eliminar"
+                      (click)="deleteItem(item.id)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon icon-tabler icons-tabler-outline icon-tabler-trash"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M4 7l16 0" />
+                        <path d="M10 11l0 6" />
+                        <path d="M14 11l0 6" />
+                        <path
+                          d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"
+                        />
+                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+                } }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer d-flex align-items-center">
+            <p class="m-0 text-secondary">
+              Mostrando <span>{{ meta.from }}</span> a
+              <span>{{ meta.to }}</span> de
+              <span>{{ meta.total }}</span> registros
+            </p>
+            <ul class="pagination m-0 ms-auto">
+              <!-- Botón anterior -->
+              <li class="page-item" [class.disabled]="!links.prev">
+                <button
+                  class="page-link"
+                  (click)="goToPage(meta.current_page - 1)"
+                  [attr.aria-disabled]="!links.prev"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M15 6l-6 6l6 6"></path>
+                  </svg>
+                  prev
+                </button>
+              </li>
+
+              <!-- Enlaces de páginas -->
+              @for( page of meta.links; track page.id; let idx = $index) {
+              <li class="page-item" [class.active]="page.active">
+                <a
+                  class="page-link"
+                  (click)="goToPage(page.page)"
+                  [innerHTML]="page.label"
+                  href="javascript:void(0)"
+                ></a>
+              </li>
+              }
+              <!-- Botón siguiente -->
+              <li class="page-item" [class.disabled]="!links.next">
+                <a
+                  class="page-link"
+                  (click)="goToPage(meta.current_page + 1)"
+                  [attr.aria-disabled]="!links.next"
+                  href="javascript:void(0)"
+                >
+                  next
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M9 6l6 6l-6 6"></path>
+                  </svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

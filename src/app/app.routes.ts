@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  /** Web Routes **/
   {
     path: '',
     loadComponent: () =>
@@ -18,6 +19,7 @@ export const routes: Routes = [
     ],
   },
 
+  /** Admin Routes **/
   {
     path: 'admin',
     loadComponent: () =>
@@ -33,6 +35,8 @@ export const routes: Routes = [
             (m) => m.DashboardComponent
           ),
       },
+
+      /** Banner Routes **/
       {
         path: 'banners',
         loadComponent: () =>
@@ -61,6 +65,8 @@ export const routes: Routes = [
             './Admin/Modules/Banner/update-banner/update-banner.component'
           ).then((m) => m.UpdateBannerComponent),
       },
+
+      /** PopUp Routes **/
       {
         path: 'popups',
         loadComponent: () =>
@@ -90,6 +96,7 @@ export const routes: Routes = [
           ).then((m) => m.UpdatePopupComponent),
       },
 
+      /** Page Routes **/
       {
         path: 'pages',
         loadComponent: () =>
@@ -119,6 +126,7 @@ export const routes: Routes = [
           ),
       },
 
+      /** User Routes **/
       {
         path: 'users',
         loadComponent: () =>
@@ -162,6 +170,7 @@ export const routes: Routes = [
           ).then((m) => m.UpdatePasswordComponent),
       },
 
+      /** File Routes **/
       {
         path: 'files/:idpage',
         loadComponent: () =>
@@ -182,6 +191,66 @@ export const routes: Routes = [
           import('./Admin/Modules/File/store-file/store-file.component').then(
             (m) => m.StoreFileComponent
           ),
+      },
+
+      /** Anexo Routes **/
+      {
+        path: 'anexos',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Anexo/index-anexo/index-anexo.component'
+          ).then((m) => m.IndexAnexoComponent),
+      },
+      {
+        path: 'anexos/page/:page',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Anexo/index-anexo/index-anexo.component'
+          ).then((m) => m.IndexAnexoComponent),
+      },
+      {
+        path: 'anexos/store',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Anexo/store-anexo/store-anexo.component'
+          ).then((m) => m.StoreAnexoComponent),
+      },
+      {
+        path: 'anexos/update/:id',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Anexo/update-anexo/update-anexo.component'
+          ).then((m) => m.UpdateAnexoComponent),
+      },
+
+      /** Mobile Routes **/
+      {
+        path: 'mobiles',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Mobile/index-mobile/index-mobile.component'
+          ).then((m) => m.IndexMobileComponent),
+      },
+      {
+        path: 'mobiles/page/:page',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Mobile/index-mobile/index-mobile.component'
+          ).then((m) => m.IndexMobileComponent),
+      },
+      {
+        path: 'mobiles/store',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Mobile/store-mobile/store-mobile.component'
+          ).then((m) => m.StoreMobileComponent),
+      },
+      {
+        path: 'mobiles/update/:id',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Mobile/update-mobile/update-mobile.component'
+          ).then((m) => m.UpdateMobileComponent),
       },
     ],
   },

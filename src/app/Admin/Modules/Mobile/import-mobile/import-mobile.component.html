@@ -1,0 +1,207 @@
+<div class="dropdown">
+  <button
+    type="button"
+    class="btn btn-success dropdown-toggle"
+    data-bs-toggle="dropdown"
+  >
+    @if(loading){
+    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+    } @else {
+    <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-table-import"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path
+        d="M12 21h-7a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v8"
+      />
+      <path d="M3 10h18" />
+      <path d="M10 3v18" />
+      <path d="M19 22v-6" />
+      <path d="M22 19l-3 -3l-3 3" />
+    </svg>
+    } Datos
+  </button>
+  <div class="dropdown-menu">
+    <a
+      href="#"
+      data-bs-toggle="modal"
+      data-bs-target="#modal-import"
+      class="dropdown-item"
+      href="#"
+    >
+      Importar
+    </a>
+    <button class="dropdown-item" (click)="exportMobiles()">Exportar</button>
+  </div>
+</div>
+
+<div
+  class="modal modal-blur fade"
+  id="modal-import"
+  tabindex="-1"
+  style="display: none"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Importar Móviles</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      @if(loading){
+      <div class="progress progress-sm">
+        <div class="progress-bar progress-bar-indeterminate"></div>
+      </div>
+      }
+      <div class="modal-body">
+        @if(successMessage){
+        <div
+          class="alert alert-important alert-success alert-dismissible"
+          role="alert"
+        >
+          <div class="d-flex">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 12l5 5l10 -10" />
+              </svg>
+            </div>
+            <span class="ms-1">{{ successMessage }}</span>
+          </div>
+          <a
+            class="btn-close btn-close-white"
+            data-bs-dismiss="alert"
+            aria-label="close"
+          ></a>
+        </div>
+        } @if(errorMessage){
+        <div
+          class="alert alert-important alert-danger alert-dismissible"
+          role="alert"
+        >
+          <div class="d-flex">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon alert-icon"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <circle cx="12" cy="12" r="9"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div>
+              <div [innerHTML]="errorMessage" class="ms-1"></div>
+            </div>
+          </div>
+          <a
+            class="btn-close btn-close-white"
+            data-bs-dismiss="alert"
+            aria-label="close"
+          ></a>
+        </div>
+        }
+        <div class="mb-3">
+          <label class="form-label">Seleccionar un archivo</label>
+          <input
+            (change)="onFileSelected($event)"
+            class="form-control"
+            type="file"
+            accept=".csv, .xlsx"
+          />
+          <div class="mb-3">
+            <p>
+              <a href="/assets/templates/plantilla_mobiles.xlsx" download
+                >Descargar plantilla</a
+              >
+              (Fila N°2, es un ejemplo)
+            </p>
+          </div>
+        </div>
+
+        @if(uploadProgress > 0){
+        <div class="progressbg">
+          <div class="progress">
+            <div
+              class="progress-bar progress-bar-striped progress-bar-animated"
+              [style.width.%]="uploadProgress"
+            ></div>
+          </div>
+          <div class="progressbg-value">{{ uploadProgress }}</div>
+        </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#"
+          class="btn btn-link link-secondary btn-3"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </a>
+        @if(selectedFile){
+        <button
+          (click)="onSubmit()"
+          [disabled]="isUploading"
+          class="btn btn-primary btn-5 ms-auto"
+        >
+          <!-- Download SVG icon from http://tabler.io/icons/icon/plus -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-upload"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+            <path d="M7 9l5 -5l5 5" />
+            <path d="M12 4l0 12" />
+          </svg>
+          Importar
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

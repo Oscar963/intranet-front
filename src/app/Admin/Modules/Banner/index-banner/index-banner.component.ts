@@ -143,6 +143,8 @@ export class IndexBannerComponent implements OnInit {
 
   onChange(e: any) {
     this.show = e.target.value;
+    this.router.navigate(['admin/banners/page', 1]);
+    this.currentPage = 1
     this.loadBanners(this.currentPage, this.show);
   }
 

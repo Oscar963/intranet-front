@@ -1,46 +1,35 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { UserService } from '../../../../core/services/user.service';
-import { User } from '../../../../interface/User';
+import { AnexoService } from '../../../../core/services/anexo.service';
+import { Anexo } from '../../../../interface/Anexo';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NotificationService } from '../../../../core/services/notification.service';
 import Swal from 'sweetalert2';
-import { AuthService } from '../../../../core/services/auth.service';
+import { ImportAnexoComponent } from '../import-anexo/import-anexo.component';
 
 @Component({
-  selector: 'app-index-user',
-  imports: [RouterLink, ReactiveFormsModule],
-  templateUrl: './index-user.component.html',
-  styleUrl: './index-user.component.css',
+  selector: 'app-index-anexo',
+  imports: [RouterLink, ReactiveFormsModule, ImportAnexoComponent],
+  templateUrl: './index-anexo.component.html',
+  styleUrl: './index-anexo.component.css',
 })
-export class IndexUserComponent implements OnInit {
-  private userService = inject(UserService);
+export class IndexAnexoComponent {
+  private anexoService = inject(AnexoService);
   private notificationService = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private authService = inject(AuthService);
 
   public errorMessage: string = '';
   public successMessage: string | null = null;
 
-  public users: User[] = [];
+  public anexos: Anexo[] = [];
   public show: number = 15;
   public meta: any = {};
   public links: any = {};
   public loading: boolean = false;
   public currentPage: number = 1;
 
-  public user: User = {
-    id: 0,
-    name: '',
-    paternal_surname: '',
-    maternal_surname: '',
-    rut: '',
-    email: '',
-    status: 0,
-  };
-
-  public values = [
+  values = [
     { value: '15', label: '15' },
     { value: '50', label: '50' },
     { value: '100', label: '100' },
@@ -52,17 +41,6 @@ export class IndexUserComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.authService.getUserObservable().subscribe({
-      next: (user) => {
-        this.user = user; 
-        this.loading = false; 
-      },
-      error: (error) => {
-        console.error('Error al obtener el usuario:', error);
-        this.loading = false;
-      },
-    });
-
     // Escuchar mensajes de éxito y error
     this.notificationService.successMessage$.subscribe(
       (message) => (this.successMessage = message)
@@ -71,16 +49,16 @@ export class IndexUserComponent implements OnInit {
     this.route.params.subscribe((params) => {
       const page = +params['page'] || 1;
       this.currentPage = page;
-      this.loadUsers(this.currentPage, this.show);
+      this.loadAnexos(this.currentPage, this.show);
     });
   }
 
-  loadUsers(page: number, show: number): void {
+  loadAnexos(page: number, show: number): void {
     this.loading = true;
 
-    this.userService.fetchUsers(page, show).subscribe({
+    this.anexoService.fetchAnexos(page, show).subscribe({
       next: (response) => {
-        this.users = response.data.data;
+        this.anexos = response.data.data;
         this.meta = {
           current_page: response.data.meta.current_page,
           last_page: response.data.meta.last_page,
@@ -102,7 +80,7 @@ export class IndexUserComponent implements OnInit {
         };
       },
       error: (error) => {
-        console.error('Error al obtener los usuarios:', error);
+        console.error('Error al obtener los anexos:', error);
       },
       complete: () => {
         this.loading = false;
@@ -112,13 +90,13 @@ export class IndexUserComponent implements OnInit {
 
   goToPage(page: number | null): void {
     if (page && page > 0 && page <= this.meta.last_page) {
-      this.router.navigate(['admin/users/page', page]);
+      this.router.navigate(['admin/anexos/page', page]);
     }
   }
 
   deleteItem(id: number) {
     Swal.fire({
-      title: '¿Estás seguro que desea eliminar el usuario?',
+      title: '¿Estás seguro que desea eliminar el anexo?',
       text: '¡Esta acción no podrá ser revertida!',
       icon: 'warning',
       showCancelButton: true,
@@ -137,7 +115,7 @@ export class IndexUserComponent implements OnInit {
           },
         });
 
-        this.userService.deleteUser(id).subscribe({
+        this.anexoService.deleteAnexo(id).subscribe({
           next: (success: string) => {
             Swal.close();
             Swal.fire({
@@ -147,7 +125,7 @@ export class IndexUserComponent implements OnInit {
               confirmButtonColor: '#06048c',
               confirmButtonText: 'Cerrar',
             });
-            this.loadUsers(this.currentPage, this.show);
+            this.loadAnexos(this.currentPage, this.show);
           },
           error: (error) => {
             Swal.close();
@@ -166,9 +144,9 @@ export class IndexUserComponent implements OnInit {
 
   onChange(e: any) {
     this.show = e.target.value;
-    this.router.navigate(['admin/users/page', 1]);
+    this.router.navigate(['admin/anexos/page', 1]);
     this.currentPage = 1
-    this.loadUsers(this.currentPage, this.show);
+    this.loadAnexos(this.currentPage, this.show);
   }
 
   private extractPage(url: string | null): number | null {

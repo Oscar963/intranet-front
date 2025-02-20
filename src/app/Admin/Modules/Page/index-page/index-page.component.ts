@@ -143,6 +143,8 @@ export class IndexPageComponent {
 
   onChange(e: any) {
     this.show = e.target.value;
+    this.router.navigate(['admin/pages/page', 1]);
+    this.currentPage = 1;
     this.loadPages(this.currentPage, this.show);
   }
 

@@ -143,6 +143,8 @@ export class IndexPopupComponent implements OnInit {
 
   onChange(e: any) {
     this.show = e.target.value;
+    this.router.navigate(['admin/popups/page', 1]);
+    this.currentPage = 1
     this.loadPopups(this.currentPage, this.show);
   }
 
