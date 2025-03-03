@@ -1,4 +1,4 @@
-import { Popup } from './interface/Popup';
+import { Popup } from './interfaces/Popup';
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -8,13 +8,47 @@ export const routes: Routes = [
     path: '',
     loadComponent: () =>
       import('./Web/Layouts/index/index.component').then(
-        (m) => m.IndexWebComponent
+        (m) => m.IndexWebComponent,
       ),
     children: [
       {
         path: '',
+        title: 'Inicio',
         loadComponent: () =>
           import('./Web/Page/home/home.component').then((m) => m.HomeComponent),
+      },
+      {
+        path: 'anexos',
+        title: 'Anexos',
+        loadComponent: () =>
+          import('./Web/Page/anexos/anexos.component').then(
+            (m) => m.AnexosComponent,
+          ),
+      },
+      {
+        path: 'anexos/page/:page',
+        title: 'Anexos',
+        loadComponent: () =>
+          import('./Web/Page/anexos/anexos.component').then(
+            (m) => m.AnexosComponent,
+          ),
+      },
+
+      {
+        path: 'mobiles',
+        title: 'Celulares',
+        loadComponent: () =>
+          import('./Web/Page/mobiles/mobiles.component').then(
+            (m) => m.MobilesComponent,
+          ),
+      },
+      {
+        path: 'mobiles/page/:page',
+        title: 'Celulares',
+        loadComponent: () =>
+          import('./Web/Page/mobiles/mobiles.component').then(
+            (m) => m.MobilesComponent,
+          ),
       },
     ],
   },
@@ -24,7 +58,7 @@ export const routes: Routes = [
     path: 'admin',
     loadComponent: () =>
       import('./Admin/Layouts/index/index.component').then(
-        (m) => m.IndexAdminComponent
+        (m) => m.IndexAdminComponent,
       ),
     canActivate: [authGuard],
     children: [
@@ -32,7 +66,7 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () =>
           import('./Admin/Modules/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent
+            (m) => m.DashboardComponent,
           ),
       },
 
@@ -101,28 +135,28 @@ export const routes: Routes = [
         path: 'pages',
         loadComponent: () =>
           import('./Admin/Modules/Page/index-page/index-page.component').then(
-            (m) => m.IndexPageComponent
+            (m) => m.IndexPageComponent,
           ),
       },
       {
         path: 'pages/page/:page',
         loadComponent: () =>
           import('./Admin/Modules/Page/index-page/index-page.component').then(
-            (m) => m.IndexPageComponent
+            (m) => m.IndexPageComponent,
           ),
       },
       {
         path: 'pages/store',
         loadComponent: () =>
           import('./Admin/Modules/Page/store-page/store-page.component').then(
-            (m) => m.StorePageComponent
+            (m) => m.StorePageComponent,
           ),
       },
       {
         path: 'pages/update/:id',
         loadComponent: () =>
           import('./Admin/Modules/Page/update-page/update-page.component').then(
-            (m) => m.UpdatePageComponent
+            (m) => m.UpdatePageComponent,
           ),
       },
 
@@ -131,28 +165,28 @@ export const routes: Routes = [
         path: 'users',
         loadComponent: () =>
           import('./Admin/Modules/User/index-user/index-user.component').then(
-            (m) => m.IndexUserComponent
+            (m) => m.IndexUserComponent,
           ),
       },
       {
         path: 'users/page/:page',
         loadComponent: () =>
           import('./Admin/Modules/User/index-user/index-user.component').then(
-            (m) => m.IndexUserComponent
+            (m) => m.IndexUserComponent,
           ),
       },
       {
         path: 'users/store',
         loadComponent: () =>
           import('./Admin/Modules/User/store-user/store-user.component').then(
-            (m) => m.StoreUserComponent
+            (m) => m.StoreUserComponent,
           ),
       },
       {
         path: 'users/update/:id',
         loadComponent: () =>
           import('./Admin/Modules/User/update-user/update-user.component').then(
-            (m) => m.UpdateUserComponent
+            (m) => m.UpdateUserComponent,
           ),
       },
       {
@@ -175,21 +209,21 @@ export const routes: Routes = [
         path: 'files/:idpage',
         loadComponent: () =>
           import('./Admin/Modules/File/index-file/index-file.component').then(
-            (m) => m.IndexFileComponent
+            (m) => m.IndexFileComponent,
           ),
       },
       {
         path: 'files/page/:page',
         loadComponent: () =>
           import('./Admin/Modules/File/index-file/index-file.component').then(
-            (m) => m.IndexFileComponent
+            (m) => m.IndexFileComponent,
           ),
       },
       {
         path: 'files/store/:idpage',
         loadComponent: () =>
           import('./Admin/Modules/File/store-file/store-file.component').then(
-            (m) => m.StoreFileComponent
+            (m) => m.StoreFileComponent,
           ),
       },
 
@@ -254,6 +288,8 @@ export const routes: Routes = [
       },
     ],
   },
+
+  /** Auth Routes **/
   {
     path: 'login',
     canActivate: [authGuard],
@@ -264,15 +300,16 @@ export const routes: Routes = [
     path: 'forgot-password',
     loadComponent: () =>
       import('./Auth/forgot-password/forgot-password.component').then(
-        (m) => m.ForgotPasswordComponent
+        (m) => m.ForgotPasswordComponent,
       ),
   },
   {
     path: 'reset-password/:token',
     loadComponent: () =>
       import('./Auth/reset-password/reset-password.component').then(
-        (m) => m.ResetPasswordComponent
+        (m) => m.ResetPasswordComponent,
       ),
   },
   { path: '**', redirectTo: 'login' },
+  { path: '', redirectTo: '', pathMatch: 'full' },
 ];

@@ -5,16 +5,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { WebService } from '../../../core/services/web.service';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { WebService } from '../../../services/web.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { File } from '../../../interface/File';
+import { File } from '../../../interfaces/File';
 
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, RouterLinkActive, ReactiveFormsModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
@@ -140,7 +140,7 @@ export class NavbarComponent {
     });
   }
 
-  private getFileExtension(headers: HttpHeaders, fileName: string): string {
+  getFileExtension(headers: HttpHeaders, fileName: string): string {
     let fileExtension = fileName.substring(fileName.lastIndexOf('.'));
     if (!fileExtension) {
       const contentType = headers.get('Content-Type');

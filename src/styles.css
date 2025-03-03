@@ -1,3 +1,6 @@
+/* @import "tailwindcss"; */
+
+
 :root,
 [data-bs-theme="light"] {
   --tblr-blue: #06048c;

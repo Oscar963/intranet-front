@@ -9,8 +9,8 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 
-import { UserService } from '../../../../core/services/user.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { UserService } from '../../../../services/user.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
 
 @Component({

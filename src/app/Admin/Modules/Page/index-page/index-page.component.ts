@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { PageService } from '../../../../core/services/page.service';
-import { Page } from '../../../../interface/Page';
+import { PageService } from '../../../../services/page.service';
+import { Page } from '../../../../interfaces/Page';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import Swal from 'sweetalert2';
 
 @Component({

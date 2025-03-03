@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { MobileService } from '../../../../core/services/mobile.service';
+import { MobileService } from '../../../../services/mobile.service';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import Swal from 'sweetalert2';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { saveAs } from 'file-saver';
 
 @Component({

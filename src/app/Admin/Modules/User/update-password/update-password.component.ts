@@ -1,4 +1,4 @@
-import { UserService } from './../../../../core/services/user.service';
+import { UserService } from './../../../../services/user.service';
 import { Component, inject } from '@angular/core';
 import {
   FormControl,
@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

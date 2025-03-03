@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { WebService } from '../../../core/services/web.service';
+import { WebService } from '../../../services/web.service';
 
 @Component({
   selector: 'app-home',

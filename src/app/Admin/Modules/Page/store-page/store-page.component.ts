@@ -9,11 +9,11 @@ import {
 } from '@angular/forms';
 import dayjs from 'dayjs/esm';
 
-import { PageService } from '../../../../core/services/page.service';
+import { PageService } from '../../../../services/page.service';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
 
 @Component({

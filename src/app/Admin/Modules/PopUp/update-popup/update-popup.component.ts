@@ -9,12 +9,12 @@ import {
 import dayjs from 'dayjs/esm';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
-import { PopupService } from '../../../../core/services/popup.service';
+import { PopupService } from '../../../../services/popup.service';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { ActivatedRoute } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
 
 @Component({

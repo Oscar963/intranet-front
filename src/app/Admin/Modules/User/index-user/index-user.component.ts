@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { UserService } from '../../../../core/services/user.service';
-import { User } from '../../../../interface/User';
+import { UserService } from '../../../../services/user.service';
+import { User } from '../../../../interfaces/User';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import Swal from 'sweetalert2';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-index-user',

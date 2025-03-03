@@ -6,8 +6,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 
-import { FileService } from '../../../../core/services/file.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { FileService } from '../../../../services/file.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UploadSimpleFileComponent } from '../../../../Utils/upload-simple-file/upload-simple-file.component';
 

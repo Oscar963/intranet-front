@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { AnexoService } from '../../../../core/services/anexo.service';
-import { Anexo } from '../../../../interface/Anexo';
+import { AnexoService } from '../../../../services/anexo.service';
+import { Anexo } from '../../../../interfaces/Anexo';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import Swal from 'sweetalert2';
 import { ImportAnexoComponent } from '../import-anexo/import-anexo.component';
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { map, Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
@@ -102,5 +102,31 @@ export class WebService {
       responseType: 'blob',
       observe: 'response', // <-- Añade esta opción
     });
+  }
+
+  /**
+   * Buscar anexos por nombre o descripción.
+   * @param query Texto de búsqueda.
+   * @returns Observable con los archivos que coincidan con la búsqueda.
+   */
+  searchAnexos(query: string, page: number = 1, show: number): Observable<any> {
+    return this.http
+      .get<any>(
+        `${this.apiUrl}/api/web/anexos/search?q=${query}&page=${page}&show=${show}`
+      )
+      .pipe(map((response) => response.data));
+  }
+
+  /**
+   * Buscar mobiles por nombre o descripción.
+   * @param query Texto de búsqueda.
+   * @returns Observable con los archivos que coincidan con la búsqueda.
+   */
+  searchMobiles(query: string, page: number = 1, show: number): Observable<any> {
+    return this.http
+      .get<any>(
+        `${this.apiUrl}/api/web/mobiles/search?q=${query}&page=${page}&show=${show}`
+      )
+      .pipe(map((response) => response.data));
   }
 }

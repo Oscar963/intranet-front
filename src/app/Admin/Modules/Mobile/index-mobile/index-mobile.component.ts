@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MobileService } from '../../../../core/services/mobile.service';
-import { Mobile } from '../../../../interface/Mobile';
+import { MobileService } from '../../../../services/mobile.service';
+import { Mobile } from '../../../../interfaces/Mobile';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import Swal from 'sweetalert2';
 import { ImportMobileComponent } from './../import-mobile/import-mobile.component';
 

@@ -1,8 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { User } from '../../../interface/User';
+import { User } from '../../../interfaces/User';
 import { RouterOutlet } from '@angular/router';
 
 @Component({

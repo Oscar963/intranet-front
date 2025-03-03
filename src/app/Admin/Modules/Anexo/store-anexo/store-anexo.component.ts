@@ -6,8 +6,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 
-import { AnexoService } from '../../../../core/services/anexo.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { AnexoService } from '../../../../services/anexo.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
 
 @Component({

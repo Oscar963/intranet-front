@@ -8,6 +8,6 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'angular-19-app';
+  title = 'Intranet Municipalidad de la municipalidad de Arica';
   city = 'Chile';
 }

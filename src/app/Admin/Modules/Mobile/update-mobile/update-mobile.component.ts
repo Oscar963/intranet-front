@@ -6,9 +6,9 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 
-import { MobileService } from '../../../../core/services/mobile.service';
+import { MobileService } from '../../../../services/mobile.service';
 import { ActivatedRoute } from '@angular/router';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
 
 @Component({
