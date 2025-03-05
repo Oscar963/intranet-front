@@ -160,6 +160,29 @@ export const routes: Routes = [
           ),
       },
 
+      {
+        path: 'pages/files/store/:id',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Page/file-store-page/file-store-page.component'
+          ).then((m) => m.FileStorePageComponent),
+      },
+
+      {
+        path: 'pages/files/:idpage',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Page/file-index-page/file-index-page.component'
+          ).then((m) => m.FileIndexPageComponent),
+      },
+      {
+        path: 'pages/files/page/:page',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Page/file-index-page/file-index-page.component'
+          ).then((m) => m.FileIndexPageComponent),
+      },
+
       /** User Routes **/
       {
         path: 'users',

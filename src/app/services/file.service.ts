@@ -19,7 +19,7 @@ export class FileService {
    */
   fetchFile(page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/files?page=${page}&show=${show}` // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/files?page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
     );
   }
 
@@ -34,7 +34,7 @@ export class FileService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -50,7 +50,7 @@ export class FileService {
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
       );
   }
 
@@ -65,7 +65,7 @@ export class FileService {
       .pipe(
         map((response) => {
           return response.data; // Extraer los datos del archivo del servidor
-        })
+        }),
       );
   }
 
@@ -80,7 +80,7 @@ export class FileService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -89,10 +89,11 @@ export class FileService {
    * @param id Identificador del archivo.
    * @param fileName Nombre del archivo para la descarga.
    */
-  downloadFile(id: number): Observable<HttpResponse<Blob>> { // <-- Cambio aquí
+  downloadFile(id: number): Observable<HttpResponse<Blob>> {
+    // <-- Cambio aquí
     return this.http.get(`${this.apiUrl}/api/files/${id}/download`, {
       responseType: 'blob',
-      observe: 'response' // <-- Añade esta opción
+      observe: 'response', // <-- Añade esta opción
     });
   }
 }

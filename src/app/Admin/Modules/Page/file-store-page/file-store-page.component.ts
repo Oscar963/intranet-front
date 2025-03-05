@@ -6,22 +6,22 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 
-import { FileService } from '../../../../services/file.service';
+import { PageService } from '../../../../services/page.service';
 import { NotificationService } from '../../../../services/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UploadSimpleFileComponent } from '../../../../Utils/upload-simple-file/upload-simple-file.component';
 
 @Component({
-  selector: 'app-store-file',
+  selector: 'app-file-store-page',
   imports: [UploadSimpleFileComponent, ReactiveFormsModule],
-  templateUrl: './store-file.component.html',
-  styleUrl: './store-file.component.css',
+  templateUrl: './file-store-page.component.html',
+  styleUrl: './file-store-page.component.css',
 })
-export class StoreFileComponent {
+export class FileStorePageComponent {
   @ViewChild(UploadSimpleFileComponent)
   UploadSimpleFile!: UploadSimpleFileComponent;
 
-  private fileService = inject(FileService);
+  private pageService = inject(PageService);
   private notificationService = inject(NotificationService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -39,7 +39,7 @@ export class StoreFileComponent {
 
   ngOnInit(): void {
     // Obtener el ID del page desde la URL
-    this.pageId = Number(this.route.snapshot.paramMap.get('idpage'));
+    this.pageId = Number(this.route.snapshot.paramMap.get('id'));
   }
 
   onSubmit(): void {
@@ -67,14 +67,14 @@ export class StoreFileComponent {
       formData.append('file', file);
     }
 
-    this.fileService
+    this.pageService
       .storeFiles(formData)
       .subscribe({
         next: (success: string) => {
           this.form.reset();
           this.UploadSimpleFile.removeAllFiles();
           this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/files/' + this.pageId]);
+          this.router.navigate(['/admin/pages/files/' + this.pageId]);
         },
         error: (error) => {
           if (error.status === 422) {

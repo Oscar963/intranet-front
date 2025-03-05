@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment'; 
-import { map, Observable } from 'rxjs'; 
-import { HttpClient } from '@angular/common/http'; 
+import { environment } from '../../environments/environment';
+import { map, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PageService {
-  private apiUrl = environment.API_URL; 
+  private apiUrl = environment.API_URL;
 
   constructor(private http: HttpClient) {}
 
@@ -19,7 +19,7 @@ export class PageService {
    */
   fetchPage(page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/pages?page=${page}&show=${show}` // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/pages?page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
     );
   }
 
@@ -34,7 +34,7 @@ export class PageService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -50,7 +50,7 @@ export class PageService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -65,7 +65,7 @@ export class PageService {
       .pipe(
         map((response) => {
           return response.data; // Extraer los datos de la página del servidor
-        })
+        }),
       );
   }
 
@@ -80,7 +80,34 @@ export class PageService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
+      );
+  }
+
+  /**
+   * Obtener una lista de archivos con soporte de paginación.
+   * @param page Número de página actual (por defecto, 1).
+   * @param show Número de elementos por página.
+   * @returns Observable con la lista de archivos.
+   */
+  fetchFile(page: number = 1, show: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/api/pages/files?page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
+    );
+  }
+
+  /**
+   * Crear un nuevo archivo.
+   * @param data Objeto con los datos del nuevo archivo.
+   * @returns Observable con el mensaje de éxito.
+   */
+  storeFiles(data: {}): Observable<string> {
+    return this.http
+      .post<{ message: string }>(`${this.apiUrl}/api/pages/files`, data) // Realizar solicitud POST
+      .pipe(
+        map((response) => {
+          return response.message; // Extraer el mensaje de éxito del servidor
+        }),
       );
   }
 }
