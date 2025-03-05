@@ -1,71 +1,73 @@
 <section>
   <div class="container-xl pt-3">
-    @if(banners.length > 0){
-    <div id="carousel-banners" class="carousel slide" data-bs-ride="carousel">
-      <!-- Indicadores del carrusel -->
-      <div class="carousel-indicators">
-        @for (banner of banners; track $index) { @if( banner.status ===
-        'published' ) {
-        <button
-          type="button"
-          [attr.data-bs-target]="'#carousel-banners'"
-          [attr.data-bs-slide-to]="$index"
-          [class.active]="$index === 0"
-          [attr.aria-label]="'Slide ' + ($index + 1)"
-        ></button>
-        } }
-      </div>
-
-      <!-- Elementos del carrusel -->
-      <div class="carousel-inner rounded-4">
-        @for (banner of banners; track $index) { @if( banner.status ===
-        'published' ) {
-        <div [class.carousel-item]="true" [class.active]="$index === 0">
-          <a [href]="banner.link">
-            <img
-              [src]="banner.image"
-              class="d-block w-100"
-              [alt]="banner.title"
-            />
-          </a>
+    @if (banners.length > 0) {
+      <div id="carousel-banners" class="carousel slide" data-bs-ride="carousel">
+        <!-- Indicadores del carrusel -->
+        <div class="carousel-indicators">
+          @for (banner of banners; track $index) {
+            @if (banner.status === "published") {
+              <button
+                type="button"
+                [attr.data-bs-target]="'#carousel-banners'"
+                [attr.data-bs-slide-to]="$index"
+                [class.active]="$index === 0"
+                [attr.aria-label]="'Slide ' + ($index + 1)"
+              ></button>
+            }
+          }
         </div>
-        } }
-      </div>
 
-      <!-- Controles del carrusel -->
-      <a
-        class="carousel-control-prev"
-        href="#carousel-banners"
-        role="button"
-        data-bs-slide="prev"
-      >
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </a>
-      <a
-        class="carousel-control-next"
-        href="#carousel-banners"
-        role="button"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </a>
-    </div>
-    } @else {
-    <div class="alert alert-info" role="alert">
-      <h4 class="alert-title">Información</h4>
-      <div class="text-secondary">
-        No hay banners publicados en este momento.
+        <!-- Elementos del carrusel -->
+        <div class="carousel-inner rounded-4">
+          @for (banner of banners; track $index) {
+            @if (banner.status === "published") {
+              <div [class.carousel-item]="true" [class.active]="$index === 0">
+                <a [href]="banner.link">
+                  <img
+                    [src]="banner.image"
+                    class="d-block w-100"
+                    [alt]="banner.title"
+                  />
+                </a>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Controles del carrusel -->
+        <a
+          class="carousel-control-prev"
+          href="#carousel-banners"
+          role="button"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </a>
+        <a
+          class="carousel-control-next"
+          href="#carousel-banners"
+          role="button"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </a>
       </div>
-    </div>
+    } @else {
+      <div class="alert alert-info" role="alert">
+        <h4 class="alert-title">Información</h4>
+        <div class="text-secondary">
+          No hay banners publicados en este momento.
+        </div>
+      </div>
     }
   </div>
 </section>
 <section>
   <div class="container-xl pt-3">
     <div class="row">
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-3 pt-2">
         <a href="#" class="text-decoration-none">
           <div class="card rounded-4" style="background-color: #27c9a2">
             <div class="card-body">
@@ -81,28 +83,28 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-dollar"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-check"
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                     <path
                       d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
                     />
-                    <path
-                      d="M14 11h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"
-                    />
-                    <path d="M12 17v1m0 -8v1" />
+                    <path d="M9 15l2 2l4 -4" />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder" style="color: #0043af"
-                  >Special title treatment</span
-                >
+                <span
+                  class="fs-2 fw-bolder text-uppercase"
+                  style="color: #0043af"
+                  >Encasillamiento <br />
+                  Escalafón
+                </span>
               </h5>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-3 pt-2">
         <a href="#" class="text-decoration-none">
           <div class="card rounded-4" style="background-color: #ffcb4a">
             <div class="card-body">
@@ -118,28 +120,29 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-dollar"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-users-group"
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path
-                      d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
-                    />
-                    <path
-                      d="M14 11h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"
-                    />
-                    <path d="M12 17v1m0 -8v1" />
+                    <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                    <path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
+                    <path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                    <path d="M17 10h2a2 2 0 0 1 2 2v1" />
+                    <path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                    <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder" style="color: #0043af"
-                  >Special title treatment</span
+                <span
+                  class="fs-2 fw-bolder text-uppercase"
+                  style="color: #0043af"
+                  >Recursos <br />
+                  Humanos</span
                 >
               </h5>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-3 pt-2">
         <a href="#" class="text-decoration-none">
           <div class="card rounded-4" style="background-color: #ff6848">
             <div class="card-body">
@@ -155,28 +158,30 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-dollar"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-gavel"
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
                     <path
-                      d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      d="M13 10l7.383 7.418c.823 .82 .823 2.148 0 2.967a2.11 2.11 0 0 1 -2.976 0l-7.407 -7.385"
                     />
+                    <path d="M6 9l4 4" />
+                    <path d="M13 10l-4 -4" />
+                    <path d="M3 21h7" />
                     <path
-                      d="M14 11h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"
+                      d="M6.793 15.793l-3.586 -3.586a1 1 0 0 1 0 -1.414l2.293 -2.293l.5 .5l3 -3l-.5 -.5l2.293 -2.293a1 1 0 0 1 1.414 0l3.586 3.586a1 1 0 0 1 0 1.414l-2.293 2.293l-.5 -.5l-3 3l.5 .5l-2.293 2.293a1 1 0 0 1 -1.414 0z"
                     />
-                    <path d="M12 17v1m0 -8v1" />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder text-white"
-                  >Special title treatment</span
-                >
+                <span class="fs-2 fw-bolder text-uppercase text-white"
+                  >Ley Karin <br />
+                  (Ley N°21.643)
+                </span>
               </h5>
             </div>
           </div>
         </a>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-6 col-md-3 pt-2">
         <a href="#" class="text-decoration-none">
           <div class="card rounded-4" style="background-color: #00a8e6">
             <div class="card-body">
@@ -192,22 +197,22 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-dollar"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-files"
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                    <path d="M15 3v4a1 1 0 0 0 1 1h4" />
                     <path
-                      d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"
+                      d="M18 17h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h4l5 5v7a2 2 0 0 1 -2 2z"
                     />
                     <path
-                      d="M14 11h-2.5a1.5 1.5 0 0 0 0 3h1a1.5 1.5 0 0 1 0 3h-2.5"
+                      d="M16 17v2a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h2"
                     />
-                    <path d="M12 17v1m0 -8v1" />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder text-white"
-                  >Special title treatment</span
-                >
+                <span class="fs-2 fw-bolder text-uppercase text-white"
+                  >Solicitudes <br />
+                  Declaraciones
+                </span>
               </h5>
             </div>
           </div>
@@ -398,29 +403,6 @@
             </div>
           </div>
         </div>
-      </div>
-  
-    </div>
-    <div class="hr-text h2 text-primary fw-bold">Enlaces Relevantes</div>
-    <div class="row mt-4 text-center">
-      <div class="col-4">
-        <a href="http://127.0.0.1:8080/vistas/48">
-          <img class="img-fluid img-footer" src="/img/app/DIP.png" alt="DIP" />
-        </a>
-      </div>
-      <div class="col-4">
-        <a href="http://127.0.0.1:8080/vistas/48">
-          <img
-            class="img-fluid img-footer"
-            src="/img/app/transformacion.png"
-            alt="DIP"
-          />
-        </a>
-      </div>
-      <div class="col-4">
-        <a href="http://127.0.0.1:8080/vistas/48">
-          <img class="img-fluid img-footer" src="/img/app/ley.png" alt="DIP" />
-        </a>
       </div>
     </div>
   </div>
