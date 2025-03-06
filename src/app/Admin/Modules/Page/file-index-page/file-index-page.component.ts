@@ -60,7 +60,7 @@ export class FileIndexPageComponent implements OnInit {
   loadFiles(page: number, show: number): void {
     this.loading = true;
 
-    this.pageService.fetchFile(page, show).subscribe({
+    this.pageService.fetchFile(this.pageId,page, show).subscribe({
       next: (response) => {
         this.files = response.data.data;
         this.meta = { ...response.data.meta };
@@ -93,7 +93,7 @@ export class FileIndexPageComponent implements OnInit {
 
   goToPage(page: number | null): void {
     if (page && page > 0 && page <= this.meta.last_page) {
-      this.router.navigate(['admin/pages/files/page', page]);
+      this.router.navigate(['admin/pages/files', this.pageId, 'page', page]);
     }
   }
 
@@ -147,7 +147,8 @@ export class FileIndexPageComponent implements OnInit {
 
   onChange(e: any) {
     this.show = e.target.value;
-    this.router.navigate(['admin/pages/files/page', 1]);
+    this.router.navigate(['admin/pages/files', this.pageId, 'page', 1]);
+
     this.currentPage = 1;
     this.loadFiles(this.currentPage, this.show);
   }

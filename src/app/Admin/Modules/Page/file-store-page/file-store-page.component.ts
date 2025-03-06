@@ -39,7 +39,7 @@ export class FileStorePageComponent {
 
   ngOnInit(): void {
     // Obtener el ID del page desde la URL
-    this.pageId = Number(this.route.snapshot.paramMap.get('id'));
+    this.pageId = Number(this.route.snapshot.paramMap.get('idpage'));
   }
 
   onSubmit(): void {
@@ -74,7 +74,9 @@ export class FileStorePageComponent {
           this.form.reset();
           this.UploadSimpleFile.removeAllFiles();
           this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/pages/files/' + this.pageId]);
+          //     this.router.navigate(['/admin/pages/files/' + this.pageId]);
+
+          this.router.navigate(['admin/pages/files', this.pageId]);
         },
         error: (error) => {
           if (error.status === 422) {

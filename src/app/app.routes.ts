@@ -161,7 +161,7 @@ export const routes: Routes = [
       },
 
       {
-        path: 'pages/files/store/:id',
+        path: 'pages/files/store/:idpage',
         loadComponent: () =>
           import(
             './Admin/Modules/Page/file-store-page/file-store-page.component'
@@ -176,11 +176,11 @@ export const routes: Routes = [
           ).then((m) => m.FileIndexPageComponent),
       },
       {
-        path: 'pages/files/page/:page',
+        path: 'pages/files/:idpage/page/:page',
         loadComponent: () =>
-          import(
-            './Admin/Modules/Page/file-index-page/file-index-page.component'
-          ).then((m) => m.FileIndexPageComponent),
+          import('./Admin/Modules/Page/file-index-page/file-index-page.component').then(
+            (m) => m.FileIndexPageComponent,
+          ),
       },
 
       /** User Routes **/
@@ -229,7 +229,7 @@ export const routes: Routes = [
 
       /** File Routes **/
       {
-        path: 'files/:idpage',
+        path: 'files',
         loadComponent: () =>
           import('./Admin/Modules/File/index-file/index-file.component').then(
             (m) => m.IndexFileComponent,
@@ -243,7 +243,7 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'files/store/:idpage',
+        path: 'files/store',
         loadComponent: () =>
           import('./Admin/Modules/File/store-file/store-file.component').then(
             (m) => m.StoreFileComponent,

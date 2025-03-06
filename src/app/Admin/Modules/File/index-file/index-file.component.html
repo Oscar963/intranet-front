@@ -11,7 +11,7 @@
       <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
           <a
-            [routerLink]="['/admin/pages/files/' + pageId]"
+            [routerLink]="['/admin/files/store']"
             class="btn btn-primary d-none d-sm-inline-block"
           >
             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
@@ -128,6 +128,7 @@
                   <th>Tamaño</th>
                   <th>Subido por</th>
                   <th>Actualizado por</th>
+                  <th>Fecha Subida</th>
                   <th></th>
                 </tr>
               </thead>
@@ -159,7 +160,6 @@
                   <td>
                     <span class="text-secondary">{{ item.description }}</span>
                   </td>
-
                   <td>
                     <span class="text-secondary">{{ item.size }}MB</span>
                   </td>
@@ -212,6 +212,9 @@
                     } @else {
                     <span class="text-secondary">-</span>
                     }
+                  </td>
+                  <td>
+                    <span class="text-secondary">{{ item.created_at }}</span>
                   </td>
                   <td>
                     <a

@@ -27,7 +27,6 @@ export class IndexFileComponent implements OnInit {
   public links: any = {};
   public loading: boolean = false;
   public currentPage: number = 1;
-  public pageId!: number;
 
   values = [
     { value: '15', label: '15' },
@@ -41,8 +40,6 @@ export class IndexFileComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.pageId = Number(this.route.snapshot.paramMap.get('idpage'));
-
     this.notificationService.successMessage$.subscribe(
       (message) => (this.successMessage = message)
     );

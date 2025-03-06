@@ -24,13 +24,11 @@ export class StoreFileComponent {
   private fileService = inject(FileService);
   private notificationService = inject(NotificationService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
 
   public loading: boolean = false;
   public errorMessage: string = '';
   public successMessage: string = '';
   public showPassword: boolean = false;
-  public pageId!: number; // ID del page a actualizar
 
   form: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
@@ -38,8 +36,6 @@ export class StoreFileComponent {
   });
 
   ngOnInit(): void {
-    // Obtener el ID del page desde la URL
-    this.pageId = Number(this.route.snapshot.paramMap.get('idpage'));
   }
 
   onSubmit(): void {
@@ -59,7 +55,6 @@ export class StoreFileComponent {
     const formData = new FormData();
     formData.append('name', this.form.value.name);
     formData.append('description', this.form.value.description);
-    formData.append('page_id', this.pageId.toString());
 
     // Obtener el archivo desde Dropzone
     const file = this.UploadSimpleFile.getFile();
@@ -74,7 +69,7 @@ export class StoreFileComponent {
           this.form.reset();
           this.UploadSimpleFile.removeAllFiles();
           this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/files/' + this.pageId]);
+          this.router.navigate(['/admin/files']);
         },
         error: (error) => {
           if (error.status === 422) {

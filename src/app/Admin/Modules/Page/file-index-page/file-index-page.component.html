@@ -131,6 +131,7 @@
                   <th>Tamaño</th>
                   <th>Subido por</th>
                   <th>Actualizado por</th>
+                  <th>Fecha Subida</th>
                   <th></th>
                 </tr>
               </thead>
@@ -226,6 +227,11 @@
                         } @else {
                           <span class="text-secondary">-</span>
                         }
+                      </td>
+                      <td>
+                        <span class="text-secondary">{{
+                          item.created_at
+                        }}</span>
                       </td>
                       <td>
                         <a
