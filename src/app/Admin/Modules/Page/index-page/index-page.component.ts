@@ -93,6 +93,22 @@ export class IndexPageComponent {
     }
   }
 
+  copyToClipboard(slug: string): void {
+    const baseUrl = window.location.origin; // Obtiene la URL base (ej. http://localhost:4200 o https://midominio.com)
+    const fullUrl = `${baseUrl}/page/${slug}`; // Construye la URL completa
+  
+    navigator.clipboard
+      .writeText(fullUrl)
+      .then(() => {
+        alert('URL copiada al portapapeles.');
+        this.notificationService.showSuccess('URL copiada al portapapeles.');
+      })
+      .catch((err) => {
+        this.notificationService.showError('Error al copiar la URL.');
+        console.error('Error al copiar al portapapeles:', err);
+      });
+  }
+
   deleteItem(id: number) {
     Swal.fire({
       title: '¿Estás seguro que desea eliminar la página?',

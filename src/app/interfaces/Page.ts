@@ -3,6 +3,7 @@ export interface Page {
   title: string;
   image: string;
   date: string;
+  slug: string;
   status: string;
   created_at: string;
   updated_at: string;

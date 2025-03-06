@@ -41,7 +41,7 @@ export class IndexFileComponent implements OnInit {
 
   ngOnInit(): void {
     this.notificationService.successMessage$.subscribe(
-      (message) => (this.successMessage = message)
+      (message) => (this.successMessage = message),
     );
 
     this.route.params.subscribe((params) => {
@@ -72,7 +72,7 @@ export class IndexFileComponent implements OnInit {
             label: link.label,
             page: this.extractPage(link.url),
             active: link.active,
-          })
+          }),
         );
       },
       error: (error) => {
@@ -142,7 +142,7 @@ export class IndexFileComponent implements OnInit {
   onChange(e: any) {
     this.show = e.target.value;
     this.router.navigate(['admin/files/page', 1]);
-    this.currentPage = 1
+    this.currentPage = 1;
     this.loadFiles(this.currentPage, this.show);
   }
 
@@ -220,6 +220,19 @@ export class IndexFileComponent implements OnInit {
       }
     }
     return fileExtension;
+  }
+
+  copyToClipboard(text: string): void {    
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        alert('URL copiada al portapapeles.');
+        this.notificationService.showSuccess('URL copiada al portapapeles.');
+      })
+      .catch((err) => {
+        this.notificationService.showError('Error al copiar la URL.');
+        console.error('Error al copiar al portapapeles:', err);
+      });
   }
 
   getFileImage(fileType: string): string {

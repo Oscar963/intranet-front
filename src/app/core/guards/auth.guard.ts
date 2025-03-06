@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       if (isAuth) {
         // Si el usuario está autenticado y está intentando ir a '/login'
         if (state.url === '/login') {
-          router.navigate(['/admin']);
+          router.navigate(['/admin/dashboard']);
           return false;
         }
         authService.fetchUser().subscribe();
@@ -27,6 +27,6 @@ export const authGuard: CanActivateFn = (route, state) => {
         router.navigate(['/login']);
         return false;
       }
-    })
+    }),
   );
 };

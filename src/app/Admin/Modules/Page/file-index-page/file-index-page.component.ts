@@ -229,6 +229,19 @@ export class FileIndexPageComponent implements OnInit {
     return fileExtension;
   }
 
+  copyToClipboard(text: string): void {    
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        alert('URL copiada al portapapeles.');
+        this.notificationService.showSuccess('URL copiada al portapapeles.');
+      })
+      .catch((err) => {
+        this.notificationService.showError('Error al copiar la URL.');
+        console.error('Error al copiar al portapapeles:', err);
+      });
+  }
+
   getFileImage(fileType: string): string {
     switch (fileType) {
       case 'PDF':

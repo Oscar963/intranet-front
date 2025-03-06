@@ -50,6 +50,12 @@ export const routes: Routes = [
             (m) => m.MobilesComponent,
           ),
       },
+      {
+        path: 'page/:slug',
+        title: 'Página',
+        loadComponent: () =>
+          import('./Web/Page/page/page.component').then((m) => m.PageComponent),
+      },
     ],
   },
 
@@ -178,9 +184,9 @@ export const routes: Routes = [
       {
         path: 'pages/files/:idpage/page/:page',
         loadComponent: () =>
-          import('./Admin/Modules/Page/file-index-page/file-index-page.component').then(
-            (m) => m.FileIndexPageComponent,
-          ),
+          import(
+            './Admin/Modules/Page/file-index-page/file-index-page.component'
+          ).then((m) => m.FileIndexPageComponent),
       },
 
       /** User Routes **/
@@ -333,6 +339,15 @@ export const routes: Routes = [
         (m) => m.ResetPasswordComponent,
       ),
   },
-  { path: '**', redirectTo: 'login' },
+  //  { path: '**', redirectTo: 'login' },
+
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./Web/Page/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
+  },
+
   { path: '', redirectTo: '', pathMatch: 'full' },
 ];
