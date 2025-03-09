@@ -20,7 +20,7 @@ export class ForgotPasswordComponent {
   public successMessage: string = '';
 
   form: FormGroup = new FormGroup({
-    email: new FormControl('oscar.apata01@gmail.com', [
+    email: new FormControl('', [
       Validators.required,
       Validators.email,
     ]),

@@ -8,7 +8,7 @@
         <img
           src="/assets/img/logos/logo-azul.png"
           alt="logo-muniarica"
-          class="mx-auto d-block img-logo-desktop"
+          class="d-block img-logo-desktop mx-auto"
         />
       </a>
     </div>
@@ -24,7 +24,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div
-      class="collapse navbar-collapse mt-2 mb-3 rounded"
+      class="navbar-collapse collapse mt-2 mb-3 rounded"
       id="navbarSupportedContent"
     >
       <ul class="navbar-nav ms-auto">
@@ -88,7 +88,7 @@
             <span class="nav-link-title"> Célulares </span>
           </a>
         </li>
-        <li class="nav-item me-2 ms-2">
+        <li class="nav-item ms-2 me-2">
           <a
             target="_blank"
             class="btn btn-warning"
@@ -152,17 +152,17 @@
 
 <!-- Movile -->
 <header
-  class="navbar navbar-expand-md d-print-none sticky-top bg-primary shadow-none d-block d-md-none d-lg-none d-xl-none"
+  class="navbar navbar-expand-md d-print-none sticky-top bg-primary d-block d-md-none d-lg-none d-xl-none shadow-none"
 >
   <div class="container-fluid">
     <div
-      class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3"
+      class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-md-3 pe-0"
     >
       <a to="/">
         <img
           src="/assets/img/logos/logo-blanco.png"
           alt="logo-muniarica"
-          class="mx-auto d-block img-logo-movile"
+          class="d-block img-logo-movile mx-auto"
         />
       </a>
     </div>
@@ -178,7 +178,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div
-      class="collapse navbar-collapse mt-2 mb-3 rounded"
+      class="navbar-collapse collapse mt-2 mb-3 rounded"
       id="navbarSupportedContent"
     >
       <ul class="navbar-nav w-100">
@@ -309,45 +309,45 @@
           aria-label="Close"
         ></button>
       </div>
-      @if(loading){
-      <div class="progress progress-sm">
-        <div class="progress-bar progress-bar-indeterminate"></div>
-      </div>
+      @if (loading) {
+        <div class="progress progress-sm">
+          <div class="progress-bar progress-bar-indeterminate"></div>
+        </div>
       }
       <div class="modal-body">
-        @if(successMessage){
-        <div
-          class="alert alert-important alert-info alert-dismissible"
-          role="alert"
-        >
-          <div class="d-flex">
-            <div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
-                <path d="M12 9h.01" />
-                <path d="M11 12h1v4h1" />
-              </svg>
+        @if (successMessage) {
+          <div
+            class="alert alert-important alert-info alert-dismissible"
+            role="alert"
+          >
+            <div class="d-flex">
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                  <path d="M12 9h.01" />
+                  <path d="M11 12h1v4h1" />
+                </svg>
+              </div>
+              <span class="ms-1">{{ successMessage }}</span>
             </div>
-            <span class="ms-1">{{ successMessage }}</span>
+            <a
+              class="btn-close btn-close-white"
+              data-bs-dismiss="alert"
+              aria-label="close"
+            ></a>
           </div>
-          <a
-            class="btn-close btn-close-white"
-            data-bs-dismiss="alert"
-            aria-label="close"
-          ></a>
-        </div>
         }
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
           <div class="mb-3">
@@ -368,107 +368,27 @@
                     (form.get('name')?.touched || form.get('name')?.dirty)
                   "
                 />
-                @if(form.get('name')?.invalid && form.get('name')?.touched ||
-                form.get('name')?.dirty){
-                @if(form.get('name')?.hasError('required')){
-                <span class="invalid-input">
-                  Ingrese el nombre del documento.
-                </span>
-                } } @else {
-                <span class="invalid-input">&nbsp;</span>
+                @if (
+                  (form.get("name")?.invalid && form.get("name")?.touched) ||
+                  form.get("name")?.dirty
+                ) {
+                  @if (form.get("name")?.hasError("required")) {
+                    <span class="invalid-input">
+                      Ingrese el nombre del documento.
+                    </span>
+                  }
+                } @else {
+                  <span class="invalid-input">&nbsp;</span>
                 }
               </div>
               <div class="col-auto">
-                @if(!loading){
-                <a
-                  href="#"
-                  (click)="onSubmit()"
-                  class="btn btn-icon"
-                  aria-label="Button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon icon-tabler icons-tabler-outline icon-tabler-search"
+                @if (!loading) {
+                  <a
+                    href="#"
+                    (click)="onSubmit()"
+                    class="btn btn-icon"
+                    aria-label="Button"
                   >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                    <path d="M21 21l-6 -6" />
-                  </svg>
-                </a>
-                } @else {
-                <a href="#" class="btn btn-icon" aria-label="Button">
-                  <div
-                    class="spinner-border spinner-border-sm text-secondary"
-                    role="status"
-                  ></div>
-                </a>
-                }
-              </div>
-            </div>
-          </div>
-        </form>
-        @if(files.length){
-        <div class="table-responsive">
-          <table class="table table-vcenter">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Tamaño</th>
-                <th>Tipo</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody class="align-middle">
-              @if(loading){
-              <tr>
-                <td colspan="8" class="text-secondary text-center">
-                  Cargando datos...
-                </td>
-              </tr>
-              } @else if (!files.length) {
-              <tr>
-                <td colspan="8" class="text-secondary text-center">
-                  No se encontraron registros
-                </td>
-              </tr>
-              } @else { @for (item of files; track $index) {
-              <tr>
-                <td>
-                  <img
-                    style="max-width: 50px"
-                    [src]="getFileImage(item.type)"
-                    [alt]="item.name"
-                  />
-                </td>
-                <td>
-                  <span class="text-secondary">{{ item.name }}</span>
-                </td>
-                <td>
-                  <span class="text-secondary">{{ item.description }}</span>
-                </td>
-                <td>
-                  <span class="text-secondary">{{ item.size }}MB</span>
-                </td>
-                <td>
-                  <span class="text-secondary">{{ item.type }}</span>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    class="btn"
-                    (click)="downloadFile(item.id, item.name)"
-                  >
-                    <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -479,21 +399,110 @@
                       stroke-width="2"
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-search"
                     >
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                      <path d="M7 11l5 5l5 -5" />
-                      <path d="M12 4l0 12" />
+                      <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                      <path d="M21 21l-6 -6" />
                     </svg>
-                    Descargar
-                  </button>
-                </td>
-              </tr>
-              } }
-            </tbody>
-          </table>
-        </div>
+                  </a>
+                } @else {
+                  <a href="#" class="btn btn-icon" aria-label="Button">
+                    <div
+                      class="spinner-border spinner-border-sm text-secondary"
+                      role="status"
+                    ></div>
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+        </form>
+        @if (files.length) {
+          <div class="table-responsive">
+            <table class="table-vcenter table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Nombre</th>
+                  <th>Descripción</th>
+                  <th>Tamaño</th>
+                  <th>Tipo</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody class="align-middle">
+                @if (loading) {
+                  <tr>
+                    <td colspan="8" class="text-secondary text-center">
+                      Cargando datos...
+                    </td>
+                  </tr>
+                } @else {
+                  @for (item of files; track $index) {
+                    <tr>
+                      <td>
+                        <img
+                          style="max-width: 50px"
+                          [src]="getFileImage(item.type)"
+                          [alt]="item.name"
+                        />
+                      </td>
+                      <td>
+                        <span class="text-secondary">{{ item.name }}</span>
+                      </td>
+                      <td>
+                        <span class="text-secondary">{{
+                          item.description
+                        }}</span>
+                      </td>
+                      <td>
+                        <span class="text-secondary">{{ item.size }}MB</span>
+                      </td>
+                      <td>
+                        <span class="text-secondary">{{ item.type }}</span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn"
+                          (click)="downloadFile(item.id, item.name)"
+                        >
+                          <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                              d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+                            />
+                            <path d="M7 11l5 5l5 -5" />
+                            <path d="M12 4l0 12" />
+                          </svg>
+                          Descargar
+                        </button>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="8" class="text-secondary text-center">
+                        No se encontraron registros
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
         }
       </div>
       <div class="modal-footer">

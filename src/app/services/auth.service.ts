@@ -22,7 +22,10 @@ export class AuthService {
     status: 0,
   });
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   getCsrfCookie(): Observable<any> {
     return this.http.get(`${this.apiUrl}/sanctum/csrf-cookie`);
@@ -43,7 +46,7 @@ export class AuthService {
         catchError((error: HttpErrorResponse) => {
           this.isAuthenticatedState = false;
           return throwError(error);
-        })
+        }),
       );
   }
 
@@ -61,7 +64,7 @@ export class AuthService {
       catchError(() => {
         this.isAuthenticatedState = false;
         return of(false);
-      })
+      }),
     );
   }
 
@@ -91,7 +94,7 @@ export class AuthService {
       tap((user: User) => {
         this.setUserObservable(user);
         return user;
-      })
+      }),
     );
   }
 

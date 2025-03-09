@@ -19,20 +19,38 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3); /* Negro semi-transparente inicial */
+  background: rgba(0, 0, 0, 0.3);
+  /* Negro semi-transparente inicial */
   transition: background 0.4s ease-in-out;
 }
 
 .image-container:hover .overlay {
-  background: rgba(0, 0, 0, 0.6); /* Se oscurece al pasar el mouse */
+  background: rgba(0, 0, 0, 0.6);
+  /* Se oscurece al pasar el mouse */
 }
 
 .icon-tabler-card {
   color: #fff;
 }
 
-.icon {
+.icon-menu-card {
   height: 60px;
   width: 60px;
 }
 
+.card-secction {
+  min-height: 84px;
+  transition: 0.2s;
+
+}
+
+.card-secction:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #06048c;
+}
+
+.card-secction .card-body {
+  display: flex;
+  vertical-align: middle;
+}

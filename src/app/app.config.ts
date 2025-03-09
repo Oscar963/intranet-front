@@ -1,5 +1,5 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors  } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -11,7 +11,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom(BrowserAnimationsModule),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions()),
     provideHttpClient(withInterceptors([authInterceptor,errorInterceptor])),
   ],
 };

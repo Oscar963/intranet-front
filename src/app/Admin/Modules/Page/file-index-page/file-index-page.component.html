@@ -142,12 +142,6 @@
                       Cargando datos...
                     </td>
                   </tr>
-                } @else if (!files.length) {
-                  <tr>
-                    <td colspan="8" class="text-secondary text-center">
-                      No se encontraron registros
-                    </td>
-                  </tr>
                 } @else {
                   @for (item of files; track item.id) {
                     <tr>
@@ -325,6 +319,12 @@
                             />
                           </svg>
                         </a>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="8" class="text-secondary text-center">
+                        No se encontraron registros
                       </td>
                     </tr>
                   }

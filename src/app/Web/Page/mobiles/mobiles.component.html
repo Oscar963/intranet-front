@@ -31,43 +31,45 @@
                   placeholder="Buscar ..."
                 />
                 <span class="input-icon-addon">
-                  @if(!loading){
-                  <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon icon-1"
-                  >
-                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
-                    <path d="M21 21l-6 -6"></path>
-                  </svg>
+                  @if (!loading) {
+                    <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-1"
+                    >
+                      <path
+                        d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
+                      ></path>
+                      <path d="M21 21l-6 -6"></path>
+                    </svg>
                   } @else {
-                  <a href="#" class="btn btn-icon" aria-label="Button">
-                    <div
-                      class="spinner-border spinner-border-sm text-secondary"
-                      role="status"
-                    ></div>
-                  </a>
+                    <a href="#" class="btn btn-icon" aria-label="Button">
+                      <div
+                        class="spinner-border spinner-border-sm text-secondary"
+                        role="status"
+                      ></div>
+                    </a>
                   }
                 </span>
               </div>
             </div>
           </form>
           <div class="card">
-            @if(loading){
-            <div class="progress progress-sm">
-              <div class="progress-bar progress-bar-indeterminate"></div>
-            </div>
+            @if (loading) {
+              <div class="progress progress-sm">
+                <div class="progress-bar progress-bar-indeterminate"></div>
+              </div>
             }
             <div class="table-responsive">
-              <table class="table card-table text-nowrap table-hover">
+              <table class="card-table table-hover table text-nowrap">
                 <thead>
                   <tr>
                     <th>Número</th>
@@ -77,40 +79,44 @@
                   </tr>
                 </thead>
                 <tbody class="align-middle">
-                  @if(loading){
-                  <tr>
-                    <td colspan="8" class="text-secondary text-center">
-                      Cargando datos...
-                    </td>
-                  </tr>
-                  } @else if (!mobiles.length) {
-                  <tr>
-                    <td colspan="8" class="text-secondary text-center">
-                      No se encontraron registros
-                    </td>
-                  </tr>
-                  } @else { @for (item of mobiles; track item.id) {
-                  <tr>
-                    <td>
-                      <span class="text-secondary">{{ item.number }}</span>
-                    </td>
-                    <td>
-                      <span class="text-secondary">{{ item.office }}</span>
-                    </td>
-                    <td>
-                      <span class="text-secondary">{{ item.direction }}</span>
-                    </td>
-                    <td>
-                      <span class="text-secondary">{{ item.person }}</span>
-                    </td>
-                  </tr>
-                  } }
+                  @if (loading) {
+                    <tr>
+                      <td colspan="8" class="text-secondary text-center">
+                        Cargando datos...
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (item of mobiles; track item.id) {
+                      <tr>
+                        <td>
+                          <span class="text-secondary">{{ item.number }}</span>
+                        </td>
+                        <td>
+                          <span class="text-secondary">{{ item.office }}</span>
+                        </td>
+                        <td>
+                          <span class="text-secondary">{{
+                            item.direction
+                          }}</span>
+                        </td>
+                        <td>
+                          <span class="text-secondary">{{ item.person }}</span>
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="8" class="text-secondary text-center">
+                          No se encontraron registros
+                        </td>
+                      </tr>
+                    }
+                  }
                 </tbody>
               </table>
             </div>
 
             <div class="card-footer d-flex align-items-center">
-              <p class="m-0 text-secondary">
+              <p class="text-secondary m-0">
                 Mostrando <span>{{ meta.from }}</span> a
                 <span>{{ meta.to }}</span> de
                 <span>{{ meta.total }}</span> registros
@@ -143,15 +149,15 @@
                 </li>
 
                 <!-- Enlaces de páginas -->
-                @for( page of meta.links; track page.id; let idx = $index) {
-                <li class="page-item" [class.active]="page.active">
-                  <a
-                    class="page-link"
-                    (click)="goToPage(page.page)"
-                    [innerHTML]="page.label"
-                    href="javascript:void(0)"
-                  ></a>
-                </li>
+                @for (page of meta.links; track page.id; let idx = $index) {
+                  <li class="page-item" [class.active]="page.active">
+                    <a
+                      class="page-link"
+                      (click)="goToPage(page.page)"
+                      [innerHTML]="page.label"
+                      href="javascript:void(0)"
+                    ></a>
+                  </li>
                 }
                 <!-- Botón siguiente -->
                 <li class="page-item" [class.disabled]="!links.next">

@@ -24,7 +24,7 @@ export class IndexAdminComponent implements OnInit {
   };
 
   public nameAvatar: string = '';
-  
+
   constructor() {}
 
   ngOnInit() {
