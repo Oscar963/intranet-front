@@ -1,11 +1,10 @@
 export interface File {
   id: number;
   name: string;
-  description?: string;
+  description: string;
   url: string;
   type: string;
   size: number;
-//  page_id: number;
   created_at: string;
   updated_at: string;
   created_by: {

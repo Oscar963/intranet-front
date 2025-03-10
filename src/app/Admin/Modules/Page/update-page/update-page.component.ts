@@ -59,7 +59,7 @@ export class UpdatePageComponent {
   form: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
     status: new FormControl('', [Validators.required]),
-    content: new FormControl('', [Validators.required]),
+    content: new FormControl(''),
   });
 
   ngOnInit(): void {

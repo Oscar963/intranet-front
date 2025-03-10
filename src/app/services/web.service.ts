@@ -76,7 +76,18 @@ export class WebService {
    */
   getPageById(id: number): Observable<any> {
     return this.http
-      .get<{ data: any }>(`${this.apiUrl}/api/web/pages/${id}`)
+      .get<{ data: any }>(`${this.apiUrl}/api/web/pages/id/${id}`)
+      .pipe(map((response) => response.data));
+  }
+
+  /**
+   * Obtener un popup específico por su ID.
+   * @param id Identificador del popup.
+   * @returns Observable con los datos del popup.
+   */
+  getPageBySlug(slug: string): Observable<any> {
+    return this.http
+      .get<{ data: any }>(`${this.apiUrl}/api/web/pages/slug/${slug}`)
       .pipe(map((response) => response.data));
   }
 
@@ -112,7 +123,7 @@ export class WebService {
   searchAnexos(query: string, page: number = 1, show: number): Observable<any> {
     return this.http
       .get<any>(
-        `${this.apiUrl}/api/web/anexos/search?q=${query}&page=${page}&show=${show}`
+        `${this.apiUrl}/api/web/anexos/search?q=${query}&page=${page}&show=${show}`,
       )
       .pipe(map((response) => response.data));
   }
@@ -122,10 +133,14 @@ export class WebService {
    * @param query Texto de búsqueda.
    * @returns Observable con los archivos que coincidan con la búsqueda.
    */
-  searchMobiles(query: string, page: number = 1, show: number): Observable<any> {
+  searchMobiles(
+    query: string,
+    page: number = 1,
+    show: number,
+  ): Observable<any> {
     return this.http
       .get<any>(
-        `${this.apiUrl}/api/web/mobiles/search?q=${query}&page=${page}&show=${show}`
+        `${this.apiUrl}/api/web/mobiles/search?q=${query}&page=${page}&show=${show}`,
       )
       .pipe(map((response) => response.data));
   }

@@ -54,7 +54,7 @@ export class StorePageComponent {
   form: FormGroup = new FormGroup({
     title: new FormControl('', [Validators.required]),
     status: new FormControl('', [Validators.required]),
-    content: new FormControl('', [Validators.required]),
+    content: new FormControl(''),
   });
 
   onSubmit(): void {
