@@ -65,7 +65,7 @@ export class PageComponent {
     this.webService.getPageBySlug(this.slug).subscribe({
       next: (response) => {
         this.page = response;
-        console.log(this.page.files);
+        console.log(this.page);
       },
       error: (error) => {
         console.error('Error al cargar la página:', error);
@@ -112,7 +112,7 @@ export class PageComponent {
       },
     });
 
-    this.fileService.downloadFile(fileId).subscribe({
+    this.webService.downloadFile(fileId).subscribe({
       next: (response: HttpResponse<Blob>) => {
         Swal.close();
 

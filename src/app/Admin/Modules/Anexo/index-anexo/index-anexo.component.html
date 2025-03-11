@@ -123,12 +123,12 @@
             <table class="card-table table-hover table text-nowrap ">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Número interno</th>
-                  <th>Número externo</th>
-                  <th>Oficina</th>
-                  <th>Unidad</th>
-                  <th>Funcionario</th>
+                  <th class="w-5">#</th>
+                  <th class="w-5">N° interno</th>
+                  <th class="w-5">N° externo</th>
+                  <th class="w-5">Oficina</th>
+                  <th class="w-5">Unidad</th>
+                  <th class="w-12">Funcionario</th>
                   <th></th>
                 </tr>
               </thead>
@@ -160,7 +160,7 @@
                         <span class="text-secondary">{{ item.unit }}</span>
                       </td>
                       <td>
-                        <span class="text-secondary">{{ item.person }}</span>
+                        <span class="d-inline-block text-secondary text-truncate" style="max-width: 250px;">{{ item.person }}</span>
                       </td>
                       <td>
                         <a

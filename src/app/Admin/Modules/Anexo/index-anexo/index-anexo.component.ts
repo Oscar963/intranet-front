@@ -23,7 +23,7 @@ export class IndexAnexoComponent {
   public successMessage: string | null = null;
 
   public anexos: Anexo[] = [];
-  public show: number = 15;
+  public show: number = 50;
   public meta: any = {};
   public links: any = {};
   public loading: boolean = false;

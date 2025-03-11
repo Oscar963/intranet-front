@@ -37,6 +37,7 @@
             </div>
           </div>
         }
+
         <div class="col-lg-12">
           <div class="row g-2 align-items-center mb-2">
             <div class="col">
@@ -58,7 +59,7 @@
                       </div>
                       <div class="col">
                         <h4 class="card-title m-0">
-                          <a href="#">{{ item.name }}</a>
+                          {{ item.name }}
                         </h4>
                         <div class="text-secondary">{{ item.description }}</div>
                       </div>
@@ -66,7 +67,7 @@
                         <div class="text-secondary">{{ item.type }}</div>
                       </div>
                       <div class="col">
-                        <div class="text-secondary">{{ item.size }}</div>
+                        <div class="text-secondary">{{ item.size }}MB</div>
                       </div>
                       <div class="col-auto">
                         <a

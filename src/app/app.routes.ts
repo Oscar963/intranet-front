@@ -56,6 +56,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./Web/Page/page/page.component').then((m) => m.PageComponent),
       },
+
+      {
+        path: 'contact',
+        title: 'Contacto',
+        loadComponent: () =>
+          import('./Web/Page/contact/contact.component').then(
+            (m) => m.ContactComponent,
+          ),
+      },
     ],
   },
 

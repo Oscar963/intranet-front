@@ -108,8 +108,7 @@ export class WebService {
    * @param fileName Nombre del archivo para la descarga.
    */
   downloadFile(id: number): Observable<HttpResponse<Blob>> {
-    // <-- Cambio aquí
-    return this.http.get(`${this.apiUrl}/api/web/files/${id}/download`, {
+    return this.http.get(`${this.apiUrl}/api/web/pages/files/${id}/download`, {
       responseType: 'blob',
       observe: 'response', // <-- Añade esta opción
     });

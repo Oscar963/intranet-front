@@ -45,9 +45,7 @@ export class MobilesComponent {
     this.loading = true;
 
     this.webService.searchMobiles(query, page, show).subscribe({
-      next: (response) => {
-        console.log(response);
-        
+      next: (response) => {        
         this.mobiles = response.data;
         this.meta = {
           current_page: response.meta.current_page,

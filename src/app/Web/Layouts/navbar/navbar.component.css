@@ -18,6 +18,12 @@
   font-size: 85.714285%;
   color: #d63939;
 }
+
 .container-tight {
   max-width: 600px;
+}
+
+.navbar {
+  border-bottom: 6px solid;
+  border-image: linear-gradient(90deg, #00bb95 25%, #ffca48 25%, #ffca48 50%, #ff6948 50%, #ff6948 75%, #00a7e6 75%) 1;
 }
