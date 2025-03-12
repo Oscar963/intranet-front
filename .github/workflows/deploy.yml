@@ -2,32 +2,25 @@ on:
   push:
     branches:
       - main
-
-name: 🚀 Despliegue sitio web on push
-
+name: 🚀 Despliege sitioweb on push
 jobs:
   web-deploy:
-    name: 🎉 Despliegue
+    name: 🎉 Despliege
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2.3.2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: Install dependencies and build project
+        run: |
+          npm install
+          npm run build
 
-    - name: Install dependencies and build project
-      run: |
-        npm install
-        npm run build
-
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      with:
-        server: dev.imaarica.cl
-        username: ${{ secrets.ftp_username }}
-        password: ${{ secrets.ftp_password }}
-        local-dir: ./dist/
-        server-dir: ./
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: dev.imaarica.cl
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          local-dir: ./dist/
+          server-dir: ./
