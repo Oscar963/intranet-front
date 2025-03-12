@@ -1,25 +1,71 @@
 <div class="page-wrapper">
   <!-- Page header -->
-  <div class="page-header d-print-none mt-3">
-    <div class="container-xl">
-      <div class="row g-2 align-items-center">
-        <div class="col">
-          <h2 class="page-title">
-            <img
-              class="rounded-4 w-100"
-              src="/assets/img/page/celulares.png"
-              alt=""
-            />
-          </h2>
+  <div class="page-header d-print-none mt-0">
+    <div class="container-fluid m-0 p-0">
+      <div id="banner-title" class="banner-title dark-background">
+        <img
+          src="/assets/img/page/edificio-consitorial.jpg"
+          class="h-100 w-100"
+        />
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 d-flex">
+              <h2 class="text-white">Celulares Municipales</h2>
+              <img
+                src="/assets/img/logos/logo-blanco.png"
+                class="img-logo me-auto"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
   <!-- Page body -->
   <div class="page-body">
     <div class="container-xl">
       <!-- Content here -->
       <div class="row row-cards">
+        <div class="col-12">
+          <div class="alert alert-info mb-0 bg-white" role="alert">
+            <div class="d-flex">
+              <div class="ml-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="icon alert-icon"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <circle cx="12" cy="12" r="9" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                  <polyline points="11 12 12 12 12 16 13 16" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="alert-title" style="margin-left: 5px">
+                  Información
+                </h4>
+                <div class="text-secondary">
+                  <p>
+                    Las unidades municipales son responsables de informar sobre
+                    cualquier cambio o modificación para mantener actualizada la
+                    base de datos. Si necesitas realizar una actualización,
+                    informar al correo de
+                    <strong>ingenieria.redes&#64;municipalidadarica.cl</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="col-12">
           <form [formGroup]="form" (ngSubmit)="onSubmit()">
             <div class="mb-3">
@@ -115,77 +161,87 @@
               </table>
             </div>
 
-            <div class="card-footer d-flex align-items-center">
-              <p class="text-secondary m-0">
-                Mostrando <span>{{ meta.from }}</span> a
-                <span>{{ meta.to }}</span> de
-                <span>{{ meta.total }}</span> registros
-              </p>
-              <ul class="pagination m-0 ms-auto">
-                <!-- Botón anterior -->
-                <li class="page-item" [class.disabled]="!links.prev">
-                  <button
-                    class="page-link"
-                    (click)="goToPage(meta.current_page - 1)"
-                    [attr.aria-disabled]="!links.prev"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="icon"
+            <div class="d-sm-none d-md-block">
+              <div class="card-footer d-flex align-items-center">
+                <p class="text-secondary m-0">
+                  Mostrando <span>{{ meta.from }}</span> a
+                  <span>{{ meta.to }}</span> de
+                  <span>{{ meta.total }}</span> registros
+                </p>
+                <ul class="pagination m-0 ms-auto">
+                  <!-- Botón anterior -->
+                  <li class="page-item" [class.disabled]="!links.prev">
+                    <button
+                      class="page-link"
+                      (click)="goToPage(meta.current_page - 1)"
+                      [attr.aria-disabled]="!links.prev"
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <path d="M15 6l-6 6l6 6"></path>
-                    </svg>
-                    prev
-                  </button>
-                </li>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M15 6l-6 6l6 6"></path>
+                      </svg>
+                      prev
+                    </button>
+                  </li>
 
-                <!-- Enlaces de páginas -->
-                @for (page of meta.links; track page.id; let idx = $index) {
-                  <li class="page-item" [class.active]="page.active">
+                  <!-- Enlaces de páginas -->
+                  @for (page of meta.links; track page.id; let idx = $index) {
+                    <li class="page-item" [class.active]="page.active">
+                      <a
+                        class="page-link"
+                        (click)="goToPage(page.page)"
+                        [innerHTML]="page.label"
+                        href="javascript:void(0)"
+                      ></a>
+                    </li>
+                  }
+                  <!-- Botón siguiente -->
+                  <li class="page-item" [class.disabled]="!links.next">
                     <a
                       class="page-link"
-                      (click)="goToPage(page.page)"
-                      [innerHTML]="page.label"
+                      (click)="goToPage(meta.current_page + 1)"
+                      [attr.aria-disabled]="!links.next"
                       href="javascript:void(0)"
-                    ></a>
-                  </li>
-                }
-                <!-- Botón siguiente -->
-                <li class="page-item" [class.disabled]="!links.next">
-                  <a
-                    class="page-link"
-                    (click)="goToPage(meta.current_page + 1)"
-                    [attr.aria-disabled]="!links.next"
-                    href="javascript:void(0)"
-                  >
-                    next
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="icon"
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <path d="M9 6l6 6l-6 6"></path>
-                    </svg>
-                  </a>
-                </li>
-              </ul>
+                      next
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="icon"
+                      >
+                        <path
+                          stroke="none"
+                          d="M0 0h24v24H0z"
+                          fill="none"
+                        ></path>
+                        <path d="M9 6l6 6l-6 6"></path>
+                      </svg>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
