@@ -1,26 +1,29 @@
+name: 🚀 Despliegue de Angular on push
+
 on:
   push:
     branches:
       - main
-name: 🚀 Despliege sitioweb on push
+
 jobs:
   web-deploy:
-    name: 🎉 Despliege
+    name: 🎉 Despliegue
     runs-on: ubuntu-latest
     steps:
-      - name: 🚚 Get latest code
+      - name: 🚚 Obtener el código más reciente
         uses: actions/checkout@v2.3.2
 
-      - name: Install dependencies and build project
+      - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
           npm install
-          npm run build
+          npm install -g @angular/cli
+          ng build --configuration=production
 
-      - name: 📂 Sync files
+      - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: dev.imaarica.cl
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
-          local-dir: ./dist/
+          local-dir: ./dist/angular-19-app/browser/
           server-dir: ./
