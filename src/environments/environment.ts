@@ -1,5 +1,4 @@
 export const environment = {
-    API_URL: 'http://localhost:8000',
-    production: true
-
+  API_URL: 'https://dev.imaarica.cl',
+  production: true,
 };
