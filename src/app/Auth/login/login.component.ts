@@ -28,8 +28,8 @@ export class LoginComponent {
   public successMessage: string = '';
 
   form = new FormGroup({
-    rut: new FormControl('68243787-1', [Validators.required, RutValidator]),
-    password: new FormControl('password123', [Validators.required]),
+    rut: new FormControl('', [Validators.required, RutValidator]),
+    password: new FormControl('', [Validators.required]),
     remember: new FormControl(false),
   });
 
