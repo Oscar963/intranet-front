@@ -24,7 +24,7 @@ jobs:
       # Paso 3: Instalar dependencias y construir el proyecto Angular
       - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
-          npm ci --omit=dev
+          npm ci
           npx ng build --configuration=production
 
       # Paso 4: Crear el archivo .htaccess para configuraciones de Apache y PHP
@@ -49,51 +49,33 @@ jobs:
           </IfModule>
           EOF
 
-      # Paso 6: Verificar si el archivo .htaccess se creó correctamente
-      - name: ✅ Verificar archivo .htaccess
-        run: |
-          if [ -f ./dist/angular-19-app/browser/.htaccess ]; then
-            echo ".htaccess creado correctamente"
-          else
-            echo "⚠️ Error: .htaccess no se creó correctamente" && exit 1
-          fi
-
-      # Paso 7: Verificar el contenido de la build antes de desplegar
-      - name: 🔍 Verificar contenido de la build
-        run: ls -la ./dist/angular-19-app/browser/
-
       # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: dev.imaarica.cl
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
-          dangerous-clean-slate: true # Limpieza completa antes de subir
 
-      # Paso 9: Notificar despliegue exitoso
-      - name: ✅ Notificar despliegue exitoso
-        if: success()
-        run: echo "El despliegue fue exitoso 🚀"
-
-      # Paso 10: Notificar error en el despliegue
+      # Paso 6: Notificación en caso de que el despliegue falle
       - name: 🚨 Notificar error en el despliegue
         if: failure()
-        run: echo "El despliegue ha fallado 😢"
+        run:
+          echo "El despliegue ha fallado 😢"
 
-      # 🔄 Activar las extensiones PHP
-      # Si tu servidor es administrado (como en un hosting compartido), las opciones son:
-      #
-      # 1. Contactar al proveedor: Solicita que activen las extensiones necesarias.
-      #
-      # 2. Usar php.ini: Si te permiten usar un archivo php.ini personalizado, puedes intentar agregar:
-      #
-      # extension=mbstring
-      # extension=intl
-      # extension=bcmath
-      # extension=pdo
-      # extension=pdo_mysql
-      #
-      # Nota: La habilitación de extensiones PHP depende del entorno del servidor.
+          # 🔄 ¿Cómo activar las extensiones PHP?
+          # Si tu servidor es administrado (como en un hosting compartido), las opciones son:
+          #
+          # 1. Contactar al proveedor: Solicita que activen las extensiones necesarias.
+          #
+          # 2. Usar php.ini: Si te permiten usar un archivo php.ini personalizado, puedes intentar agregar:
+          #
+          # extension=mbstring
+          # extension=intl
+          # extension=bcmath
+          # extension=pdo
+          # extension=pdo_mysql
+          #
+          # Nota: La habilitación de extensiones PHP depende del entorno del servidor.
