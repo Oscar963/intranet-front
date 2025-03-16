@@ -24,6 +24,20 @@ jobs:
           npm ci
           npx ng build --configuration=production
 
+      - name: 🛠️ Crear archivo .htaccess
+        run: |
+          cat <<EOF > ./dist/angular-19-app/browser/.htaccess
+          <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteBase /
+
+            # Redirige todas las solicitudes a index.html, excepto las solicitudes de archivos existentes
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^.*$ index.html [L]
+          </IfModule>
+          EOF
+
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
