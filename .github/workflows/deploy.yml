@@ -49,13 +49,22 @@ jobs:
           </IfModule>
           EOF
 
+      # Paso 6: Verificar si el archivo .htaccess se creó correctamente
+      - name: ✅ Verificar archivo .htaccess
+        run: |
+          if [ -f ./dist/angular-19-app/browser/.htaccess ]; then
+            echo ".htaccess creado correctamente"
+          else
+            echo "⚠️ Error: .htaccess no se creó correctamente" && exit 1
+          fi
+
       # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: dev.imaarica.cl
-          username: ${{ secrets.ftp_username }}
-          password: ${{ secrets.ftp_password }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
           dangerous-clean-slate: true # Limpieza completa antes de subir
