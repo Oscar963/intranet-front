@@ -28,7 +28,7 @@ jobs:
       - name: 🔧 Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18" # Versión específica de Node.js
+          node-version: "22.14.0" # Versión específica de Node.js
 
       # Paso 4: Instalar dependencias y construir el proyecto en modo producción
       - name: 🔧 Instalar dependencias y construir el proyecto
