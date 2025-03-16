@@ -15,39 +15,39 @@ jobs:
       - name: 🚚 Obtener el código más reciente
         uses: actions/checkout@v4
 
-      # Paso 3: Configurar Node.js
+      # Paso 2: Configurar Node.js en la versión especificada
       - name: 🔧 Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.14.0" # Versión específica de Node.js
+          node-version: "18" # Versión específica de Node.js
 
-      # Paso 4: Instalar dependencias y construir el proyecto en modo producción
+      # Paso 3: Instalar dependencias y construir el proyecto Angular
       - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
-          npm ci --omit=dev # Instalación solo de dependencias necesarias para producción
-          npx ng build --configuration=production # Construcción del proyecto Angular
+          npm ci --omit=dev
+          npx ng build --configuration=production
 
-      # Paso 5: Crear el archivo .htaccess con configuraciones de Apache y PHP
+      # Paso 4: Crear el archivo .htaccess para configuraciones de Apache y PHP
       - name: 🛠️ Crear archivo .htaccess
         run: |
           cat <<EOF > ./dist/angular-19-app/browser/.htaccess
-          # Configuración para redirección en Angular usando mod_rewrite
           <IfModule mod_rewrite.c>
             RewriteEngine On
             RewriteBase /
 
-            # Redirige todas las solicitudes a index.html, excepto archivos o directorios existentes
+            # Redirige todas las solicitudes a index.html, excepto las solicitudes de archivos existentes
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteCond %{REQUEST_FILENAME} !-d
             RewriteRule ^.*$ index.html [L]
           </IfModule>
 
-          # Configuración de valores PHP personalizados
+            # Configuración de PHP
           <IfModule mod_php.c>
-            php_value post_max_size 256M # Tamaño máximo para datos POST
-            php_value upload_max_filesize 256M # Tamaño máximo para archivos subidos
-            php_value max_execution_time 300 # Tiempo máximo de ejecución de un script en segundos
+            php_value post_max_size 256M
+            php_value upload_max_filesize 256M
+            php_value max_execution_time 300
           </IfModule>
+          EOF
 
       # Paso 6: Verificar si el archivo .htaccess se creó correctamente
       - name: ✅ Verificar archivo .htaccess
@@ -62,7 +62,7 @@ jobs:
       - name: 🔍 Verificar contenido de la build
         run: ls -la ./dist/angular-19-app/browser/
 
-      # Paso 8: Sincronizar archivos por FTP al servidor
+      # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
@@ -81,7 +81,7 @@ jobs:
       # Paso 10: Notificar error en el despliegue
       - name: 🚨 Notificar error en el despliegue
         if: failure()
-        run: echo "El despliegue ha fallado 😢"        
+        run: echo "El despliegue ha fallado 😢"
 
       # 🔄 Activar las extensiones PHP
       # Si tu servidor es administrado (como en un hosting compartido), las opciones son:
