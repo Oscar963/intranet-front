@@ -15,15 +15,6 @@ jobs:
       - name: 🚚 Obtener el código más reciente
         uses: actions/checkout@v4
 
-      # Paso 2: Cachear dependencias de Node.js para acelerar el despliegue
-      - name: ⚡️ Cachear dependencias de Node.js
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       # Paso 3: Configurar Node.js
       - name: 🔧 Configurar Node.js
         uses: actions/setup-node@v4
