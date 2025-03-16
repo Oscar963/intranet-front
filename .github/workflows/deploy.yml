@@ -3,27 +3,31 @@ name: 🚀 Despliegue de Angular on push
 on:
   push:
     branches:
-      - main
+      - main # El flujo se ejecuta en cada push a la rama main
 
 jobs:
   web-deploy:
     name: 🎉 Despliegue
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Utiliza la última versión de Ubuntu para la ejecución
 
     steps:
+      # Paso 1: Obtener el código más reciente del repositorio
       - name: 🚚 Obtener el código más reciente
         uses: actions/checkout@v4
 
+      # Paso 2: Configurar Node.js en la versión especificada
       - name: 🔧 Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "18" # Versión específica de Node.js
 
+      # Paso 3: Instalar dependencias y construir el proyecto Angular
       - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
           npm ci
           npx ng build --configuration=production
 
+      # Paso 4: Crear el archivo .htaccess para configuraciones de Apache y PHP
       - name: 🛠️ Crear archivo .htaccess
         run: |
           cat <<EOF > ./dist/angular-19-app/browser/.htaccess
@@ -36,8 +40,16 @@ jobs:
             RewriteCond %{REQUEST_FILENAME} !-d
             RewriteRule ^.*$ index.html [L]
           </IfModule>
+
+            # Configuración de PHP
+          <IfModule mod_php.c>
+            php_value post_max_size 256M
+            php_value upload_max_filesize 256M
+            php_value max_execution_time 300
+          </IfModule>
           EOF
 
+      # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
@@ -46,7 +58,8 @@ jobs:
           password: ${{ secrets.ftp_password }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
-
+          
+      # Paso 6: Notificación en caso de que el despliegue falle
       - name: 🚨 Notificar error en el despliegue
         if: failure()
         run: echo "El despliegue ha fallado 😢"
