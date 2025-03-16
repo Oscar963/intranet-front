@@ -9,21 +9,30 @@ jobs:
   web-deploy:
     name: 🎉 Despliegue
     runs-on: ubuntu-latest
+
     steps:
       - name: 🚚 Obtener el código más reciente
-        uses: actions/checkout@v2.3.2
+        uses: actions/checkout@v4
+
+      - name: 🔧 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
 
       - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
-          npm install
-          npm install -g @angular/cli
-          ng build --configuration=production
+          npm ci
+          npx ng build --configuration=production
 
       - name: 📂 Sincronizar archivos por FTP
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: dev.imaarica.cl
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
+
+      - name: 🚨 Notificar error en el despliegue
+        if: failure()
+        run: echo "El despliegue ha fallado 😢"
