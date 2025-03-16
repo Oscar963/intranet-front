@@ -58,14 +58,13 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
-          dangerous-clean-slate: true # Limpieza completa antes de subir
 
-      # Paso 9: Notificar despliegue exitoso
+      # Paso 6: Notificar despliegue exitoso
       - name: ✅ Notificar despliegue exitoso
         if: success()
         run: echo "El despliegue fue exitoso 🚀"
 
-      # Paso 10: Notificar error en el despliegue
+      # Paso 7: Notificar error en el despliegue
       - name: 🚨 Notificar error en el despliegue
         if: failure()
         run:
