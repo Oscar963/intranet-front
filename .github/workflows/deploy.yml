@@ -24,7 +24,7 @@ jobs:
       # Paso 3: Instalar dependencias y construir el proyecto Angular
       - name: 🔧 Instalar dependencias y construir el proyecto
         run: |
-          npm ci
+          npm ci --omit=dev # Instalación solo de dependencias necesarias para producción
           npx ng build --configuration=production
 
       # Paso 4: Crear el archivo .htaccess para configuraciones de Apache y PHP
