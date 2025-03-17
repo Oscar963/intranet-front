@@ -20,47 +20,47 @@
           <div class="card-header">
             <h3 class="card-title">Formulario de registro</h3>
           </div>
-          @if(loading){
-          <div class="progress progress-sm">
-            <div class="progress-bar progress-bar-indeterminate"></div>
-          </div>
+          @if (loading) {
+            <div class="progress progress-sm">
+              <div class="progress-bar progress-bar-indeterminate"></div>
+            </div>
           }
           <div class="card-body">
-            @if(errorMessage){
-            <div
-              class="alert alert-important alert-danger alert-dismissible"
-              role="alert"
-            >
-              <div class="d-flex">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="icon alert-icon"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
+            @if (errorMessage) {
+              <div
+                class="alert alert-important alert-danger alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon alert-icon"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <div [innerHTML]="errorMessage" class="ms-1"></div>
+                  </div>
                 </div>
-                <div>
-                  <div [innerHTML]="errorMessage" class="ms-1"></div>
-                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
               </div>
-              <a
-                class="btn-close btn-close-white"
-                data-bs-dismiss="alert"
-                aria-label="close"
-              ></a>
-            </div>
             }
             <div class="row">
               <div class="col-md-6">
@@ -80,16 +80,19 @@
                       (form.get('rut')?.touched || form.get('rut')?.dirty)
                     "
                   />
-                  @if(form.get('rut')?.invalid && form.get('rut')?.touched ||
-                  form.get('rut')?.dirty){
-                  @if(form.get('rut')?.hasError('required')){
-                  <span class="invalid-input">El rut es obligatorio.</span>
-                  } @else if(form.get('rut')?.hasError('invalidRut')){
-                  <span class="invalid-input"
-                    >El rut ingresado no es válido.</span
-                  >
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("rut")?.invalid && form.get("rut")?.touched) ||
+                    form.get("rut")?.dirty
+                  ) {
+                    @if (form.get("rut")?.hasError("required")) {
+                      <span class="invalid-input">El rut es obligatorio.</span>
+                    } @else if (form.get("rut")?.hasError("invalidRut")) {
+                      <span class="invalid-input"
+                        >El rut ingresado no es válido.</span
+                      >
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -110,12 +113,17 @@
                       (form.get('name')?.touched || form.get('name')?.dirty)
                     "
                   />
-                  @if(form.get('name')?.invalid && form.get('name')?.touched ||
-                  form.get('name')?.dirty){
-                  @if(form.get('name')?.hasError('required')){
-                  <span class="invalid-input"> El nombre es obligatorio. </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("name")?.invalid && form.get("name")?.touched) ||
+                    form.get("name")?.dirty
+                  ) {
+                    @if (form.get("name")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El nombre es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -138,15 +146,18 @@
                         form.get('paternal_surname')?.dirty)
                     "
                   />
-                  @if(form.get('paternal_surname')?.invalid &&
-                  form.get('paternal_surname')?.touched ||
-                  form.get('paternal_surname')?.dirty){
-                  @if(form.get('paternal_surname')?.hasError('required')){
-                  <span class="invalid-input">
-                    El apellido paterno es obligatorio.
-                  </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("paternal_surname")?.invalid &&
+                      form.get("paternal_surname")?.touched) ||
+                    form.get("paternal_surname")?.dirty
+                  ) {
+                    @if (form.get("paternal_surname")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El apellido paterno es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -169,15 +180,18 @@
                         form.get('maternal_surname')?.dirty)
                     "
                   />
-                  @if(form.get('maternal_surname')?.invalid &&
-                  form.get('maternal_surname')?.touched ||
-                  form.get('maternal_surname')?.dirty){
-                  @if(form.get('maternal_surname')?.hasError('required')){
-                  <span class="invalid-input">
-                    El apellido materno es obligatorio.
-                  </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("maternal_surname")?.invalid &&
+                      form.get("maternal_surname")?.touched) ||
+                    form.get("maternal_surname")?.dirty
+                  ) {
+                    @if (form.get("maternal_surname")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El apellido materno es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -198,18 +212,22 @@
                       (form.get('email')?.touched || form.get('email')?.dirty)
                     "
                   />
-                  @if(form.get('email')?.invalid && form.get('email')?.touched
-                  || form.get('email')?.dirty){
-                  @if(form.get('email')?.hasError('required')){
-                  <span class="invalid-input">
-                    El correo electrónico es obligatorio.
-                  </span>
-                  } @else if(form.get('email')?.hasError('email')){
-                  <span class="invalid-input">
-                    El correo electrónico no es válido.
-                  </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("email")?.invalid &&
+                      form.get("email")?.touched) ||
+                    form.get("email")?.dirty
+                  ) {
+                    @if (form.get("email")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El correo electrónico es obligatorio.
+                      </span>
+                    } @else if (form.get("email")?.hasError("email")) {
+                      <span class="invalid-input">
+                        El correo electrónico no es válido.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -258,39 +276,69 @@
                       <span class="form-check-label">Suspendido</span>
                     </label>
                   </div>
-                  @if(form.get('status')?.invalid && form.get('status')?.touched
-                  || form.get('status')?.dirty){
-                  @if(form.get('status')?.hasError('required')){
-                  <span class="invalid-input"> El estado es obligatorio. </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("status")?.invalid &&
+                      form.get("status")?.touched) ||
+                    form.get("status")?.dirty
+                  ) {
+                    @if (form.get("status")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El estado es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
-              <hr class="pb-0 mb-0" />
+              <hr class="mb-0 pb-0" />
               <div class="col-md-12">
                 <div>
-                  <div class="alert alert-info pb-0" role="alert">
-                    <h4 class="alert-title">
-                      La contraseña debe cumplir con los siguientes requisitos:
-                    </h4>
-                    <div class="text-secondary">
-                      <ul>
-                        <li>Tener al menos 8 caracteres de longitud.</li>
-                        <li>
-                          Incluir al menos una letra mayúscula y una letra
-                          minúscula.
-                        </li>
-                        <li>Al menos una letra minúscula.</li>
-                        <li>
-                          Incluir al menos un carácter especial (por ejemplo, #,
-                          $, !, %, etc.).
-                        </li>
-                        <li>
-                          No debe haber sido comprometida en brechas de
-                          seguridad.
-                        </li>
-                      </ul>
+                  <div class="alert alert-info" role="alert">
+                    <div class="d-flex">
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="icon alert-icon"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          stroke-width="2"
+                          stroke="currentColor"
+                          fill="none"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <circle cx="12" cy="12" r="9" />
+                          <line x1="12" y1="8" x2="12.01" y2="8" />
+                          <polyline points="11 12 12 12 12 16 13 16" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 class="alert-title" style="margin-left: 5px">
+                          La contraseña debe cumplir con los siguientes
+                          requisitos:
+                        </h4>
+                        <div class="text-secondary">
+                          <ul>
+                            <li>Tener al menos 8 caracteres de longitud.</li>
+                            <li>
+                              Incluir al menos una letra mayúscula y una letra
+                              minúscula.
+                            </li>
+                            <li>Al menos una letra minúscula.</li>
+                            <li>
+                              Incluir al menos un carácter especial (por ejemplo, #,
+                              $, !, %, etc.).
+                            </li>
+                            <li>
+                              No debe haber sido comprometida en brechas de
+                              seguridad.
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -316,25 +364,30 @@
                             form.get('password')?.dirty)
                         "
                       />
-                      @if(form.get('password')?.invalid &&
-                      form.get('password')?.touched ||
-                      form.get('password')?.dirty){
-                      @if(form.get('password')?.hasError('required')){
-                      <span class="invalid-input">
-                        La contraseña es obligatoria.
-                      </span>
-                      } @else if(form.get('password')?.hasError('minlength')){
-                      <span class="invalid-input">
-                        La contraseña debe tener al menos 8 caracteres.
-                      </span>
-                      } @else if(form.get('password')?.hasError('pattern')){
-                      <span class="invalid-input">
-                        La contraseña debe contener al menos una letra
-                        mayúscula, una letra minúscula, un número y un carácter
-                        especial.
-                      </span>
-                      } } @else {
-                      <span class="invalid-input">&nbsp;</span>
+                      @if (
+                        (form.get("password")?.invalid &&
+                          form.get("password")?.touched) ||
+                        form.get("password")?.dirty
+                      ) {
+                        @if (form.get("password")?.hasError("required")) {
+                          <span class="invalid-input">
+                            La contraseña es obligatoria.
+                          </span>
+                        } @else if (
+                          form.get("password")?.hasError("minlength")
+                        ) {
+                          <span class="invalid-input">
+                            La contraseña debe tener al menos 8 caracteres.
+                          </span>
+                        } @else if (form.get("password")?.hasError("pattern")) {
+                          <span class="invalid-input">
+                            La contraseña debe contener al menos una letra
+                            mayúscula, una letra minúscula, un número y un
+                            carácter especial.
+                          </span>
+                        }
+                      } @else {
+                        <span class="invalid-input">&nbsp;</span>
                       }
                     </div>
                     <div class="col-auto">
@@ -344,49 +397,50 @@
                         class="btn btn-icon"
                         aria-label="Button"
                       >
-                        @if(showPassword){
-                        <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                          <path
-                            d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
-                          />
-                        </svg>
-                        } @if(!showPassword){
-                        <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye-closed"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path
-                            d="M21 9c-2.4 2.667 -5.4 4 -9 4c-3.6 0 -6.6 -1.333 -9 -4"
-                          />
-                          <path d="M3 15l2.5 -3.8" />
-                          <path d="M21 14.976l-2.492 -3.776" />
-                          <path d="M9 17l.5 -4" />
-                          <path d="M15 17l-.5 -4" />
-                        </svg>
+                        @if (showPassword) {
+                          <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                            <path
+                              d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+                            />
+                          </svg>
+                        }
+                        @if (!showPassword) {
+                          <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-eye-closed"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                              d="M21 9c-2.4 2.667 -5.4 4 -9 4c-3.6 0 -6.6 -1.333 -9 -4"
+                            />
+                            <path d="M3 15l2.5 -3.8" />
+                            <path d="M21 14.976l-2.492 -3.776" />
+                            <path d="M9 17l.5 -4" />
+                            <path d="M15 17l-.5 -4" />
+                          </svg>
                         }
                       </a>
                     </div>
@@ -416,20 +470,29 @@
                             form.get('password_confirmation')?.dirty)
                         "
                       />
-                      @if(form.get('password_confirmation')?.invalid &&
-                      form.get('password_confirmation')?.touched ||
-                      form.get('password_confirmation')?.dirty){ @if
-                      (form.get('password_confirmation')?.hasError('required')){
-                      <span class="invalid-input">
-                        La confirmación de la contraseña es obligatoria.
-                      </span>
-                      } @else if(form.get('password_confirmation')?.valid &&
-                      form.get('passwordsMatch')?.touched){
-                      <span class="invalid-input">
-                        Las contraseñas no coinciden.
-                      </span>
-                      } } @else {
-                      <span class="invalid-input">&nbsp;</span>
+                      @if (
+                        (form.get("password_confirmation")?.invalid &&
+                          form.get("password_confirmation")?.touched) ||
+                        form.get("password_confirmation")?.dirty
+                      ) {
+                        @if (
+                          form
+                            .get("password_confirmation")
+                            ?.hasError("required")
+                        ) {
+                          <span class="invalid-input">
+                            La confirmación de la contraseña es obligatoria.
+                          </span>
+                        } @else if (
+                          form.get("password_confirmation")?.valid &&
+                          form.get("passwordsMatch")?.touched
+                        ) {
+                          <span class="invalid-input">
+                            Las contraseñas no coinciden.
+                          </span>
+                        }
+                      } @else {
+                        <span class="invalid-input">&nbsp;</span>
                       }
                     </div>
                     <div class="col-auto">
@@ -439,49 +502,50 @@
                         class="btn btn-icon"
                         aria-label="Button"
                       >
-                        @if(showPassword){
-                        <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                          <path
-                            d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
-                          />
-                        </svg>
-                        } @if(!showPassword){
-                        <!-- Download SVG icon from http://tabler-icons.io/i/search -->
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="icon icon-tabler icons-tabler-outline icon-tabler-eye-closed"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                          <path
-                            d="M21 9c-2.4 2.667 -5.4 4 -9 4c-3.6 0 -6.6 -1.333 -9 -4"
-                          />
-                          <path d="M3 15l2.5 -3.8" />
-                          <path d="M21 14.976l-2.492 -3.776" />
-                          <path d="M9 17l.5 -4" />
-                          <path d="M15 17l-.5 -4" />
-                        </svg>
+                        @if (showPassword) {
+                          <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-eye"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                            <path
+                              d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"
+                            />
+                          </svg>
+                        }
+                        @if (!showPassword) {
+                          <!-- Download SVG icon from http://tabler-icons.io/i/search -->
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-eye-closed"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                              d="M21 9c-2.4 2.667 -5.4 4 -9 4c-3.6 0 -6.6 -1.333 -9 -4"
+                            />
+                            <path d="M3 15l2.5 -3.8" />
+                            <path d="M21 14.976l-2.492 -3.776" />
+                            <path d="M9 17l.5 -4" />
+                            <path d="M15 17l-.5 -4" />
+                          </svg>
                         }
                       </a>
                     </div>
@@ -491,37 +555,37 @@
             </div>
           </div>
           <div class="card-footer text-end">
-            @if(loading){
-            <button type="button" class="btn btn-primary" disabled>
-              <span
-                class="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-              Cargando...
-            </button>
+            @if (loading) {
+              <button type="button" class="btn btn-primary" disabled>
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                Cargando...
+              </button>
             } @else {
-            <button type="submit" class="btn btn-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path
-                  d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
-                />
-                <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                <path d="M14 4l0 4l-6 0l0 -4" />
-              </svg>
-              Guardar
-            </button>
+              <button type="submit" class="btn btn-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
+                  />
+                  <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                  <path d="M14 4l0 4l-6 0l0 -4" />
+                </svg>
+                Guardar
+              </button>
             }
           </div>
         </form>
