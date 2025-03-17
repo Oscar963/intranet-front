@@ -19,7 +19,7 @@ export class UserService {
    */
   fetchUsers(page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/users?page=${page}&show=${show}`
+      `${this.apiUrl}/api/users?page=${page}&show=${show}`,
     );
   }
 
@@ -34,7 +34,7 @@ export class UserService {
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
       );
   }
 
@@ -50,7 +50,7 @@ export class UserService {
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
       );
   }
 
@@ -63,7 +63,7 @@ export class UserService {
     return this.http.get<{ data: any }>(`${this.apiUrl}/api/users/${id}`).pipe(
       map((response) => {
         return response.data;
-      })
+      }),
     );
   }
 
@@ -78,7 +78,7 @@ export class UserService {
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
       );
   }
 
@@ -90,14 +90,13 @@ export class UserService {
    */
   resetPassword(id: number, data: {}): Observable<string> {
     return this.http
-      .post<{ message: string }>(
-        `${this.apiUrl}/api/users/reset-password/${id}`,
-        data
-      )
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/api/users/reset-password/${id}`, data)
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
       );
   }
 
@@ -109,14 +108,39 @@ export class UserService {
    */
   updatePassword(data: {}): Observable<string> {
     return this.http
-      .post<{ message: string }>(
-        `${this.apiUrl}/api/users/update-password`,
-        data
-      )
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/api/users/update-password`, data)
       .pipe(
         map((response) => {
           return response.message;
-        })
+        }),
+      );
+  }
+
+  /**
+   * Obtener un usuario
+   * @returns Observable con los datos del usuario.
+   */
+  getUserProfile(): Observable<any> {
+    return this.http
+      .get<{ data: any }>(`${this.apiUrl}/api/users/profile`)
+      .pipe(
+        map((response) => {
+          return response.data;
+        }),
+      );
+  }
+
+  updateProfile(data: {}): Observable<string> {
+    return this.http
+      .post<{
+        message: string;
+      }>(`${this.apiUrl}/api/users/update-profile`, data)
+      .pipe(
+        map((response) => {
+          return response.message;
+        }),
       );
   }
 }

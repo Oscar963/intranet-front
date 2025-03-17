@@ -241,6 +241,13 @@ export const routes: Routes = [
             './Admin/Modules/User/update-password/update-password.component'
           ).then((m) => m.UpdatePasswordComponent),
       },
+      {
+        path: 'users/profile-update',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/User/update-profile/update-profile.component'
+          ).then((m) => m.UpdateProfileComponent),
+      }, 
 
       /** File Routes **/
       {

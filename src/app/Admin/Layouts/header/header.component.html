@@ -12,7 +12,7 @@
       <span class="navbar-toggler-icon text-white"></span>
     </button>
     <h1
-      class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3"
+      class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-md-3 pe-0"
     >
       <a [routerLink]="['/admin/dashboard']">
         <img
@@ -24,7 +24,7 @@
         />
       </a>
     </h1>
-    <div class="navbar-nav flex-row order-md-last">
+    <div class="navbar-nav order-md-last flex-row">
       <div class="nav-item d-none d-md-flex me-3">
         <div class="btn-list">
           <a href="/" class="btn btn-primary" target="_blank" rel="noreferrer">
@@ -68,14 +68,21 @@
 
           <div class="d-none d-xl-block ps-2 text-white">
             <div>{{ user().name }} {{ user().paternal_surname }}</div>
-            <div class="mt-1 small text-white">{{ user().rut }}</div>
+            <div class="small mt-1 text-white">{{ user().rut }}</div>
           </div>
         </a>
         <div
           class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
           data-bs-theme="light"
         >
-          <a [routerLink]="['/admin/users/password-update']" class="dropdown-item"
+          <a
+            [routerLink]="['/admin/users/profile-update']"
+            class="dropdown-item"
+            >Mi Perfil</a
+          >
+          <a
+            [routerLink]="['/admin/users/password-update']"
+            class="dropdown-item"
             >Cambiar contraseña</a
           >
           <button (click)="logout()" class="dropdown-item">

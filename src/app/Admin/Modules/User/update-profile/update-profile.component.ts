@@ -14,20 +14,20 @@ import { NotificationService } from '../../../../services/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-update-user',
+  selector: 'app-update-profile',
   imports: [ReactiveFormsModule],
-  templateUrl: './update-user.component.html',
-  styleUrl: './update-user.component.css',
+  templateUrl: './update-profile.component.html',
+  styleUrl: './update-profile.component.css',
 })
-export class UpdateUserComponent {
+export class UpdateProfileComponent {
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
-  private router = inject(Router);
+  public router = inject(Router);
   private route = inject(ActivatedRoute);
 
   public loading: boolean = false;
   public errorMessage: string = '';
-  public successMessage: string = '';
+  public successMessage: string | null = null;
   public userId!: number;
 
   form: FormGroup = new FormGroup({
@@ -36,17 +36,21 @@ export class UpdateUserComponent {
     maternal_surname: new FormControl('', [Validators.required]),
     rut: new FormControl('', [Validators.required, RutValidator]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    status: new FormControl('', [Validators.required]),
   });
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadUserData();
+
+    // Escuchar mensajes de éxito y error
+    this.notificationService.successMessage$.subscribe(
+      (message) => (this.successMessage = message),
+    );
   }
 
   private loadUserData(): void {
     this.loading = true;
-    this.userService.getUserById(this.userId).subscribe({
+    this.userService.getUserProfile().subscribe({
       next: (user) => {
         this.form.patchValue({
           name: user.name,
@@ -54,7 +58,6 @@ export class UpdateUserComponent {
           paternal_surname: user.paternal_surname,
           maternal_surname: user.maternal_surname,
           email: user.email,
-          status: user.status,
         });
       },
       error: (error) => {
@@ -80,21 +83,18 @@ export class UpdateUserComponent {
     }
 
     const formData = new FormData();
-    formData.append('_method', 'PUT');
     formData.append('name', this.form.value.name);
     formData.append('paternal_surname', this.form.value.paternal_surname);
     formData.append('maternal_surname', this.form.value.maternal_surname);
     formData.append('rut', this.form.value.rut);
     formData.append('email', this.form.value.email);
-    formData.append('status', this.form.value.status);
 
     this.userService
-      .updateUser(this.userId, formData)
+      .updateProfile(formData)
       .subscribe({
         next: (success: string) => {
-          this.form.reset();
           this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/admin/users/profile-update']);
         },
         error: (error) => {
           if (error.status === 422) {
