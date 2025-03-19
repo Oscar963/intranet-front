@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
     ReactiveFormsModule,
     BsDatepickerModule,
     TinymceComponent,
-    RouterLink
+    RouterLink,
   ],
   templateUrl: './update-page.component.html',
   styleUrl: './update-page.component.css',

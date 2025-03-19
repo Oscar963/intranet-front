@@ -21,7 +21,7 @@ export class UploadSimpleImgComponent {
       url: '/upload', // Solo para inicializar Dropzone, no se usa para subir automáticamente.
       maxFiles: 1,
       maxFilesize: 2, // En MB
-      acceptedFiles: '.jpg,.png,.jpeg',
+      acceptedFiles: '.jpg,.png,.jpeg,.webp',
       addRemoveLinks: true, // Mostrar enlace para eliminar archivo
       autoProcessQueue: false, // No subir automáticamente
       uploadMultiple: false,

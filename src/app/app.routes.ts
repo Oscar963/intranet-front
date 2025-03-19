@@ -65,6 +65,28 @@ export const routes: Routes = [
             (m) => m.ContactComponent,
           ),
       },
+
+      /** Auth Routes **/
+      {
+        path: 'login',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./Auth/login/login.component').then((m) => m.LoginComponent),
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./Auth/forgot-password/forgot-password.component').then(
+            (m) => m.ForgotPasswordComponent,
+          ),
+      },
+      {
+        path: 'reset-password/:token',
+        loadComponent: () =>
+          import('./Auth/reset-password/reset-password.component').then(
+            (m) => m.ResetPasswordComponent,
+          ),
+      },
     ],
   },
 
@@ -327,27 +349,6 @@ export const routes: Routes = [
     ],
   },
 
-  /** Auth Routes **/
-  {
-    path: 'login',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./Auth/login/login.component').then((m) => m.LoginComponent),
-  },
-  {
-    path: 'forgot-password',
-    loadComponent: () =>
-      import('./Auth/forgot-password/forgot-password.component').then(
-        (m) => m.ForgotPasswordComponent,
-      ),
-  },
-  {
-    path: 'reset-password/:token',
-    loadComponent: () =>
-      import('./Auth/reset-password/reset-password.component').then(
-        (m) => m.ResetPasswordComponent,
-      ),
-  },
   //  { path: '**', redirectTo: 'login' },
 
   {
