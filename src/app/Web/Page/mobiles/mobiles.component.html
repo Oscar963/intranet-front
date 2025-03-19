@@ -67,49 +67,47 @@
           </div>
         </div>
         <div class="col-12">
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <div class="input-icon">
-                <input
-                  formControlName="query"
-                  type="text"
-                  class="form-control form-control-rounded"
-                  placeholder="Buscar ..."
-                />
-                <span class="input-icon-addon">
-                  @if (!loading) {
-                    <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="icon icon-1"
-                    >
-                      <path
-                        d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
-                      ></path>
-                      <path d="M21 21l-6 -6"></path>
-                    </svg>
-                  } @else {
-                    <a href="#" class="btn btn-icon" aria-label="Button">
-                      <div
-                        class="spinner-border spinner-border-sm text-secondary"
-                        role="status"
-                      ></div>
-                    </a>
-                  }
-                </span>
-              </div>
+          <div class="mb-3">
+            <div class="input-icon">
+              <input
+                [(ngModel)]="query"
+                name="query"
+                type="text"
+                class="form-control form-control-rounded"
+                placeholder="Buscar ..."
+              />
+              <span class="input-icon-addon">
+                @if (!mobilesRs.isLoading()) {
+                  <!-- Download SVG icon from http://tabler.io/icons/icon/search -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon icon-1"
+                  >
+                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path>
+                    <path d="M21 21l-6 -6"></path>
+                  </svg>
+                } @else {
+                  <a href="#" class="input-icon-addon" aria-label="Button">
+                    <div
+                      class="spinner-border spinner-border-sm text-secondary"
+                      role="status"
+                    ></div>
+                  </a>
+                }
+              </span>
             </div>
-          </form>
+          </div>
+
           <div class="card">
-            @if (loading) {
+            @if (mobilesRs.isLoading()) {
               <div class="progress progress-sm">
                 <div class="progress-bar progress-bar-indeterminate"></div>
               </div>
@@ -125,14 +123,14 @@
                   </tr>
                 </thead>
                 <tbody class="align-middle">
-                  @if (loading) {
+                  @if (mobilesRs.isLoading()) {
                     <tr>
                       <td colspan="8" class="text-secondary text-center">
                         Cargando datos...
                       </td>
                     </tr>
                   } @else {
-                    @for (item of mobiles; track item.id) {
+                    @for (item of mobilesRs.value(); track item.id) {
                       <tr>
                         <td>
                           <span class="text-secondary">{{ item.number }}</span>
@@ -164,43 +162,13 @@
             <div class="d-sm-none d-md-block">
               <div class="card-footer d-flex align-items-center">
                 <p class="text-secondary m-0">
-                  Mostrando <span>{{ meta.from }}</span> a
-                  <span>{{ meta.to }}</span> de
-                  <span>{{ meta.total }}</span> registros
+                  Mostrando <span>{{ meta().from }}</span> a
+                  <span>{{ meta().to }}</span> de
+                  <span>{{ meta().total }}</span> registros
                 </p>
                 <ul class="pagination m-0 ms-auto">
-                  <!-- Botón anterior -->
-                  <li class="page-item" [class.disabled]="!links.prev">
-                    <button
-                      class="page-link"
-                      (click)="goToPage(meta.current_page - 1)"
-                      [attr.aria-disabled]="!links.prev"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M15 6l-6 6l6 6"></path>
-                      </svg>
-                      prev
-                    </button>
-                  </li>
-
                   <!-- Enlaces de páginas -->
-                  @for (page of meta.links; track page.id; let idx = $index) {
+                  @for (page of meta().links; track page.id; let idx = $index) {
                     <li class="page-item" [class.active]="page.active">
                       <a
                         class="page-link"
@@ -210,36 +178,6 @@
                       ></a>
                     </li>
                   }
-                  <!-- Botón siguiente -->
-                  <li class="page-item" [class.disabled]="!links.next">
-                    <a
-                      class="page-link"
-                      (click)="goToPage(meta.current_page + 1)"
-                      [attr.aria-disabled]="!links.next"
-                      href="javascript:void(0)"
-                    >
-                      next
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="icon"
-                      >
-                        <path
-                          stroke="none"
-                          d="M0 0h24v24H0z"
-                          fill="none"
-                        ></path>
-                        <path d="M9 6l6 6l-6 6"></path>
-                      </svg>
-                    </a>
-                  </li>
                 </ul>
               </div>
             </div>

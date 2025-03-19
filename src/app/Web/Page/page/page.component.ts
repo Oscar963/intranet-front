@@ -1,11 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, effect, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { WebService } from '../../../services/web.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Page } from '../../../interfaces/Page';
 import Swal from 'sweetalert2';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { FileService } from '../../../services/file.service';
+import { map, switchMap, tap } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-page',
@@ -16,9 +17,8 @@ import { FileService } from '../../../services/file.service';
 export class PageComponent {
   private webService = inject(WebService);
   private route = inject(ActivatedRoute);
-  private fileService = inject(FileService);
 
-  public page: Page = {
+  public page = signal<Page>({
     id: 0,
     title: '',
     content: '',
@@ -43,38 +43,20 @@ export class PageComponent {
       maternal_surname: '',
     },
     deleted_by: null,
-  };
-
-  public slug!: string;
-  public loading: boolean = false;
-  public bannerId!: number; // ID del banner a actualizar
-
-  form = new FormGroup({
-    query: new FormControl(''),
-    show: new FormControl(15),
   });
+  public slug = signal<string>(
+    this.route.snapshot.paramMap.get('slug')?.toString() || '',
+  );
 
-  ngOnInit() {
-    // Obtener el ID del banner desde la URL
-    this.slug = this.route.snapshot.paramMap.get('slug')?.toString() || '';
-    this.loadPage();
-  }
-
-  loadPage(): void {
-    this.loading = true;
-    this.webService.getPageBySlug(this.slug).subscribe({
-      next: (response) => {
-        this.page = response;
-        console.log(this.page);
-      },
-      error: (error) => {
-        console.error('Error al cargar la página:', error);
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
+  public pageRs = rxResource({
+    request: () => ({
+      slug: this.slug(),
+    }),
+    loader: ({ request }) =>
+      this.webService
+        .getPageBySlug(request.slug)
+        .pipe(tap((response) => response.data)),
+  });
 
   getFileImage(fileType: string): string {
     switch (fileType) {

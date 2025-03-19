@@ -85,7 +85,7 @@ export class WebService {
    * @param id Identificador del popup.
    * @returns Observable con los datos del popup.
    */
-  getPageBySlug(slug: string): Observable<any> {
+  getPageBySlug(slug: string): Observable<any> {    
     return this.http
       .get<{ data: any }>(`${this.apiUrl}/api/web/pages/slug/${slug}`)
       .pipe(map((response) => response.data));

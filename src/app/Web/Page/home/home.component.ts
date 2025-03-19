@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { WebService } from '../../../services/web.service';
 import { RouterLink } from '@angular/router';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -10,27 +12,18 @@ import { RouterLink } from '@angular/router';
 })
 export class HomeComponent {
   private webService = inject(WebService);
-  public banners: any[] = []; // Lista para almacenar los banners
-  public loading: boolean = true; // Indicador de carga
 
-  constructor() {}
-
-  ngOnInit(): void {
-    this.loadBanners();
-  }
-
-  loadBanners(): void {
-    this.loading = true;
-    this.webService.fetchBanners().subscribe({
-      next: (response) => {
-        this.banners = response.data;
-      },
-      error: (error) => {
-        console.error('Error al cargar banners:', error);
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
+  //Con rxResource se carga automáticamente los datos de los banners, se filtran los que estén publicados y no hayan expirado
+  public bannersRx = rxResource({
+    loader: () =>
+      this.webService.fetchBanners().pipe(
+        map((response) =>
+          response.data.filter((banner: any) => {
+            const now = new Date(); // Fecha y hora actual
+            const expirationDate = new Date(banner.date_expiration);
+            return banner.status === 'published' && expirationDate > now;
+          }),
+        ),
+      ),
+  });
 }
