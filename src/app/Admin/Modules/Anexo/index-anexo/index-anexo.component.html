@@ -45,82 +45,48 @@
     <!-- Content here -->
     <div class="row row-cards">
       <div class="col-12">
-        @if (successMessage) {
-          <div
-            class="alert alert-important alert-success alert-dismissible"
-            role="alert"
-          >
-            <div class="d-flex">
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-check"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M5 12l5 5l10 -10" />
-                </svg>
-              </div>
-              <span class="ms-1">{{ successMessage }}</span>
-            </div>
-            <a
-              class="btn-close btn-close-white"
-              data-bs-dismiss="alert"
-              aria-label="close"
-            ></a>
-          </div>
-        }
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Listado de Anexos</h3>
           </div>
           <div class="card-body border-bottom py-3">
-            <form [formGroup]="form">
-              <div class="d-flex">
-                <div class="text-secondary">
-                  Mostrar
-                  <div class="d-inline-block mx-2">
-                    <select
-                      formControlName="show"
-                      (change)="onChange($event)"
-                      class="form-select form-select-sm"
-                    >
-                      @for (
-                        value of values;
-                        track value.value;
-                        let idx = $index
-                      ) {
-                        <option value="{{ value.value }}">
-                          {{ value.label }}
-                        </option>
-                      }
-                    </select>
-                  </div>
-                  Registros
+            <div class="d-flex">
+              <div class="text-secondary">
+                Mostrar
+                <div class="d-inline-block mx-2">
+                  <select
+                    [(ngModel)]="show"
+                    name="show"
+                    class="form-select form-select-sm"
+                  >
+                    @for (
+                      value of values;
+                      track value.value;
+                      let idx = $index
+                    ) {
+                      <option value="{{ value.value }}">
+                        {{ value.label }}
+                      </option>
+                    }
+                  </select>
                 </div>
-                <div class="text-secondary ms-auto">
-                  Buscar:
-                  <div class="d-inline-block ms-2">
-                    <input type="text" class="form-control form-control-sm" />
-                  </div>
+                Registros
+              </div>
+              <div class="text-secondary ms-auto">
+                Buscar:
+                <div class="d-inline-block ms-2">
+                  <input type="text" class="form-control form-control-sm" />
                 </div>
               </div>
-            </form>
+            </div>
           </div>
-          @if (loading) {
+          @if (anexoRs.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
           }
           <div class="table-responsive">
-            <table class="card-table table-hover table text-nowrap ">
+            <table class="card-table table-hover table text-nowrap">
               <thead>
                 <tr>
                   <th class="w-5">#</th>
@@ -133,14 +99,14 @@
                 </tr>
               </thead>
               <tbody class="align-middle">
-                @if (loading) {
+                @if (anexoRs.isLoading()) {
                   <tr>
                     <td colspan="8" class="text-secondary text-center">
                       Cargando datos...
                     </td>
                   </tr>
                 } @else {
-                  @for (item of anexos; track item.id) {
+                  @for (item of anexoRs.value(); track item.id) {
                     <tr>
                       <td>{{ $index + 1 }}</td>
                       <td>
@@ -160,7 +126,11 @@
                         <span class="text-secondary">{{ item.unit }}</span>
                       </td>
                       <td>
-                        <span class="d-inline-block text-secondary text-truncate" style="max-width: 250px;">{{ item.person }}</span>
+                        <span
+                          class="d-inline-block text-secondary text-truncate"
+                          style="max-width: 250px"
+                          >{{ item.person }}</span
+                        >
                       </td>
                       <td>
                         <a
@@ -241,39 +211,13 @@
 
           <div class="card-footer d-flex align-items-center">
             <p class="text-secondary m-0">
-              Mostrando <span>{{ meta.from }}</span> a
-              <span>{{ meta.to }}</span> de
-              <span>{{ meta.total }}</span> registros
+              Mostrando <span>{{ meta().from }}</span> a
+              <span>{{ meta().to }}</span> de
+              <span>{{ meta().total }}</span> registros
             </p>
             <ul class="pagination m-0 ms-auto">
-              <!-- Botón anterior -->
-              <li class="page-item" [class.disabled]="!links.prev">
-                <button
-                  class="page-link"
-                  (click)="goToPage(meta.current_page - 1)"
-                  [attr.aria-disabled]="!links.prev"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M15 6l-6 6l6 6"></path>
-                  </svg>
-                  prev
-                </button>
-              </li>
-
               <!-- Enlaces de páginas -->
-              @for (page of meta.links; track page.id; let idx = $index) {
+              @for (page of meta().links; track page.id; let idx = $index) {
                 <li class="page-item" [class.active]="page.active">
                   <a
                     class="page-link"
@@ -283,32 +227,6 @@
                   ></a>
                 </li>
               }
-              <!-- Botón siguiente -->
-              <li class="page-item" [class.disabled]="!links.next">
-                <a
-                  class="page-link"
-                  (click)="goToPage(meta.current_page + 1)"
-                  [attr.aria-disabled]="!links.next"
-                  href="javascript:void(0)"
-                >
-                  next
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M9 6l6 6l-6 6"></path>
-                  </svg>
-                </a>
-              </li>
             </ul>
           </div>
         </div>

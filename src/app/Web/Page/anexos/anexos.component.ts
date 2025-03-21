@@ -44,7 +44,6 @@ export class AnexosComponent {
       show: this.show(),
     }),
     loader: ({ request }) => {
-      // Llamar al servicio que devuelve un Observable
       return this.webService
         .searchAnexos(request.query, request.page, request.show)
         .pipe(

@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class NotificationService {
+
   private successMessageSubject = new BehaviorSubject<string | null>(null);
   private errorMessageSubject = new BehaviorSubject<string | null>(null);
 
@@ -12,8 +13,9 @@ export class NotificationService {
   errorMessage$ = this.errorMessageSubject.asObservable();
 
   showSuccess(message: string): void {
-    this.successMessageSubject.next(message);
-    setTimeout(() => this.clearSuccess(), 10000); // Limpiar después de 3 segundos
+
+    // this.successMessageSubject.next(message);
+    // setTimeout(() => this.clearSuccess(), 10000); // Limpiar después de 3 segundos
   }
 
   showError(message: string): void {

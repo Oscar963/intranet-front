@@ -1,5 +1,5 @@
 <section>
-  <div class="container-xl pt-3">
+  <div style="width: 100%;">
     @defer {
       @let bannersLoaded = bannersRx.value() !== null;
 
@@ -19,7 +19,7 @@
           </div>
 
           <!-- Elementos del carrusel -->
-          <div class="carousel-inner rounded-4">
+          <div class="carousel-inner">
             @for (banner of bannersRx.value(); track $index) {
               <div [class.carousel-item]="true" [class.active]="$index === 0">
                 <a [href]="banner.link">

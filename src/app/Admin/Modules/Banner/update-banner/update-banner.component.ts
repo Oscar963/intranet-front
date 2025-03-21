@@ -1,21 +1,19 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { UploadSimpleImgComponent } from '../../../../Utils/upload-simple-img/upload-simple-img.component';
-import {
-  FormControl,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import dayjs from 'dayjs/esm';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-
+import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { BannerService } from '../../../../services/banner.service';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { ActivatedRoute } from '@angular/router';
-import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../../services/toast.service';
+import { take, tap } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Banner } from '../../../../interfaces/Banner';
+
+import dayjs from 'dayjs/esm';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 @Component({
   selector: 'app-update-banner',
@@ -24,114 +22,143 @@ import { Router } from '@angular/router';
   styleUrl: './update-banner.component.css',
 })
 export class UpdateBannerComponent {
+  // Referencia al componente de subida de imágenes.
+  // Se usa para obtener la imagen seleccionada.
   @ViewChild(UploadSimpleImgComponent)
   UploadSimpleImg!: UploadSimpleImgComponent;
 
+  //Inyección de servicios usando la nueva API de Angular.
   private bannerService = inject(BannerService);
-  private notificationService = inject(NotificationService);
-  public router = inject(Router);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
 
   constructor(private bsLocaleService: BsLocaleService) {
+    // Configura el idioma del datepicker
     defineLocale('es', esLocale);
+    this.bsLocaleService.use('es');
     dayjs.extend(customParseFormat);
-    this.bsLocaleService.use('es'); // Fecha en español, datepicker
+    this.loadBanner();
   }
 
-  public loading: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
-  public bannerId!: number; // ID del banner a actualizar
+  // Variables de estado reactivas
+  public loading = signal(false);
+  public errorMessage = signal<string>('');
+  public bannerId = signal<number>(
+    Number(this.route.snapshot.paramMap.get('id')),
+  );
 
-  form: FormGroup = new FormGroup({
-    title: new FormControl('', [Validators.required]),
-    date_expiration: new FormControl('', [Validators.required]),
-    status: new FormControl('', [Validators.required]),
-    link: new FormControl(''),
+  // Definición del formulario con validaciones
+  form = this.fb.nonNullable.group({
+    title: ['', Validators.required],
+    date_expiration: ['', Validators.required],
+    status: ['', Validators.required],
+    link: '',
   });
 
-  ngOnInit(): void {
-    // Obtener el ID del banner desde la URL
-    this.bannerId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadBannerData();
-  }
-
-  // Cargar datos del banner existente
-  private loadBannerData(): void {
-    this.loading = true;
-    this.bannerService.getBannerById(this.bannerId).subscribe({
-      next: (banner) => {        
-        this.form.patchValue({
-          title: banner.title,
-          date_expiration: dayjs(
-            banner.date_expiration,
-            'DD-MM-YYYY HH:mm:ss'
-          ).format('YYYY-MM-DD HH:mm'),
-          status: banner.status,
-          link: banner.link,
-        });
-      },
-      error: (error) => {
-        this.errorMessage = 'No se pudieron cargar los datos del banner.';
-      },
-      complete: () => {
-        this.loading = false;
-      },
+  private loadBanner() {
+    return rxResource<Banner, void>({
+      loader: () =>
+        this.bannerService
+          .getBannerById(this.bannerId())
+          .pipe(tap((response) => this.setData(response))),
     });
   }
 
+  //Maneja el envío del formulario.
+  //Valida el formulario, construye los datos y los envía al backend.
   onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (!this.validateForm()) return;
+    this.loading.set(true);
+    this.clearMessages();
 
-    this.form.markAllAsTouched();
-    if (this.form.invalid) {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-      this.loading = false;
-      return;
-    }
+    const formData = this.buildFormData();
 
-    const formData = new FormData();
-    formData.append('title', this.form.value.title);
-    formData.append('_method', 'PUT');
-    formData.append(
-      'date_expiration',
-      this.formatDateToInternal(this.form.value.date_expiration)
-    );
-    formData.append('status', this.form.value.status);
-    formData.append('link', this.form.value.link);
-
-    const image = this.UploadSimpleImg.getFile();
-    if (image) {
-      formData.append('image', image);
-    } else {
-      //   console.error('No hay imagen seleccionada');
-    }
-
-    // Llamar al servicio de actualización
     this.bannerService
-      .updateBanner(this.bannerId, formData)
+      .updateBanner(this.bannerId(), formData)
+      .pipe(take(1))
       .subscribe({
-        next: (success: string) => {
-          this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/banners']);
-        },
-        error: (error) => {
-          if (error.status === 422) {
-            this.errorMessage = this.processErrors(error.error.errors);
-          } else {
-            this.errorMessage = error;
-          }
-          window.scroll(0, 0);
-        },
+        next: (success: string) => this.handleSuccess(success),
+        error: (error) => this.handleError(error),
+        complete: () => this.loading.set(false),
       })
       .add(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
   }
 
-  processErrors(errors: { [key: string]: string[] }): string {
+  private setData(response: Banner) {
+    if (response) {
+      this.form.patchValue({
+        title: response.title,
+        date_expiration: response.date_expiration,
+        status: response.status,
+        link: response.link || '',
+      });
+    }
+  }
+
+  private clearMessages(): void {
+    this.errorMessage.set('');
+  }
+
+  // Construye los datos a enviar en `FormData`
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('title', this.form.value.title!);
+    formData.append(
+      'date_expiration',
+      this.formatDate(this.form.value.date_expiration),
+    );
+
+    formData.append('status', this.form.value.status!);
+    formData.append('link', this.form.value.link!);
+
+    // Agregar la imagen si está disponible
+    const image = this.UploadSimpleImg.getFile();
+    if (image) formData.append('image', image);
+
+    return formData;
+  }
+
+  // Maneja la respuesta exitosa del backend
+  private handleSuccess(success: string): void {
+    this.resetForm();
+    this.toastService.success('Banner actualizado correctamente');
+    this.router.navigate(['/admin/banners']);
+  }
+
+  // Valida el formulario antes de enviarlo
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      return false;
+    }
+    return true;
+  }
+
+  // Maneja los errores del backend
+  private handleError(error: any): void {
+    if (error.status === 422) {
+      this.errorMessage.set(this.processErrors(error.error.errors));
+      window.scroll(0, 0);
+    } else {
+      this.errorMessage.set(error);
+    }
+  }
+
+  // Reinicia el formulario y limpia los archivos
+  private resetForm(): void {
+    this.form.reset();
+    this.UploadSimpleImg.removeAllFiles();
+  }
+
+  // Procesa los errores de validación del backend
+  private processErrors(errors: { [key: string]: string[] }): string {
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
       .map((error) => `${error}</br>`)
@@ -139,13 +166,22 @@ export class UpdateBannerComponent {
     return `${errorList}`;
   }
 
-  onDateChange(value: any): void {
-    if (value) {
-      this.form.value.date_expiration = this.formatDateToInternal(value);
+  // Formatea la fecha para el backend
+  public formatDate(date: any): string {
+    if (
+      typeof date === 'string' &&
+      dayjs(date, 'DD-MM-YYYY HH:mm:ss', true).isValid()
+    ) {
+      // Si la fecha es un string con formato 'DD-MM-YYYY HH:mm:ss', convertir a 'YYYY-MM-DD HH:mm'
+      return dayjs(date, 'DD-MM-YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm');
     }
-  }
 
-  private formatDateToInternal(date: any): string {
-    return dayjs(date).format('YYYY-MM-DD HH:mm');
+    // Si la fecha es un objeto Date o una fecha en formato largo, convertirla directamente
+    const fechaParseada = dayjs(date);
+    if (fechaParseada.isValid()) {
+      return fechaParseada.format('YYYY-MM-DD HH:mm');
+    }
+
+    return 'Formato de fecha no válido';
   }
 }
