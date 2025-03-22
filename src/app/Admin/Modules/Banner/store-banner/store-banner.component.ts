@@ -25,18 +25,18 @@ export class StoreBannerComponent {
   //Inyección de servicios usando la nueva API de Angular.
   private bannerService = inject(BannerService);
   private toastService = inject(ToastService);
-  public router = inject(Router);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
+
+  // Variables de estado reactivas
+  public loading = signal(false);
+  public errorMessage = signal<string>('');
 
   constructor(private bsLocaleService: BsLocaleService) {
     // Configura el idioma del datepicker
     defineLocale('es', esLocale);
     this.bsLocaleService.use('es');
   }
-
-  // Variables de estado reactivas
-  public loading = signal(false);
-  public errorMessage = signal<string>('');
 
   // Definición del formulario con validaciones
   form = this.fb.nonNullable.group({
@@ -94,7 +94,7 @@ export class StoreBannerComponent {
   // Maneja la respuesta exitosa del backend
   private handleSuccess(success: string): void {
     this.resetForm();
-    this.toastService.success('Banner creado correctamente');
+    this.toastService.success(success);
     this.router.navigate(['/admin/banners']);
   }
 

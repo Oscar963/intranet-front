@@ -49,13 +49,13 @@
               </div>
             </div>
           </div>
-          @if (loading) {
+          @if (loading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
           }
           <div class="card-body">
-            @if (errorMessage) {
+            @if (errorMessage()) {
               <div
                 class="alert alert-important alert-danger alert-dismissible"
                 role="alert"
@@ -81,7 +81,7 @@
                     </svg>
                   </div>
                   <div>
-                    <div [innerHTML]="errorMessage" class="ms-1"></div>
+                    <div [innerHTML]="errorMessage()" class="ms-1"></div>
                   </div>
                 </div>
                 <a
@@ -109,6 +109,19 @@
                       (form.get('title')?.touched || form.get('title')?.dirty)
                     "
                   />
+                  @if (
+                    (form.get("title")?.invalid &&
+                      form.get("title")?.touched) ||
+                    form.get("title")?.dirty
+                  ) {
+                    @if (form.get("title")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El título es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
                 </div>
               </div>
               <div class="col-sm-6 col-md-3">
@@ -156,6 +169,19 @@
                       <span class="form-check-label">Oculto</span>
                     </label>
                   </div>
+                  @if (
+                    (form.get("status")?.invalid &&
+                      form.get("status")?.touched) ||
+                    form.get("status")?.dirty
+                  ) {
+                    @if (form.get("status")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El estado es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
                 </div>
               </div>
               <div class="col-sm-6 col-md-8">
@@ -164,25 +190,22 @@
                   <app-upload-simple-img />
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label required">Imagen Actual</label>
-                  <img class="w-75 rounded" [src]="imgCurrent" alt="" />
-                </div>
-              </div>
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Contenido</label>
                   <app-tinymce
                     formControlName="content"
-                    [initOptions]="customOptions"
+                    [initOptions]="{
+                      height: 500,
+                      menubar: true,
+                    }"
                   ></app-tinymce>
                 </div>
               </div>
             </div>
           </div>
           <div class="card-footer text-end">
-            @if (loading) {
+            @if (loading()) {
               <button type="button" class="btn btn-primary" disabled>
                 <span
                   class="spinner-border spinner-border-sm me-2"

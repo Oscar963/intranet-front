@@ -2,13 +2,7 @@ import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PopupService } from '../../../../services/popup.service';
 import { Popup } from '../../../../interfaces/Popup';
-import {
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { NotificationService } from '../../../../services/notification.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';

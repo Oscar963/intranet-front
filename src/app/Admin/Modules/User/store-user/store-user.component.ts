@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 export class StoreUserComponent {
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
-  public router = inject(Router);
+  private router = inject(Router);
 
   constructor() {}
 

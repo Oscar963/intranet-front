@@ -31,16 +31,8 @@ export class UpdateBannerComponent {
   private bannerService = inject(BannerService);
   private toastService = inject(ToastService);
   private router = inject(Router);
-  private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
-
-  constructor(private bsLocaleService: BsLocaleService) {
-    // Configura el idioma del datepicker
-    defineLocale('es', esLocale);
-    this.bsLocaleService.use('es');
-    dayjs.extend(customParseFormat);
-    this.loadBanner();
-  }
+  private fb = inject(FormBuilder);
 
   // Variables de estado reactivas
   public loading = signal(false);
@@ -48,6 +40,13 @@ export class UpdateBannerComponent {
   public bannerId = signal<number>(
     Number(this.route.snapshot.paramMap.get('id')),
   );
+
+  constructor(private bsLocaleService: BsLocaleService) {
+    // Configura el idioma del datepicker
+    defineLocale('es', esLocale);
+    this.bsLocaleService.use('es');
+    dayjs.extend(customParseFormat);
+  }
 
   // Definición del formulario con validaciones
   form = this.fb.nonNullable.group({
@@ -57,14 +56,13 @@ export class UpdateBannerComponent {
     link: '',
   });
 
-  private loadBanner() {
-    return rxResource<Banner, void>({
-      loader: () =>
-        this.bannerService
-          .getBannerById(this.bannerId())
-          .pipe(tap((response) => this.setData(response))),
-    });
-  }
+  //Cargando datos de objeto
+  bannerRs = rxResource<Banner, void>({
+    loader: () =>
+      this.bannerService
+        .getBannerById(this.bannerId())
+        .pipe(tap((response) => this.setData(response))),
+  });
 
   //Maneja el envío del formulario.
   //Valida el formulario, construye los datos y los envía al backend.
@@ -126,7 +124,7 @@ export class UpdateBannerComponent {
   // Maneja la respuesta exitosa del backend
   private handleSuccess(success: string): void {
     this.resetForm();
-    this.toastService.success('Banner actualizado correctamente');
+    this.toastService.success(success);
     this.router.navigate(['/admin/banners']);
   }
 

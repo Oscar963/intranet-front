@@ -2,8 +2,7 @@ import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FileService } from '../../../../services/file.service';
 import { File } from '../../../../interfaces/File';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../services/notification.service';
+import {  FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 import { HttpResponse, HttpHeaders } from '@angular/common/http';

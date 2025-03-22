@@ -22,7 +22,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class UpdateProfileComponent {
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
-  public router = inject(Router);
+  private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   public loading: boolean = false;

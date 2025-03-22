@@ -19,7 +19,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class LoginComponent {
   public authService = inject(AuthService);
-  public router = inject(Router);
+  private router = inject(Router);
 
   public loading: boolean = false;
   public validationErrors: string[] = [];

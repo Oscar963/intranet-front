@@ -1,0 +1,16 @@
+.no-pointer {
+    pointer-events: none;
+    background-color: #f8f9fa;
+    /* Color gris para indicar que no es editable */
+}
+
+.invalid-input {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 85.714285%;
+    color: #d63939;
+}
+
+.container-tight {
+    max-width: 600px;
+}
