@@ -1,29 +1,31 @@
 <div class="page-wrapper">
   <!-- Page header -->
   <div class="page-header d-print-none mt-0">
-    <div class="container-fluid m-0 p-0">
-      <div id="banner-title" class="banner-title dark-background">
-        @if (!pageRs.isLoading()) {
-          <img
-            [src]="pageRs.value().image"
-            [alt]="pageRs.value().title"
-            class="h-100 w-100"
-          />
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-12 d-flex">
-                <h2 class="text-white">{{ pageRs.value().title }}</h2>
-                <img
-                  src="/assets/img/logos/logo-blanco.png"
-                  alt="logo-muni-arica"
-                  class="img-logo me-auto"
-                />
+    @defer {
+      <div class="container-fluid m-0 p-0">
+        <div id="banner-title" class="banner-title dark-background">
+          @if (!pageRs.isLoading()) {
+            <img
+              [src]="pageRs.value().image"
+              [alt]="pageRs.value().title"
+              class="h-100 w-100"
+            />
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12 d-flex">
+                  <h2 class="text-white">{{ pageRs.value().title }}</h2>
+                  <img
+                    src="/assets/img/logos/logo-blanco.png"
+                    alt="logo-muni-arica"
+                    class="img-logo me-auto"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
-    </div>
+    }
   </div>
   <!-- Page body -->
   <div class="page-body">
@@ -48,85 +50,94 @@
           </div>
         }
         <div class="col-lg-12">
-          <div class="row row-cards">
-            @if (!pageRs.isLoading()) {
-              @for (item of pageRs.value().files; track $index) {
+          @defer {
+            <div class="row row-cards">
+              @if (!pageRs.isLoading() && pageRs.value().files.length > 0) {
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-body">
                       <div class="h3">Archivos</div>
                     </div>
-                    <div class="card-body">
-                      <div class="row g-2 align-items-center">
-                        <div class="col-auto">
-                          <img
-                            style="max-width: 50px"
-                            [src]="getFileImage(item.type)"
-                            [alt]="item.name"
-                          />
-                        </div>
-                        <div class="col">
-                          <h4 class="card-title m-0">
-                            {{ item.name }}
-                          </h4>
-                          <div class="text-secondary">
-                            {{ item.description }}
+                  </div>
+                </div>
+                @for (item of pageRs.value().files; track $index) {
+                  <div
+                    [ngClass]="
+                      pageRs.value()?.files?.length === 1
+                        ? 'col-md-12'
+                        : 'col-md-6'
+                    "
+                  >
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="row g-2 align-items-center">
+                          <div class="col-auto">
+                            <img
+                              style="max-width: 50px"
+                              [src]="getFileImage(item.type)"
+                              [alt]="item.name"
+                            />
                           </div>
-                        </div>
-                        <div class="col">
-                          <div class="text-secondary">{{ item.type }}</div>
-                        </div>
-                        <div class="col">
-                          <div class="text-secondary">{{ item.size }}MB</div>
-                        </div>
-                        <div class="col-auto">
-                          <a
-                            class="btn"
-                            title="Descargar"
-                            download
-                            (click)="downloadFile(item.id, item.name)"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                          <div class="col">
+                            <h4 class="card-title m-0">
+                              {{ item.name }}
+                            </h4>
+                            <div class="text-secondary">
+                              {{ item.description }}
+                            </div>
+                          </div>
+                          <div class="col-2">
+                            <div class="text-secondary">{{ item.size }}MB</div>
+                          </div>
+                          <div class="col-auto">
+                            <a
+                              class="btn"
+                              title="Descargar"
+                              download
+                              (click)="downloadFile(item.id, item.name)"
                             >
-                              <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
                                 fill="none"
-                              />
-                              <path
-                                d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
-                              />
-                              <path d="M7 11l5 5l5 -5" />
-                              <path d="M12 4l0 12" />
-                            </svg>
-                            Descargar
-                          </a>
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                              >
+                                <path
+                                  stroke="none"
+                                  d="M0 0h24v24H0z"
+                                  fill="none"
+                                />
+                                <path
+                                  d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+                                />
+                                <path d="M7 11l5 5l5 -5" />
+                                <path d="M12 4l0 12" />
+                              </svg>
+                              Descargar
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              } @empty {
-                <div class="col-lg-12">
-                  <div class="card">
-                    <div class="card-body">
-                      <div class="h3">No hay archivos</div>
+                } @empty {
+                  <div class="col-lg-12">
+                    <div class="card">
+                      <div class="card-body">
+                        <div class="h3">No hay archivos</div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                }
               }
-            }
-          </div>
+            </div>
+          }
         </div>
       </div>
     </div>

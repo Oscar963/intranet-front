@@ -20,7 +20,7 @@ export class UploadSimpleFileComponent {
     this.dropzoneInstance = new Dropzone(this.UploadSimpleFile.nativeElement, {
       url: '/upload', // Solo para inicializar Dropzone, no se usa para subir automáticamente.
       maxFiles: 1,
-      maxFilesize: 20, // En MB
+      maxFilesize: 250, // En MB
       addRemoveLinks: true, // Mostrar enlace para eliminar archivo
       autoProcessQueue: false, // No subir automáticamente
       uploadMultiple: false,

@@ -7,10 +7,11 @@ import Swal from 'sweetalert2';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './page.component.html',
   styleUrl: './page.component.css',
 })

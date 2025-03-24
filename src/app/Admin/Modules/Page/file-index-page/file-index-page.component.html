@@ -127,7 +127,6 @@
                 <tr>
                   <th></th>
                   <th>Nombre</th>
-                  <th>Descripción</th>
                   <th>Tamaño</th>
                   <th>Subido por</th>
                   <th>Actualizado por</th>
@@ -147,20 +146,23 @@
                     <tr>
                       <td>
                         <img
-                          style="max-width: 50px"
+                          style="max-width: 40px"
                           [src]="getFileImage(item.type)"
                           [alt]="item.name"
                         />
                       </td>
                       <td>
-                        <span class="text-secondary">{{ item.name }}</span>
-                      </td>
-                      <td>
-                        <span class="text-secondary">{{
-                          item.description
+                        <span class="font-weight-bold">{{
+                          item.name
                         }}</span>
+                        <br />
+                        <span
+                          class="d-inline-block text-secondary text-truncate"
+                          title="{{ item.description }}"
+                          style="max-width: 550px"
+                          >{{ item.description }}</span
+                        >
                       </td>
-
                       <td>
                         <span class="text-secondary">{{ item.size }}MB</span>
                       </td>
