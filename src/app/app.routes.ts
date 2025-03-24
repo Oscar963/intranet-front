@@ -356,10 +356,7 @@ export const routes: Routes = [
     ],
   },
 
-  //  { path: '**', redirectTo: 'login' },
 
-<<<<<<< HEAD
-=======
   /** Auth Routes **/
   {
     path: 'login',
@@ -381,7 +378,6 @@ export const routes: Routes = [
         (m) => m.ResetPasswordComponent,
       ),
   },
->>>>>>> dev
   {
     path: '**',
     loadComponent: () =>

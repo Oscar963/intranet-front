@@ -49,21 +49,13 @@
               </div>
             </div>
           </div>
-<<<<<<< HEAD
-          @if (loading) {
-=======
           @if (loading()) {
->>>>>>> dev
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
           }
           <div class="card-body">
-<<<<<<< HEAD
-            @if (errorMessage) {
-=======
             @if (errorMessage()) {
->>>>>>> dev
               <div
                 class="alert alert-important alert-danger alert-dismissible"
                 role="alert"
@@ -89,11 +81,7 @@
                     </svg>
                   </div>
                   <div>
-<<<<<<< HEAD
-                    <div [innerHTML]="errorMessage" class="ms-1"></div>
-=======
                     <div [innerHTML]="errorMessage()" class="ms-1"></div>
->>>>>>> dev
                   </div>
                 </div>
                 <a
@@ -202,15 +190,6 @@
                   <app-upload-simple-img />
                 </div>
               </div>
-<<<<<<< HEAD
-              <div class="col-sm-6 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label required">Imagen Actual</label>
-                  <img class="w-75 rounded" [src]="imgCurrent" alt="" />
-                </div>
-              </div>
-=======
->>>>>>> dev
               <div class="col-md-12">
                 <div class="mb-3">
                   <label class="form-label required">Contenido</label>
@@ -226,11 +205,7 @@
             </div>
           </div>
           <div class="card-footer text-end">
-<<<<<<< HEAD
-            @if (loading) {
-=======
             @if (loading()) {
->>>>>>> dev
               <button type="button" class="btn btn-primary" disabled>
                 <span
                   class="spinner-border spinner-border-sm me-2"
