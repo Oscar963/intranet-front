@@ -1,7 +1,7 @@
 <section>
   <div class="container-xl pt-3">
     @defer {
-      @if (bannersRx.value().length > 0) {
+      @if (!bannersRx.isLoading() && bannersRx.value().length > 0) {
         <div id="carousel-banners" class="carousel slide carousel-fade">
           <!-- Indicadores del carrusel -->
           <div class="carousel-indicators">
