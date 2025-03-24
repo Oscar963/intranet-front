@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -9,7 +9,8 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-index',
   imports: [RouterOutlet, HeaderComponent, NavbarComponent],
   templateUrl: './index.component.html',
-  styleUrl: './index.component.css',
+  styleUrls: ['./index.component.css', '../../../../../node_modules/ngx-toastr/toastr.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class IndexAdminComponent implements OnInit {
   private authService = inject(AuthService);

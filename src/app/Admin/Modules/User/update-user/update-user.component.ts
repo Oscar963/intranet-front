@@ -30,44 +30,42 @@ export class UpdateUserComponent {
   public successMessage: string = '';
   public userId!: number;
 
-  form: FormGroup = new FormGroup(
-    {
-      name: new FormControl('', [Validators.required]),
-      paternal_surname: new FormControl('', [Validators.required]),
-      maternal_surname: new FormControl('', [Validators.required]),
-      rut: new FormControl('', [Validators.required, RutValidator]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      status: new FormControl('', [Validators.required]),
-    }
-  );
+  form: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    paternal_surname: new FormControl('', [Validators.required]),
+    maternal_surname: new FormControl('', [Validators.required]),
+    rut: new FormControl('', [Validators.required, RutValidator]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    status: new FormControl('', [Validators.required]),
+  });
 
   ngOnInit(): void {
     this.userId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadUserData();
   }
 
-    private loadUserData(): void {
-      this.loading = true;
-      this.userService.getUserById(this.userId).subscribe({
-        next: (user) => {
-          this.form.patchValue({
-            name: user.name,
-            rut: user.rut,
-            paternal_surname: user.paternal_surname,
-            maternal_surname: user.maternal_surname,
-            email: user.email,
-            status: user.status,
-          });          
-        },
-        error: (error) => {
-          this.errorMessage = 'No se pudieron cargar los datos del popup.';
-        },
-        complete: () => {
-          this.loading = false;
-        },
-      });
-    }
-  
+  private loadUserData(): void {
+    this.loading = true;
+    this.userService.getUserById(this.userId).subscribe({
+      next: (user) => {
+        this.form.patchValue({
+          name: user.name,
+          rut: user.rut,
+          paternal_surname: user.paternal_surname,
+          maternal_surname: user.maternal_surname,
+          email: user.email,
+          status: user.status,
+        });
+      },
+      error: (error) => {
+        this.errorMessage = 'No se pudieron cargar los datos del usuario.';
+      },
+      complete: () => {
+        this.loading = false;
+      },
+    });
+  }
+
   onSubmit(): void {
     this.loading = true;
     this.errorMessage = '';
@@ -89,7 +87,7 @@ export class UpdateUserComponent {
     formData.append('rut', this.form.value.rut);
     formData.append('email', this.form.value.email);
     formData.append('status', this.form.value.status);
-    
+
     this.userService
       .updateUser(this.userId, formData)
       .subscribe({
@@ -112,7 +110,6 @@ export class UpdateUserComponent {
       });
   }
 
-
   processErrors(errors: { [key: string]: string[] }): string {
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
@@ -120,11 +117,10 @@ export class UpdateUserComponent {
       .join('');
     return `${errorList}`;
   }
-
 }
 
 export const RutValidator: ValidatorFn = (
-  control: AbstractControl
+  control: AbstractControl,
 ): ValidationErrors | null => {
   const rut = control.value;
 

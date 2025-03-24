@@ -116,10 +116,10 @@
         <li class="nav-item ms-2 me-2">
           <a
             target="_blank"
-            class="btn btn-warning"
+            class="btn btn-outline-warning ms-4"
             href="https://intranetarica.smc.cl/login.aspx"
           >
-            <span class="nav-link-icon text-white"
+            <span class="nav-link-icon"
               ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +147,7 @@
           <a
             href="#"
             class="btn btn-icon btn-outline-dark"
-            title="Buscar"
+            title="Buscar archivo..."
             data-bs-toggle="modal"
             data-bs-target="#modal-search"
           >
@@ -177,22 +177,11 @@
 
 <!-- Movile -->
 <header
-  class="navbar navbar-expand-md d-print-none sticky-top bg-primary d-block d-md-none d-lg-none d-xl-none shadow-none"
+  class="navbar navbar-expand-md d-print-none sticky-top d-block d-md-none d-lg-none d-xl-none shadow-none"
 >
   <div class="container-fluid">
-    <div
-      class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-md-3 pe-0"
-    >
-      <a to="/">
-        <img
-          src="/assets/img/logos/logo-blanco.png"
-          alt="logo-muniarica"
-          class="d-block img-logo-movile mx-auto"
-        />
-      </a>
-    </div>
     <button
-      class="navbar-toggler text-white"
+      class="navbar-toggler"
       type="button"
       data-bs-toggle="collapse"
       data-bs-target="#navbarSupportedContent"
@@ -202,14 +191,145 @@
     >
       <span class="navbar-toggler-icon"></span>
     </button>
+    <div class="navbar-brand d-none-navbar-horizontal pe-md-3 pe-0">
+      <a [routerLink]="['/']" class="">
+        <img
+          src="/assets/img/logos/logo-azul.png"
+          alt="logo-muniarica"
+          class="d-block img-logo-movile"
+        />
+      </a>
+    </div>
+    <div></div>
     <div
       class="navbar-collapse collapse mt-2 mb-3 rounded"
       id="navbarSupportedContent"
     >
-      <ul class="navbar-nav w-100">
-        <li class="nav-item">
-          <a href="#" class="btn btn-warning btn-icon" aria-label="Button">
-            <!-- SVG icon from http://tabler.io/icons/icon/star -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/anexos']">
+            <span class="nav-link-icon"
+              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-device-landline-phone"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M20 3h-2a2 2 0 0 0 -2 2v14a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-14a2 2 0 0 0 -2 -2z"
+                />
+                <path d="M16 4h-11a3 3 0 0 0 -3 3v10a3 3 0 0 0 3 3h11" />
+                <path d="M12 8h-6v3h6z" />
+                <path d="M12 14v.01" />
+                <path d="M9 14v.01" />
+                <path d="M6 14v.01" />
+                <path d="M12 17v.01" />
+                <path d="M9 17v.01" />
+                <path d="M6 17v.01" />
+              </svg>
+            </span>
+            <span class="nav-link-title"> Anexos </span>
+          </a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/mobiles']">
+            <span class="nav-link-icon"
+              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-device-mobile"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14z"
+                />
+                <path d="M11 4h2" />
+                <path d="M12 17v.01" />
+              </svg>
+            </span>
+            <span class="nav-link-title"> Celulares </span>
+          </a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']">
+          <a class="nav-link" [routerLink]="['/contact']">
+            <span class="nav-link-icon"
+              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                <path d="M12 9h.01" />
+                <path d="M11 12h1v4h1" />
+              </svg>
+            </span>
+            <span class="nav-link-title"> Contacto </span>
+          </a>
+        </li>
+        <li class="nav-item ms-2 me-2 mt-2">
+          <a
+            target="_blank"
+            class="btn btn-outline-warning"
+            href="https://intranetarica.smc.cl/login.aspx"
+          >
+            <span class="nav-link-icon text-white"
+              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+              </svg>
+            </span>
+            <span class="nav-link-title"> Sistema RR.HH </span>
+          </a>
+        </li>
+        <li class="nav-item ms-2 me-2 mt-2">
+          <a
+            href="#"
+            class="btn"
+            title="Buscar archivo..."
+            data-bs-toggle="modal"
+            data-bs-target="#modal-search"
+          >
+            <!-- SVG icon from http://tabler.io/icons/icon/git-merge -->
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -226,90 +346,7 @@
               <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
               <path d="M21 21l-6 -6" />
             </svg>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link text-white"
-            href="https://intranet.imaarica.cl/anexos"
-          >
-            <span class="nav-link-icon text-white"
-              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-              </svg>
-            </span>
-            <span class="nav-link-title"> Anexos Municipales </span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link text-white"
-            href="https://intranet.imaarica.cl/anexos"
-          >
-            <span class="nav-link-icon text-white"
-              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-              </svg>
-            </span>
-            <span class="nav-link-title"> Celulares Municipales </span>
-          </a>
-        </li>
-        <li class="nav-item pt-3">
-          <a
-            class="btn btn-warning"
-            href="https://intranetarica.smc.cl/login.aspx?ReturnUrl=%2f"
-          >
-            <span class="nav-link-icon d-md-none d-lg-inline-block text-white"
-              ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <path d="M5 12l-2 0l9 -9l9 9l-2 0"></path>
-                <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
-                <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
-              </svg>
-            </span>
-            <span class="nav-link-title"> Sistema de RRHH </span>
+            <span class="nav-link-title"> Buscar Documento</span>
           </a>
         </li>
       </ul>

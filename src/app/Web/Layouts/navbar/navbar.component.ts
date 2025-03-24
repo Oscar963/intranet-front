@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -11,6 +11,7 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { File } from '../../../interfaces/File';
 
 import Swal from 'sweetalert2';
+import { routes } from '../../../app.routes';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,13 @@ import Swal from 'sweetalert2';
 export class NavbarComponent {
   private webService = inject(WebService);
 
+  public menuItems = signal([
+    { icon: '', title: 'Inicio' },
+    { icon: 'anexos', title: 'Anexos' },
+    { icon: 'mobiles', title: 'Celulares' },
+    { icon: 'contact', title: 'Contacto' },
+  ]);
+
   public files: File[] = [];
   public loading: boolean = false;
   public errorMessage: string = '';
@@ -29,6 +37,7 @@ export class NavbarComponent {
   form: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
   });
+
 
   onSubmit(): void {
     this.loading = true;

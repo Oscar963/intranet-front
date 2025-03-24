@@ -1,33 +1,31 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FileService } from '../../../../services/file.service';
 import { File } from '../../../../interfaces/File';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '../../../../services/notification.service';
+import {  FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { switchMap } from 'rxjs';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   selector: 'app-index-file',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, FormsModule],
   templateUrl: './index-file.component.html',
   styleUrls: ['./index-file.component.css'],
 })
-export class IndexFileComponent implements OnInit {
+export class IndexFileComponent {
   private fileService = inject(FileService);
-  private notificationService = inject(NotificationService);
+  private toastService = inject(ToastService);
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  public errorMessage: string = '';
-  public successMessage: string | null = null;
-  public files: File[] = [];
-  public show: number = 15;
-  public meta: any = {};
-  public links: any = {};
-  public loading: boolean = false;
-  public currentPage: number = 1;
+  public show = signal<number>(50);
+  public meta = signal<any>({});
+  public page = signal<number>(1);
 
   values = [
     { value: '15', label: '15' },
@@ -36,63 +34,45 @@ export class IndexFileComponent implements OnInit {
     { value: '500', label: '500' },
   ];
 
-  form = new FormGroup({
-    show: new FormControl(this.values[0]?.value),
+  constructor() {
+    // Efecto para sincronizar `page` con la URL
+    effect(() => {
+      this.route.params.subscribe((params) => {
+        this.page.set(+params['page'] || 1);
+      });
+    });
+  }
+
+  public filesRs = rxResource<File[], { page: number; show: number }>({
+    request: () => ({
+      page: this.page(),
+      show: this.show(),
+    }),
+    loader: ({ request }) => {
+      return this.fileService.fetchFile(request.page, request.show).pipe(
+        switchMap((response) => {
+          this.meta.set({
+            current_page: response.meta?.current_page ?? 1,
+            last_page: response.meta?.last_page ?? 1,
+            from: response.meta?.from ?? 0,
+            to: response.meta?.to ?? 0,
+            total: response.meta?.total ?? 0,
+            links:
+              response.meta?.links?.map((link: any, index: number) => ({
+                id: `link-${index}`,
+                label: link.label ?? '',
+                page: this.extractPage(link.url) ?? null,
+                active: link.active ?? false,
+              })) ?? [],
+          });
+
+          return [response.data.data];
+        }),
+      );
+    },
   });
 
-  ngOnInit(): void {
-    this.notificationService.successMessage$.subscribe(
-      (message) => (this.successMessage = message),
-    );
-
-    this.route.params.subscribe((params) => {
-      const page = +params['page'] || 1;
-      this.currentPage = page;
-      this.loadFiles(this.currentPage, this.show);
-    });
-  }
-
-  loadFiles(page: number, show: number): void {
-    this.loading = true;
-
-    this.fileService.fetchFile(page, show).subscribe({
-      next: (response) => {
-        this.files = response.data.data;
-        this.meta = { ...response.data.meta };
-
-        this.links = {
-          first: response.data.links.first,
-          last: response.data.links.last,
-          next: response.data.links.next,
-          prev: response.data.links.prev,
-        };
-
-        this.meta.links = response.data.meta.links.map(
-          (link: any, index: number) => ({
-            id: `link-${index}`,
-            label: link.label,
-            page: this.extractPage(link.url),
-            active: link.active,
-          }),
-        );
-      },
-      error: (error) => {
-        console.error('Error al obtener los files:', error);
-        this.errorMessage = error.message || 'Error al cargar los archivos.';
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
-
-  goToPage(page: number | null): void {
-    if (page && page > 0 && page <= this.meta.last_page) {
-      this.router.navigate(['admin/files/page', page]);
-    }
-  }
-
-  deleteItem(id: number) {
+  public deleteItem(id: number) {
     Swal.fire({
       title: '¿Estás seguro que desea eliminar el archivo?',
       text: '¡Esta acción no podrá ser revertida!',
@@ -123,7 +103,7 @@ export class IndexFileComponent implements OnInit {
               confirmButtonColor: '#06048c',
               confirmButtonText: 'Cerrar',
             });
-            this.loadFiles(this.currentPage, this.show);
+            this.filesRs.reload();
           },
           error: (error) => {
             Swal.close();
@@ -140,20 +120,19 @@ export class IndexFileComponent implements OnInit {
     });
   }
 
-  onChange(e: any) {
-    this.show = e.target.value;
-    this.router.navigate(['admin/files/page', 1]);
-    this.currentPage = 1;
-    this.loadFiles(this.currentPage, this.show);
+  public goToPage(page: number | null): void {
+    if (page && page > 0 && page <= this.meta().last_page) {
+      this.router.navigate(['admin/files/page', page]);
+    }
   }
 
-  extractPage(url: string | null): number | null {
+  private extractPage(url: string | null): number | null {
     return url
       ? parseInt(url.match(/page=(\d+)/)?.[1] || '', 10) || null
       : null;
   }
 
-  downloadFile(fileId: number, fileName: string) {
+  public downloadFile(fileId: number, fileName: string) {
     Swal.fire({
       title: 'Descargando...',
       html: 'Por favor, espera mientras se descarga el archivo.',
@@ -223,20 +202,18 @@ export class IndexFileComponent implements OnInit {
     return fileExtension;
   }
 
-  copyToClipboard(text: string): void {    
+  public copyToClipboard(text: string): void {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        alert('URL copiada al portapapeles.');
-        this.notificationService.showSuccess('URL copiada al portapapeles.');
+        this.toastService.info('URL copiada al portapapeles.');
       })
       .catch((err) => {
-        this.notificationService.showError('Error al copiar la URL.');
-        console.error('Error al copiar al portapapeles:', err);
+        this.toastService.error('Error al copiar al portapapeles', err);
       });
   }
 
-  getFileImage(fileType: string): string {
+  public getFileImage(fileType: string): string {
     switch (fileType) {
       case 'PDF':
         return '/assets/icons/files/pdf.png'; // Ruta a tu imagen PDF

@@ -1,9 +1,13 @@
 <section>
   <div class="container-xl pt-3">
     @defer {
+<<<<<<< HEAD
       @let bannersLoaded = bannersRx.value() !== null;
 
       @if (bannersLoaded) {
+=======
+      @if (!bannersRx.isLoading() && bannersRx.value().length > 0) {
+>>>>>>> dev
         <div id="carousel-banners" class="carousel slide carousel-fade">
           <!-- Indicadores del carrusel -->
           <div class="carousel-indicators">
@@ -53,7 +57,11 @@
             <span class="visually-hidden">Next</span>
           </a>
         </div>
+<<<<<<< HEAD
       } @else if (bannersLoaded) {
+=======
+      } @else {
+>>>>>>> dev
         <div class="alert alert-info mb-0 bg-white" role="alert">
           <div class="d-flex">
             <div class="ml-2">

@@ -11,43 +11,63 @@ import {
 
 import { UserService } from '../../../../services/user.service';
 import { NotificationService } from '../../../../services/notification.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-store-user',
+  selector: 'app-update-profile',
   imports: [ReactiveFormsModule],
-  templateUrl: './store-user.component.html',
-  styleUrl: './store-user.component.css',
+  templateUrl: './update-profile.component.html',
+  styleUrl: './update-profile.component.css',
 })
-export class StoreUserComponent {
+export class UpdateProfileComponent {
   private userService = inject(UserService);
   private notificationService = inject(NotificationService);
   private router = inject(Router);
-
-  constructor() {}
+  private route = inject(ActivatedRoute);
 
   public loading: boolean = false;
   public errorMessage: string = '';
-  public successMessage: string = '';
-  public showPassword: boolean = false;
+  public successMessage: string | null = null;
+  public userId!: number;
 
-  form: FormGroup = new FormGroup(
-    {
-      name: new FormControl('', [Validators.required]),
-      paternal_surname: new FormControl('', [Validators.required]),
-      maternal_surname: new FormControl('', [Validators.required]),
-      rut: new FormControl('', [Validators.required, RutValidator]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      status: new FormControl('', [Validators.required]),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(8),
-        this.passwordValidator(),
-      ]),
-      password_confirmation: new FormControl('', [Validators.required]),
-    },
-    { validators: this.passwordsMatch.bind(this) }
-  );
+  form: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required]),
+    paternal_surname: new FormControl('', [Validators.required]),
+    maternal_surname: new FormControl('', [Validators.required]),
+    rut: new FormControl('', [Validators.required, RutValidator]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+  });
+
+  ngOnInit(): void {
+    this.userId = Number(this.route.snapshot.paramMap.get('id'));
+    this.loadUserData();
+
+    // Escuchar mensajes de éxito y error
+    this.notificationService.successMessage$.subscribe(
+      (message) => (this.successMessage = message),
+    );
+  }
+
+  private loadUserData(): void {
+    this.loading = true;
+    this.userService.getUserProfile().subscribe({
+      next: (user) => {
+        this.form.patchValue({
+          name: user.name,
+          rut: user.rut,
+          paternal_surname: user.paternal_surname,
+          maternal_surname: user.maternal_surname,
+          email: user.email,
+        });
+      },
+      error: (error) => {
+        this.errorMessage = 'No se pudieron cargar los datos del usuario.';
+      },
+      complete: () => {
+        this.loading = false;
+      },
+    });
+  }
 
   onSubmit(): void {
     this.loading = true;
@@ -68,20 +88,13 @@ export class StoreUserComponent {
     formData.append('maternal_surname', this.form.value.maternal_surname);
     formData.append('rut', this.form.value.rut);
     formData.append('email', this.form.value.email);
-    formData.append('status', this.form.value.status);
-    formData.append('password', this.form.value.password);
-    formData.append(
-      'password_confirmation',
-      this.form.value.password_confirmation
-    );
 
     this.userService
-      .storeUser(formData)
+      .updateProfile(formData)
       .subscribe({
         next: (success: string) => {
-          this.form.reset();
           this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/users']);
+          this.router.navigate(['/admin/users/profile-update']);
         },
         error: (error) => {
           if (error.status === 422) {
@@ -97,18 +110,6 @@ export class StoreUserComponent {
       });
   }
 
-  toggleShowPassword(): void {
-    this.showPassword = !this.showPassword;
-  }
-
-  passwordsMatch(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirmPassword = control.get('password_confirmation')?.value;
-    return password && confirmPassword && password === confirmPassword
-      ? null
-      : { passwordsNotMatch: 'Las contraseñas no coinciden' };
-  }
-
   processErrors(errors: { [key: string]: string[] }): string {
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
@@ -116,38 +117,10 @@ export class StoreUserComponent {
       .join('');
     return `${errorList}`;
   }
-
-  passwordValidator() {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const password = control.value;
-
-      // Validar que la contraseña tenga al menos una letra mayúscula
-      const hasUpperCase = /[A-Z]/.test(password);
-
-      // Validar que la contraseña tenga al menos una letra minúscula
-      const hasLowerCase = /[a-z]/.test(password);
-
-      // Validar que la contraseña tenga al menos un número
-      const hasNumber = /\d/.test(password);
-
-      // Validar que la contraseña tenga al menos un carácter especial
-      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-      // Verificar que todas las condiciones se cumplan
-      if (hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
-        return null; // Si la contraseña cumple con todos los requisitos, es válida
-      } else {
-        return {
-          passwordStrength:
-            'La contraseña debe contener al menos: 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.',
-        };
-      }
-    };
-  }
 }
 
 export const RutValidator: ValidatorFn = (
-  control: AbstractControl
+  control: AbstractControl,
 ): ValidationErrors | null => {
   const rut = control.value;
 

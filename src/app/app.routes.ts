@@ -263,6 +263,13 @@ export const routes: Routes = [
             './Admin/Modules/User/update-password/update-password.component'
           ).then((m) => m.UpdatePasswordComponent),
       },
+      {
+        path: 'users/profile-update',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/User/update-profile/update-profile.component'
+          ).then((m) => m.UpdateProfileComponent),
+      },
 
       /** File Routes **/
       {
@@ -351,6 +358,30 @@ export const routes: Routes = [
 
   //  { path: '**', redirectTo: 'login' },
 
+<<<<<<< HEAD
+=======
+  /** Auth Routes **/
+  {
+    path: 'login',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./Auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./Auth/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
+  },
+  {
+    path: 'reset-password/:token',
+    loadComponent: () =>
+      import('./Auth/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent,
+      ),
+  },
+>>>>>>> dev
   {
     path: '**',
     loadComponent: () =>

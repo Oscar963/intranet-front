@@ -1,11 +1,15 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WebService } from '../../../services/web.service';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Page } from '../../../interfaces/Page';
 import Swal from 'sweetalert2';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
+<<<<<<< HEAD
 import { map, switchMap, tap } from 'rxjs';
+=======
+import { tap } from 'rxjs';
+>>>>>>> dev
 import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -84,7 +88,7 @@ export class PageComponent {
     }
   }
 
-  downloadFile(fileId: number, fileName: string) {
+  public downloadFile(fileId: number, fileName: string) {
     Swal.fire({
       title: 'Descargando...',
       html: 'Por favor, espera mientras se descarga el archivo.',

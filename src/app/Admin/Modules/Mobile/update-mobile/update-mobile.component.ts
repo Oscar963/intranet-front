@@ -1,15 +1,12 @@
-import { Component, inject, ViewChild } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
-
+import { Component, inject, signal } from '@angular/core';
+import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MobileService } from '../../../../services/mobile.service';
 import { ActivatedRoute } from '@angular/router';
-import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../../services/toast.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Mobile } from '../../../../interfaces/Mobile';
+import { take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-update-mobile',
@@ -18,94 +15,120 @@ import { Router } from '@angular/router';
   styleUrl: './update-mobile.component.css',
 })
 export class UpdateMobileComponent {
+  //Inyección de servicios usando la nueva API de Angular.
   private mobileService = inject(MobileService);
-  private notificationService = inject(NotificationService);
-  public router = inject(Router);
+  private toastService = inject(ToastService);
+  private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private fb = inject(FormBuilder);
 
-  constructor() {}
+  // Variables de estado reactivas
+  public loading = signal(false);
+  public errorMessage = signal<string>('');
+  public anexoId = signal<number>(
+    Number(this.route.snapshot.paramMap.get('id')),
+  );
 
-  public loading: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
-  public mobileId!: number; // ID del mobile a actualizar
-
-  form: FormGroup = new FormGroup({
-    number: new FormControl('', [Validators.required]),
-    office: new FormControl(''),
-    direction: new FormControl(''),
-    person: new FormControl(''),
+  // Definición del formulario con validaciones
+  form = this.fb.nonNullable.group({
+    number: ['', Validators.required],
+    office: '',
+    direction: '',
+    person: '',
   });
 
-  ngOnInit(): void {
-    // Obtener el ID del mobile desde la URL
-    this.mobileId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadMobileData();
-  }
+  //Cargando datos de objeto
+  mobileRs = rxResource<Mobile, void>({
+    loader: () =>
+      this.mobileService
+        .getMobileById(this.anexoId())
+        .pipe(tap((response) => this.setData(response))),
+  });
 
-  // Cargar datos del mobile existente
-  private loadMobileData(): void {
-    this.loading = true;
-    this.mobileService.getMobileById(this.mobileId).subscribe({
-      next: (mobile) => {
-        this.form.patchValue({
-          number: mobile.number,
-          office: mobile.office,
-          direction: mobile.direction,
-          person: mobile.person,
-        });
-      },
-      error: (error) => {
-        this.errorMessage = 'No se pudieron cargar los datos del mobile.';
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
-
+  //Maneja el envío del formulario.
+  //Valida el formulario, construye los datos y los envía al backend.
   onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (!this.validateForm()) return;
+    this.loading.set(true);
+    this.clearMessages();
 
-    this.form.markAllAsTouched();
-    if (this.form.invalid) {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-      this.loading = false;
-      return;
-    }
+    const formData = this.buildFormData();
 
-    const formData = new FormData();
-    formData.append('_method', 'PUT');
-    formData.append('number', this.form.value.number);
-    formData.append('office', this.form.value.office);
-    formData.append('direction', this.form.value.direction);
-    formData.append('person', this.form.value.person);
-
-    // Llamar al servicio de actualización
     this.mobileService
-      .updateMobile(this.mobileId, formData)
+      .updateMobile(this.anexoId(), formData)
+      .pipe(take(1))
       .subscribe({
-        next: (success: string) => {
-          this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/mobiles']);
-        },
-        error: (error) => {
-          if (error.status === 422) {
-            this.errorMessage = this.processErrors(error.error.errors);
-          } else {
-            this.errorMessage = error;
-          }
-          window.scroll(0, 0);
-        },
+        next: (success: string) => this.handleSuccess(success),
+        error: (error) => this.handleError(error),
+        complete: () => this.loading.set(false),
       })
       .add(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
   }
 
-  processErrors(errors: { [key: string]: string[] }): string {
+  private setData(response: Mobile) {
+    if (response) {
+      this.form.patchValue({
+        number: response.number.toString(),
+        office: response.office || '',
+        direction: response.direction || '',
+        person: response.person || '',
+      });
+    }
+  }
+
+  private clearMessages(): void {
+    this.errorMessage.set('');
+  }
+
+  // Construye los datos a enviar en `FormData`
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('number', this.form.value.number!);
+    formData.append('office', this.form.value.office!);
+    formData.append('direction', this.form.value.direction!);
+    formData.append('person', this.form.value.person!);
+
+    return formData;
+  }
+
+  // Maneja la respuesta exitosa del backend
+  private handleSuccess(success: string): void {
+    this.resetForm();
+    this.toastService.success(success);
+    this.router.navigate(['/admin/mobiles']);
+  }
+
+  // Valida el formulario antes de enviarlo
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      return false;
+    }
+    return true;
+  }
+
+  // Maneja los errores del backend
+  private handleError(error: any): void {
+    if (error.status === 422) {
+      this.errorMessage.set(this.processErrors(error.error.errors));
+      window.scroll(0, 0);
+    } else {
+      this.errorMessage.set(error);
+    }
+  }
+
+  // Reinicia el formulario y limpia los archivos
+  private resetForm(): void {
+    this.form.reset();
+  }
+
+  // Procesa los errores de validación del backend
+  private processErrors(errors: { [key: string]: string[] }): string {
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
       .map((error) => `${error}</br>`)

@@ -1,0 +1,306 @@
+<!-- Page header -->
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <!-- Page pre-title -->
+        <div class="page-pretitle">Módulo</div>
+        <h2 class="page-title">Perfil de Usuario</h2>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Page body -->
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Content here -->
+    <div class="row">
+      <div class="col-12">
+        <form class="card" [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="card-header">
+            <h3 class="card-title">Mis datos</h3>
+          </div>
+          @if (loading) {
+            <div class="progress progress-sm">
+              <div class="progress-bar progress-bar-indeterminate"></div>
+            </div>
+          }
+          <div class="card-body">
+            @if (successMessage) {
+              <div
+                class="alert alert-important alert-success alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="icon icon-tabler icons-tabler-outline icon-tabler-check"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <path d="M5 12l5 5l10 -10" />
+                    </svg>
+                  </div>
+                  <span class="ms-1">{{ successMessage }}</span>
+                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
+              </div>
+            }
+            @if (errorMessage) {
+              <div
+                class="alert alert-important alert-danger alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon alert-icon"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <div [innerHTML]="errorMessage" class="ms-1"></div>
+                  </div>
+                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
+              </div>
+            }
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label required">Rut (12345678-K)</label>
+                  <input
+                    formControlName="rut"
+                    type="text"
+                    class="form-control"
+                    placeholder="12345678-K"
+                    [class.is-invalid]="
+                      form.get('rut')?.invalid &&
+                      (form.get('rut')?.touched || form.get('rut')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('rut')?.valid &&
+                      (form.get('rut')?.touched || form.get('rut')?.dirty)
+                    "
+                  />
+                  @if (
+                    (form.get("rut")?.invalid && form.get("rut")?.touched) ||
+                    form.get("rut")?.dirty
+                  ) {
+                    @if (form.get("rut")?.hasError("required")) {
+                      <span class="invalid-input">El rut es obligatorio.</span>
+                    } @else if (form.get("rut")?.hasError("invalidRut")) {
+                      <span class="invalid-input"
+                        >El rut ingresado no es válido.</span
+                      >
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label required">Nombre</label>
+                  <input
+                    formControlName="name"
+                    type="text"
+                    class="form-control"
+                    placeholder="Nombre del usuario"
+                    [class.is-invalid]="
+                      form.get('name')?.invalid &&
+                      (form.get('name')?.touched || form.get('name')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('name')?.valid &&
+                      (form.get('name')?.touched || form.get('name')?.dirty)
+                    "
+                  />
+                  @if (
+                    (form.get("name")?.invalid && form.get("name")?.touched) ||
+                    form.get("name")?.dirty
+                  ) {
+                    @if (form.get("name")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El nombre es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label required">Apellido Paterno</label>
+                  <input
+                    formControlName="paternal_surname"
+                    type="text"
+                    class="form-control"
+                    placeholder="Ingrese el apellido paterno"
+                    [class.is-invalid]="
+                      form.get('paternal_surname')?.invalid &&
+                      (form.get('paternal_surname')?.touched ||
+                        form.get('paternal_surname')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('paternal_surname')?.valid &&
+                      (form.get('paternal_surname')?.touched ||
+                        form.get('paternal_surname')?.dirty)
+                    "
+                  />
+                  @if (
+                    (form.get("paternal_surname")?.invalid &&
+                      form.get("paternal_surname")?.touched) ||
+                    form.get("paternal_surname")?.dirty
+                  ) {
+                    @if (form.get("paternal_surname")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El apellido paterno es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label required">Apellido Materno</label>
+                  <input
+                    formControlName="maternal_surname"
+                    type="text"
+                    class="form-control"
+                    placeholder="Ingrese el apellido materno"
+                    [class.is-invalid]="
+                      form.get('maternal_surname')?.invalid &&
+                      (form.get('maternal_surname')?.touched ||
+                        form.get('maternal_surname')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('maternal_surname')?.valid &&
+                      (form.get('maternal_surname')?.touched ||
+                        form.get('maternal_surname')?.dirty)
+                    "
+                  />
+                  @if (
+                    (form.get("maternal_surname")?.invalid &&
+                      form.get("maternal_surname")?.touched) ||
+                    form.get("maternal_surname")?.dirty
+                  ) {
+                    @if (form.get("maternal_surname")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El apellido materno es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label class="form-label required">Correo Electrónico</label>
+                  <input
+                    formControlName="email"
+                    type="text"
+                    class="form-control"
+                    placeholder="correo@municipalidadarica.cl"
+                    [class.is-invalid]="
+                      form.get('email')?.invalid &&
+                      (form.get('email')?.touched || form.get('email')?.dirty)
+                    "
+                    [class.is-valid]="
+                      form.get('email')?.valid &&
+                      (form.get('email')?.touched || form.get('email')?.dirty)
+                    "
+                  />
+                  @if (
+                    (form.get("email")?.invalid &&
+                      form.get("email")?.touched) ||
+                    form.get("email")?.dirty
+                  ) {
+                    @if (form.get("email")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El correo electrónico es obligatorio.
+                      </span>
+                    } @else if (form.get("email")?.hasError("email")) {
+                      <span class="invalid-input">
+                        El correo electrónico no es válido.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer text-end">
+            @if (loading) {
+              <button type="button" class="btn btn-primary" disabled>
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                Cargando...
+              </button>
+            } @else {
+              <button type="submit" class="btn btn-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
+                  />
+                  <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                  <path d="M14 4l0 4l-6 0l0 -4" />
+                </svg>
+                Guardar
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

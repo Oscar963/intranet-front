@@ -31,7 +31,6 @@
             ],
             "styles": [
               "node_modules/@tabler/core/dist/css/tabler.min.css",
-              "node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "src/styles.css"
             ],
 

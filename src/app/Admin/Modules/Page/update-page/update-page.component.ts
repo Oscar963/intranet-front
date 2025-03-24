@@ -1,29 +1,20 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { UploadSimpleImgComponent } from '../../../../Utils/upload-simple-img/upload-simple-img.component';
 import { TinymceComponent } from '../../../../Utils/tinymce/tinymce.component';
-
-import {
-  FormControl,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import dayjs from 'dayjs/esm';
-
+import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { PageService } from '../../../../services/page.service';
-import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
-import { defineLocale } from 'ngx-bootstrap/chronos';
-import { esLocale } from 'ngx-bootstrap/locale';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { NotificationService } from '../../../../services/notification.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../../../services/toast.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Page } from '../../../../interfaces/Page';
+import { tap, take } from 'rxjs';
 
 @Component({
   selector: 'app-update-page',
   imports: [
     UploadSimpleImgComponent,
     ReactiveFormsModule,
-    BsDatepickerModule,
     TinymceComponent,
     RouterLink,
   ],
@@ -31,126 +22,136 @@ import { Router } from '@angular/router';
   styleUrl: './update-page.component.css',
 })
 export class UpdatePageComponent {
+  // Referencia al componente de subida de imágenes.
+  // Se usa para obtener la imagen seleccionada.
   @ViewChild(UploadSimpleImgComponent)
   UploadSimpleImg!: UploadSimpleImgComponent;
 
-  private PageService = inject(PageService);
-  private notificationService = inject(NotificationService);
+  //Inyección de servicios usando la nueva API de Angular.
+  private pageService = inject(PageService);
+  private toastService = inject(ToastService);
   private router = inject(Router);
+  private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
 
-  constructor(private bsLocaleService: BsLocaleService) {
-    defineLocale('es', esLocale);
-    this.bsLocaleService.use('es'); //fecha en español, datepicker
+  // Variables de estado reactivas
+  public loading = signal(false);
+  public errorMessage = signal<string>('');
+  public pageId = signal<number>(
+    Number(this.route.snapshot.paramMap.get('id')),
+  );
+
+  constructor() {
+    this.loadPage();
   }
 
-  public textContent: string = ''; // Contenido inicial
-  public customOptions = {
-    height: 500, // Altura personalizada
-    menubar: true, // Mostrar la barra de menús
-  };
-
-  public loading: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
-  public pageId!: number; // ID del page a actualizar
-  public imgCurrent!: number; // ID del page a actualizar
-
-  form: FormGroup = new FormGroup({
-    title: new FormControl('', [Validators.required]),
-    status: new FormControl('', [Validators.required]),
-    content: new FormControl(''),
+  // Definición del formulario con validaciones
+  form = this.fb.nonNullable.group({
+    title: ['', Validators.required],
+    status: ['', Validators.required],
+    content: '',
   });
 
-  ngOnInit(): void {
-    // Obtener el ID del page desde la URL
-    this.pageId = Number(this.route.snapshot.paramMap.get('id'));
-    this.loadPageData();
-  }
-
-  private loadPageData(): void {
-    this.loading = true;
-    this.PageService.getPageById(this.pageId).subscribe({
-      next: (page) => {
-        this.imgCurrent = page.image;
-        this.form.patchValue({
-          title: page.title,
-          status: page.status,
-          content: page.content,
-        });
-      },
-      error: (error) => {
-        this.errorMessage = 'No se pudieron cargar los datos del page.';
-      },
-      complete: () => {
-        this.loading = false;
-      },
+  private loadPage() {
+    return rxResource<Page, void>({
+      loader: () =>
+        this.pageService
+          .getPageById(this.pageId())
+          .pipe(tap((response) => this.setData(response))),
     });
   }
 
+  //Maneja el envío del formulario.
+  //Valida el formulario, construye los datos y los envía al backend.
   onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    if (!this.validateForm()) return;
+    this.loading.set(true);
+    this.clearMessages();
 
-    this.form.markAllAsTouched();
-    // Verificar si el formulario es válido antes de enviarlo
-    if (this.form.invalid) {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-      this.loading = false;
-      window.scroll(0, 0);
-      return;
-    }
+    const formData = this.buildFormData();
 
-    const formData = new FormData();
-    formData.append('_method', 'PUT');
-    formData.append('title', this.form.value.title);
-    formData.append('status', this.form.value.status);
-    formData.append('content', this.form.value.content);
-
-    // Obtener el archivo desde Dropzone
-    const image = this.UploadSimpleImg.getFile();
-    if (image) {
-      formData.append('image', image);
-    } else {
-      //   console.error('No hay image seleccionada');
-    }
-
-    this.PageService.updatePage(this.pageId, formData)
+    this.pageService
+      .updatePage(this.pageId(), formData)
+      .pipe(take(1))
       .subscribe({
-        next: (success: string) => {
-          this.UploadSimpleImg.removeAllFiles();
-          this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/pages']);
-        },
-        error: (error) => {
-          if (error.status === 422) {
-            this.errorMessage = this.processErrors(error.error.errors);
-            window.scroll(0, 0);
-          } else {
-            this.errorMessage = error;
-          }
-        },
+        next: (success: string) => this.handleSuccess(success),
+        error: (error) => this.handleError(error),
+        complete: () => this.loading.set(false),
       })
       .add(() => {
-        this.loading = false;
+        this.loading.set(false);
       });
   }
 
-  processErrors(errors: { [key: string]: string[] }): string {
+  private setData(response: Page) {
+    if (response) {
+      this.form.patchValue({
+        title: response.title,
+        status: response.status,
+        content: response.content || '',
+      });
+    }
+  }
+
+  private clearMessages(): void {
+    this.errorMessage.set('');
+  }
+
+  // Construye los datos a enviar en `FormData`
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('title', this.form.value.title!);
+    formData.append('status', this.form.value.status!);
+    formData.append('content', this.form.value.content!);
+
+    // Agregar la imagen si está disponible
+    const image = this.UploadSimpleImg.getFile();
+    if (image) formData.append('image', image);
+
+    return formData;
+  }
+
+  // Maneja la respuesta exitosa del backend
+  private handleSuccess(success: string): void {
+    this.resetForm();
+    this.toastService.success(success);
+    this.router.navigate(['/admin/pages']);
+  }
+
+  // Valida el formulario antes de enviarlo
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      return false;
+    }
+    return true;
+  }
+
+  // Maneja los errores del backend
+  private handleError(error: any): void {
+    if (error.status === 422) {
+      this.errorMessage.set(this.processErrors(error.error.errors));
+      window.scroll(0, 0);
+    } else {
+      this.errorMessage.set(error);
+    }
+  }
+
+  // Reinicia el formulario y limpia los archivos
+  private resetForm(): void {
+    this.form.reset();
+    this.UploadSimpleImg.removeAllFiles();
+  }
+
+  // Procesa los errores de validación del backend
+  private processErrors(errors: { [key: string]: string[] }): string {
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
       .map((error) => `${error}</br>`)
       .join('');
     return `${errorList}`;
-  }
-
-  onContentChange(content: string): void {
-    this.form.value.content = content;
-  }
-
-  // Método para convertir la fecha a formato interno usando dayjs
-  private formatDateToInternal(date: any): string {
-    return dayjs(date).format('YYYY-MM-DD HH:mm');
   }
 }

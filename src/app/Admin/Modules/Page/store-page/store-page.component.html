@@ -20,47 +20,47 @@
           <div class="card-header">
             <h3 class="card-title">Formulario de registro</h3>
           </div>
-          @if(loading){
-          <div class="progress progress-sm">
-            <div class="progress-bar progress-bar-indeterminate"></div>
-          </div>
+          @if (loading()) {
+            <div class="progress progress-sm">
+              <div class="progress-bar progress-bar-indeterminate"></div>
+            </div>
           }
           <div class="card-body">
-            @if(errorMessage){
-            <div
-              class="alert alert-important alert-danger alert-dismissible"
-              role="alert"
-            >
-              <div class="d-flex">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="icon alert-icon"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    fill="none"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
+            @if (errorMessage()) {
+              <div
+                class="alert alert-important alert-danger alert-dismissible"
+                role="alert"
+              >
+                <div class="d-flex">
+                  <div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="icon alert-icon"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                  </div>
                 </div>
-                <div>
-                  <div [innerHTML]="errorMessage" class="ms-1"></div>
-                </div>
+                <a
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="alert"
+                  aria-label="close"
+                ></a>
               </div>
-              <a
-                class="btn-close btn-close-white"
-                data-bs-dismiss="alert"
-                aria-label="close"
-              ></a>
-            </div>
             }
             <div class="row row-cards">
               <div class="col-md-6 col-md-9">
@@ -80,12 +80,18 @@
                       (form.get('title')?.touched || form.get('title')?.dirty)
                     "
                   />
-                  @if(form.get('title')?.invalid && form.get('title')?.touched
-                  || form.get('title')?.dirty){
-                  @if(form.get('title')?.hasError('required')){
-                  <span class="invalid-input"> El título es obligatorio. </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("title")?.invalid &&
+                      form.get("title")?.touched) ||
+                    form.get("title")?.dirty
+                  ) {
+                    @if (form.get("title")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El título es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -134,12 +140,18 @@
                       <span class="form-check-label">Oculto</span>
                     </label>
                   </div>
-                  @if(form.get('status')?.invalid && form.get('status')?.touched
-                  || form.get('status')?.dirty){
-                  @if(form.get('status')?.hasError('required')){
-                  <span class="invalid-input"> El estado es obligatorio. </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("status")?.invalid &&
+                      form.get("status")?.touched) ||
+                    form.get("status")?.dirty
+                  ) {
+                    @if (form.get("status")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El estado es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
@@ -156,51 +168,55 @@
                     formControlName="content"
                     [initOptions]="customOptions"
                   ></app-tinymce>
-                  @if(form.get('content')?.invalid &&
-                  form.get('content')?.touched || form.get('content')?.dirty){
-                  @if(form.get('content')?.hasError('required')){
-                  <span class="invalid-input">
-                    El contenido es obligatorio.
-                  </span>
-                  } } @else {
-                  <span class="invalid-input">&nbsp;</span>
+                  @if (
+                    (form.get("content")?.invalid &&
+                      form.get("content")?.touched) ||
+                    form.get("content")?.dirty
+                  ) {
+                    @if (form.get("content")?.hasError("required")) {
+                      <span class="invalid-input">
+                        El contenido es obligatorio.
+                      </span>
+                    }
+                  } @else {
+                    <span class="invalid-input">&nbsp;</span>
                   }
                 </div>
               </div>
             </div>
           </div>
           <div class="card-footer text-end">
-            @if(loading){
-            <button type="button" class="btn btn-primary" disabled>
-              <span
-                class="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-              Cargando...
-            </button>
+            @if (loading()) {
+              <button type="button" class="btn btn-primary" disabled>
+                <span
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></span>
+                Cargando...
+              </button>
             } @else {
-            <button type="submit" class="btn btn-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path
-                  d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
-                />
-                <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                <path d="M14 4l0 4l-6 0l0 -4" />
-              </svg>
-              Guardar
-            </button>
+              <button type="submit" class="btn btn-primary">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path
+                    d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
+                  />
+                  <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                  <path d="M14 4l0 4l-6 0l0 -4" />
+                </svg>
+                Guardar
+              </button>
             }
           </div>
         </form>

@@ -20,13 +20,13 @@
           <div class="card-header">
             <h3 class="card-title">Formulario de registro</h3>
           </div>
-          @if(loading){
+          @if(loading()){
           <div class="progress progress-sm">
             <div class="progress-bar progress-bar-indeterminate"></div>
           </div>
           }
           <div class="card-body">
-            @if(errorMessage){
+            @if(errorMessage()){
             <div
               class="alert alert-important alert-danger alert-dismissible"
               role="alert"
@@ -52,7 +52,7 @@
                   </svg>
                 </div>
                 <div>
-                  <div [innerHTML]="errorMessage" class="ms-1"></div>
+                  <div [innerHTML]="errorMessage()" class="ms-1"></div>
                 </div>
               </div>
               <a
@@ -216,7 +216,7 @@
             </div>
           </div>
           <div class="card-footer text-end">
-            @if(loading){
+            @if(loading()){
             <button type="button" class="btn btn-primary" disabled>
               <span
                 class="spinner-border spinner-border-sm me-2"
