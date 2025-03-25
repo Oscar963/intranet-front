@@ -220,6 +220,13 @@ export const routes: Routes = [
           ).then((m) => m.FileIndexPageComponent),
       },
 
+      {
+        path: 'pages/files/update/:idfile/page/:idpage',
+        loadComponent: () =>
+          import(
+            './Admin/Modules/Page/file-update-page/file-update-page.component'
+          ).then((m) => m.FileUpdatePageComponent),
+      },
       /** User Routes **/
       {
         path: 'users',
@@ -293,6 +300,13 @@ export const routes: Routes = [
             (m) => m.StoreFileComponent,
           ),
       },
+      {
+        path: 'files/update/:id',
+        loadComponent: () =>
+          import('./Admin/Modules/File/update-file/update-file.component').then(
+            (m) => m.UpdateFileComponent,
+          ),
+      },
 
       /** Anexo Routes **/
       {
@@ -355,7 +369,6 @@ export const routes: Routes = [
       },
     ],
   },
-
 
   /** Auth Routes **/
   {
