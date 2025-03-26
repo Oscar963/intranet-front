@@ -29,9 +29,9 @@ export class WebService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de popups.
    */
-  fetchPopups(page: number = 1, show: number): Observable<any> {
+  fetchPopups(): Observable<any> {
     return this.http
-      .get<any>(`${this.apiUrl}/api/web/popups?page=${page}&show=${show}`)
+      .get<any>(`${this.apiUrl}/api/web/popups`)
       .pipe(map((response) => response));
   }
 
@@ -85,7 +85,7 @@ export class WebService {
    * @param id Identificador del popup.
    * @returns Observable con los datos del popup.
    */
-  getPageBySlug(slug: string): Observable<any> {    
+  getPageBySlug(slug: string): Observable<any> {
     return this.http
       .get<{ data: any }>(`${this.apiUrl}/api/web/pages/slug/${slug}`)
       .pipe(map((response) => response.data));

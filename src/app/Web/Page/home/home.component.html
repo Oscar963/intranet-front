@@ -759,3 +759,140 @@
     </div>
   </div>
 </section>
+<section>
+  <!-- Modal con Carrusel -->
+  <div
+    #modalPopUp
+    class="modal fade"
+    id="modal-popup"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content" style="background-color: transparent">
+        <!-- Carrusel de Bootstrap -->
+        <div
+          id="carouselExample"
+          class="carousel slide"
+          data-bs-ride="carousel"
+        >
+          <div class="carousel-inner">
+            @defer {
+              @if (!popUpsRx.isLoading() && popUpsRx.value().length > 0) {
+                <div id="carousel-popups" class="carousel slide carousel-fade">
+                  <!-- Indicadores del carrusel -->
+                  <div class="carousel-indicators">
+                    @for (popup of popUpsRx.value(); track $index) {
+                      <button
+                        type="button"
+                        [attr.data-bs-target]="'#carousel-popups'"
+                        [attr.data-bs-slide-to]="$index"
+                        [class.active]="$index === 0"
+                        [attr.aria-label]="'Slide ' + ($index + 1)"
+                      ></button>
+                    }
+                  </div>
+
+                  <!-- Elementos del carrusel -->
+                  <div class="carousel-inner rounded-4">
+                    @for (popup of popUpsRx.value(); track $index) {
+                      <div
+                        [class.carousel-item]="true"
+                        [class.active]="$index === 0"
+                      >
+                        <a [href]="popup.link" target="_blank">
+                          <img
+                            [src]="popup.image"
+                            class="d-block w-100"
+                            [alt]="popup.title"
+                          />
+                        </a>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Controles del carrusel -->
+                  <a
+                    class="carousel-control-prev"
+                    href="#carousel-banners"
+                    role="button"
+                    data-bs-slide="prev"
+                  >
+                    <span
+                      class="carousel-control-prev-icon"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="visually-hidden">Previous</span>
+                  </a>
+                  <a
+                    class="carousel-control-next"
+                    href="#carousel-banners"
+                    role="button"
+                    data-bs-slide="next"
+                  >
+                    <span
+                      class="carousel-control-next-icon"
+                      aria-hidden="true"
+                    ></span>
+                    <span class="visually-hidden">Next</span>
+                  </a>
+                </div>
+              } @else {
+                <div class="alert alert-info mb-0 bg-white" role="alert">
+                  <div class="d-flex">
+                    <div class="ml-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="icon alert-icon"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <circle cx="12" cy="12" r="9" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
+                        <polyline points="11 12 12 12 12 16 13 16" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 class="alert-title" style="margin-left: 5px">
+                        Información
+                      </h4>
+                      <div class="text-secondary">
+                        No hay banners publicados en este momento.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            } @placeholder {
+              <span>Cargando datos....</span>
+            }
+          </div>
+          <!-- Controles del carrusel -->
+          <button
+            class="carousel-control-prev"
+            type="button"
+            data-bs-target="#carouselExample"
+            data-bs-slide="prev"
+          >
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          </button>
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#carouselExample"
+            data-bs-slide="next"
+          >
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
