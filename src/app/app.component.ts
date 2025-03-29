@@ -1,6 +1,6 @@
 import { RouterOutlet } from '@angular/router';
 import { Component, computed, effect, inject } from '@angular/core';
-import { LoadingService } from './services/loading.service';
+import { LoadingService } from '@services/loading.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],

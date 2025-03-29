@@ -37,7 +37,6 @@
 
             "scripts": [
               "node_modules/@tabler/core/dist/js/tabler.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "node_modules/tinymce/tinymce.min.js"
             ]
           },

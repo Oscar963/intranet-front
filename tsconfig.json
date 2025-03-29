@@ -3,6 +3,26 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@env/*": ["src/environments/*"],
+      // "@core/*": ["src/app/core/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@services/*": ["src/app/core/services/*"],
+      // "@models/*": ["src/app/models/*"],
+      "@guards/*": ["src/app/core/guards/*"],
+      // "@interceptors/*": ["src/app/interceptors/*"],
+      "@interfaces/*": ["src/app/core/interfaces/*"],
+      // "@resolvers/*": ["src/app/resolvers/*"],
+      // "@utils/*": ["src/app/utils/*"],
+      // "@directives/*": ["src/app/directives/*"],
+      // "@pipes/*": ["src/app/pipes/*"],
+      "@components/*": ["src/app/components/*"]
+      // "@pages/*": ["src/app/pages/*"],
+      // "@configs/*": ["src/app/configs/*"],
+      // "@assets/*": ["src/assets/*"]
+    },
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
@@ -23,24 +43,5 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  },
-  // "paths": {
-  //   "@app/*": ["src/app/*"],
-  //   "@env/*": ["src/environments/*"],
-  //   "@core/*": ["src/app/core/*"],
-  //   "@shared/*": ["src/app/shared/*"],
-  //   "@modules/*": ["src/app/modules/*"],
-  //   "@services/*": ["src/app/services/*"],
-  //   "@models/*": ["src/app/models/*"],
-  //   "@guards/*": ["src/app/guards/*"],
-  //   "@interceptors/*": ["src/app/interceptors/*"],
-  //   "@resolvers/*": ["src/app/resolvers/*"],
-  //   "@utils/*": ["src/app/utils/*"],
-  //   "@directives/*": ["src/app/directives/*"],
-  //   "@pipes/*": ["src/app/pipes/*"],
-  //   "@components/*": ["src/app/components/*"],
-  //   "@pages/*": ["src/app/pages/*"],
-  //   "@configs/*": ["src/app/configs/*"],
-  //   "@assets/*": ["src/assets/*"]
-  // }
+  }
 }
