@@ -1,36 +1,55 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FileService } from '@services/file.service';
 import { File } from '@interfaces/File';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { NotificationService } from '@services/notification.service';
+import { ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { ToastService } from '@services/toast.service';
+import { ModalFileUploadComponent } from '@components/Admin/Modules/Page/modal-file-upload/modal-file-upload.component';
 import { PageService } from '@services/page.service';
+import { ModalUpdateFileUploadComponent } from '@components/Admin/Modules/Page/modal-update-file-upload/modal-update-file-upload.component';
 
 @Component({
   selector: 'app-file-index-page',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    ModalFileUploadComponent,
+    ModalUpdateFileUploadComponent,
+  ],
   templateUrl: './file-index-page.component.html',
   styleUrl: './file-index-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FileIndexPageComponent implements OnInit {
+export class FileIndexPageComponent {
   private fileService = inject(FileService);
+  private toastService = inject(ToastService);
   private pageService = inject(PageService);
 
-  private notificationService = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  public errorMessage: string = '';
-  public successMessage: string | null = null;
-  public files: File[] = [];
-  public show: number = 15;
-  public meta: any = {};
-  public links: any = {};
-  public loading: boolean = false;
-  public currentPage: number = 1;
-  public pageId!: number;
+  public pageId = signal<number>(
+    Number(this.route.snapshot.paramMap.get('idpage')),
+  );
+
+  public uploadEditFile = viewChild.required<ModalUpdateFileUploadComponent>(
+    'uploadModalFileEditRef',
+  ); // Capturamos la referencia del componente  ModalUpdateFileUploadComponent
+
+  public query = signal<string>('');
+  public show = signal<number>(15);
+  public meta = signal<any>({});
+  public page = signal<number>(1);
 
   values = [
     { value: '15', label: '15' },
@@ -39,65 +58,62 @@ export class FileIndexPageComponent implements OnInit {
     { value: '500', label: '500' },
   ];
 
-  form = new FormGroup({
-    show: new FormControl(this.values[0]?.value),
-  });
-
-  ngOnInit(): void {
-    this.pageId = Number(this.route.snapshot.paramMap.get('idpage'));
-
-    this.notificationService.successMessage$.subscribe(
-      (message) => (this.successMessage = message),
-    );
-
-    this.route.params.subscribe((params) => {
-      const page = +params['page'] || 1;
-      this.currentPage = page;
-      this.loadFiles(this.currentPage, this.show);
+  constructor() {
+    // Efecto para sincronizar `page` con la URL
+    effect(() => {
+      this.route.params.subscribe((params) => {
+        this.page.set(+params['page'] || 1);
+      });
+    });
+    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
+    effect(() => {
+      if (this.page() !== 1 && this.query() !== '') {
+        this.page.set(1);
+        this.router.navigate(['admin/pages/files', this.pageId()]);
+      }
     });
   }
 
-  loadFiles(page: number, show: number): void {
-    this.loading = true;
+  public filesRs = rxResource<
+    File[],
+    { idpage: number; query: string; page: number; show: number }
+  >({
+    request: () => ({
+      idpage: this.pageId(),
+      query: this.query(),
+      page: this.page(),
+      show: this.show(),
+    }),
+    loader: ({ request }) => {
+      return this.pageService
+        .fetchFile(request.idpage, request.query, request.page, request.show)
+        .pipe(
+          // Usamos map para transformar la respuesta
+          map((response) => {
+            // Actualizamos la metadata
+            this.meta.set({
+              current_page: response.data.meta?.current_page ?? 1,
+              last_page: response.data.meta?.last_page ?? 1,
+              from: response.data.meta?.from ?? 0,
+              to: response.data.meta?.to ?? 0,
+              total: response.data.meta?.total ?? 0,
+              links:
+                response.data.meta?.links?.map((link: any, index: number) => ({
+                  id: `link-${index}`, // Clave única generada para cada enlace
+                  label: link.label ?? '',
+                  page: this.extractPage(link.url) ?? null,
+                  active: link.active ?? false,
+                })) ?? [],
+            });
 
-    this.pageService.fetchFile(this.pageId,page, show).subscribe({
-      next: (response) => {
-        this.files = response.data.data;
-        this.meta = { ...response.data.meta };
-
-        this.links = {
-          first: response.data.links.first,
-          last: response.data.links.last,
-          next: response.data.links.next,
-          prev: response.data.links.prev,
-        };
-
-        this.meta.links = response.data.meta.links.map(
-          (link: any, index: number) => ({
-            id: `link-${index}`,
-            label: link.label,
-            page: this.extractPage(link.url),
-            active: link.active,
+            // Convertimos explícitamente a File[] y retornamos los datos
+            return response.data.data as File[];
           }),
         );
-      },
-      error: (error) => {
-        console.error('Error al obtener los files:', error);
-        this.errorMessage = error.message || 'Error al cargar los archivos.';
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
-  }
+    },
+  });
 
-  goToPage(page: number | null): void {
-    if (page && page > 0 && page <= this.meta.last_page) {
-      this.router.navigate(['admin/pages/files', this.pageId, 'page', page]);
-    }
-  }
-
-  deleteItem(id: number) {
+  public deleteItem(id: number) {
     Swal.fire({
       title: '¿Estás seguro que desea eliminar el archivo?',
       text: '¡Esta acción no podrá ser revertida!',
@@ -128,7 +144,7 @@ export class FileIndexPageComponent implements OnInit {
               confirmButtonColor: '#06048c',
               confirmButtonText: 'Cerrar',
             });
-            this.loadFiles(this.currentPage, this.show);
+            this.filesRs.reload();
           },
           error: (error) => {
             Swal.close();
@@ -145,21 +161,19 @@ export class FileIndexPageComponent implements OnInit {
     });
   }
 
-  onChange(e: any) {
-    this.show = e.target.value;
-    this.router.navigate(['admin/pages/files', this.pageId, 'page', 1]);
-
-    this.currentPage = 1;
-    this.loadFiles(this.currentPage, this.show);
+  public goToPage(page: number | null): void {
+    if (page && page > 0 && page <= this.meta().last_page) {
+      this.router.navigate(['admin/pages/files', this.pageId(), 'page', page]);
+    }
   }
 
-  extractPage(url: string | null): number | null {
-    return url
-      ? parseInt(url.match(/page=(\d+)/)?.[1] || '', 10) || null
-      : null;
+  private extractPage(url: string | null): number | null {
+    if (!url) return null;
+    const match = url.match(/page=(\d+)/);
+    return match ? parseInt(match[1], 10) : null;
   }
 
-  downloadFile(fileId: number, fileName: string) {
+  public downloadFile(fileId: number, fileName: string) {
     Swal.fire({
       title: 'Descargando...',
       html: 'Por favor, espera mientras se descarga el archivo.',
@@ -229,20 +243,22 @@ export class FileIndexPageComponent implements OnInit {
     return fileExtension;
   }
 
-  copyToClipboard(text: string): void {    
+  public copyToClipboard(text: string): void {
     navigator.clipboard
       .writeText(text)
       .then(() => {
-        alert('URL copiada al portapapeles.');
-        this.notificationService.showSuccess('URL copiada al portapapeles.');
+        this.toastService.info('URL copiada al portapapeles.');
       })
       .catch((err) => {
-        this.notificationService.showError('Error al copiar la URL.');
-        console.error('Error al copiar al portapapeles:', err);
+        this.toastService.error('Error al copiar la URL.');
       });
   }
 
-  getFileImage(fileType: string): string {
+  public openModalEdit(file: any) {    
+   this.uploadEditFile().openModal(file);
+  }
+
+  public getFileImage(fileType: string): string {
     switch (fileType) {
       case 'PDF':
         return '/assets/icons/files/pdf.png'; // Ruta a tu imagen PDF

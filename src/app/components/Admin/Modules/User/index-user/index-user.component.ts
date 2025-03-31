@@ -1,18 +1,18 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UserService } from '@services/user.service';
 import { User } from '@interfaces/User';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AuthService } from '@services/auth.service';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-index-user',
-  imports: [RouterLink, ReactiveFormsModule, FormsModule],
+  imports: [RouterLink],
   templateUrl: './index-user.component.html',
   styleUrl: './index-user.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexUserComponent {
   private userService = inject(UserService);
@@ -22,8 +22,8 @@ export class IndexUserComponent {
   private router = inject(Router);
 
   public user = signal<User[]>([]);
-
-  public show = signal<number>(50);
+  public query = signal<string>('');
+  public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 
@@ -41,34 +41,50 @@ export class IndexUserComponent {
         this.page.set(+params['page'] || 1);
       });
     });
+    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
+    effect(() => {
+      if (this.page() !== 1 && this.query() !== '') {
+        this.page.set(1);
+        this.router.navigate(['admin/users/page', 1]);
+      }
+    });
   }
 
-  public usersRs = rxResource<User[], { page: number; show: number }>({
+  public usersRs = rxResource<
+    User[],
+    { query: string; page: number; show: number }
+  >({
     request: () => ({
+      query: this.query(),
       page: this.page(),
       show: this.show(),
     }),
     loader: ({ request }) => {
-      return this.userService.fetchUsers(request.page, request.show).pipe(
-        switchMap((response) => {
-          this.meta.set({
-            current_page: response.meta?.current_page ?? 1,
-            last_page: response.meta?.last_page ?? 1,
-            from: response.meta?.from ?? 0,
-            to: response.meta?.to ?? 0,
-            total: response.meta?.total ?? 0,
-            links:
-              response.meta?.links?.map((link: any, index: number) => ({
-                id: `link-${index}`,
-                label: link.label ?? '',
-                page: this.extractPage(link.url) ?? null,
-                active: link.active ?? false,
-              })) ?? [],
-          });
+      return this.userService
+        .fetchUsers(request.query, request.page, request.show)
+        .pipe(
+          // Usamos map para transformar la respuesta
+          map((response) => {
+            // Actualizamos la metadata
+            this.meta.set({
+              current_page: response.data.meta?.current_page ?? 1,
+              last_page: response.data.meta?.last_page ?? 1,
+              from: response.data.meta?.from ?? 0,
+              to: response.data.meta?.to ?? 0,
+              total: response.data.meta?.total ?? 0,
+              links:
+                response.data.meta?.links?.map((link: any, index: number) => ({
+                  id: `link-${index}`, // Clave única generada para cada enlace
+                  label: link.label ?? '',
+                  page: this.extractPage(link.url) ?? null,
+                  active: link.active ?? false,
+                })) ?? [],
+            });
 
-          return [response.data.data];
-        }),
-      );
+            // Convertimos explícitamente a User[] y retornamos los datos
+            return response.data.data as User[];
+          }),
+        );
     },
   });
 

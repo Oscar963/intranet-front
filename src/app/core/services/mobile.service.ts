@@ -17,9 +17,9 @@ export class MobileService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de móviles.
    */
-  fetchMobiles(page: number = 1, show: number): Observable<any> {
+  fetchMobiles(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/mobiles?page=${page}&show=${show}`
+      `${this.apiUrl}/api/mobiles?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -84,7 +84,7 @@ export class MobileService {
       {
         reportProgress: true,
         responseType: 'json',
-      }
+      },
     );
 
     return this.http.request(req);

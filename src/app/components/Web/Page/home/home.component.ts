@@ -6,10 +6,11 @@ import {
   inject,
   effect,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { WebService } from '@services/web.service';
 import { RouterLink } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop'; 
 import { map } from 'rxjs';
 import { Modal } from 'bootstrap';
 
@@ -18,6 +19,7 @@ import { Modal } from 'bootstrap';
   imports: [RouterLink],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements AfterViewInit {
   @ViewChild('modalPopUp', { static: true }) modalRef!: ElementRef;

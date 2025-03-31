@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { MobileService } from '@services/mobile.service';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { take } from 'rxjs';
   imports: [ReactiveFormsModule],
   templateUrl: './store-mobile.component.html',
   styleUrl: './store-mobile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreMobileComponent {
   //Inyección de servicios usando la nueva API de Angular.
@@ -23,7 +24,7 @@ export class StoreMobileComponent {
   public errorMessage = signal<string>('');
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     number: ['', Validators.required],
     office: '',
     direction: '',
@@ -81,6 +82,7 @@ export class StoreMobileComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

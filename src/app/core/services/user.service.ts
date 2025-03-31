@@ -17,9 +17,9 @@ export class UserService {
    * @param show Cantidad de usuarios por página.
    * @returns Observable con los datos de usuarios.
    */
-  fetchUsers(page: number = 1, show: number): Observable<any> {
+  fetchUsers(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/users?page=${page}&show=${show}`,
+      `${this.apiUrl}/api/users?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 

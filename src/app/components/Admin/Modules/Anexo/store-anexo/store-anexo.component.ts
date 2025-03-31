@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { AnexoService } from '@services/anexo.service';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { take } from 'rxjs';
   imports: [ReactiveFormsModule],
   templateUrl: './store-anexo.component.html',
   styleUrl: './store-anexo.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreAnexoComponent {
   //Inyección de servicios usando la nueva API de Angular.
@@ -23,7 +24,7 @@ export class StoreAnexoComponent {
   public errorMessage = signal<string>('');
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     internal_number: ['', Validators.required],
     external_number: ['', Validators.required],
     office: '',
@@ -83,6 +84,7 @@ export class StoreAnexoComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

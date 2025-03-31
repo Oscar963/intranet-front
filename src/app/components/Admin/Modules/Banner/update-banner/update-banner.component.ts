@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { BannerService } from '@services/banner.service';
@@ -20,6 +20,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
   imports: [UploadSimpleImgComponent, ReactiveFormsModule, BsDatepickerModule],
   templateUrl: './update-banner.component.html',
   styleUrl: './update-banner.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateBannerComponent {
   // Referencia al componente de subida de imágenes.
@@ -49,7 +50,7 @@ export class UpdateBannerComponent {
   }
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     title: ['', Validators.required],
     date_expiration: ['', Validators.required],
     status: ['', Validators.required],
@@ -134,6 +135,7 @@ export class UpdateBannerComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

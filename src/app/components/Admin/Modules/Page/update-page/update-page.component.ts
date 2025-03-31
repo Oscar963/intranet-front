@@ -1,4 +1,10 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { TinymceComponent } from '@shared/tinymce/tinymce.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
@@ -20,13 +26,9 @@ import { tap, take } from 'rxjs';
   ],
   templateUrl: './update-page.component.html',
   styleUrl: './update-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdatePageComponent {
-  // Referencia al componente de subida de imágenes.
-  // Se usa para obtener la imagen seleccionada.
-  @ViewChild(UploadSimpleImgComponent)
-  UploadSimpleImg!: UploadSimpleImgComponent;
-
   //Inyección de servicios usando la nueva API de Angular.
   private pageService = inject(PageService);
   private toastService = inject(ToastService);
@@ -41,25 +43,25 @@ export class UpdatePageComponent {
     Number(this.route.snapshot.paramMap.get('id')),
   );
 
-  constructor() {
-    this.loadPage();
-  }
+  public uploadSimpleFileImg =
+    viewChild.required<UploadSimpleImgComponent>('uploadSimpleImgRef'); // Capturamos la referencia del componente  UploadSimpleFileComponent
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     title: ['', Validators.required],
     status: ['', Validators.required],
     content: '',
   });
 
-  private loadPage() {
-    return rxResource<Page, void>({
-      loader: () =>
-        this.pageService
-          .getPageById(this.pageId())
-          .pipe(tap((response) => this.setData(response))),
-    });
-  }
+  public pageRs = rxResource({
+    request: () => ({
+      idpage: this.pageId(),
+    }),
+    loader: ({ request }) =>
+      this.pageService
+        .getPageById(request.idpage)
+        .pipe(tap((response) => this.setData(response))),
+  });
 
   //Maneja el envío del formulario.
   //Valida el formulario, construye los datos y los envía al backend.
@@ -106,7 +108,7 @@ export class UpdatePageComponent {
     formData.append('content', this.form.value.content!);
 
     // Agregar la imagen si está disponible
-    const image = this.UploadSimpleImg.getFile();
+    const image = this.uploadSimpleFileImg().getFile();
     if (image) formData.append('image', image);
 
     return formData;
@@ -125,6 +127,7 @@ export class UpdatePageComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;
@@ -143,7 +146,7 @@ export class UpdatePageComponent {
   // Reinicia el formulario y limpia los archivos
   private resetForm(): void {
     this.form.reset();
-    this.UploadSimpleImg.removeAllFiles();
+    this.uploadSimpleFileImg().removeAllFiles();
   }
 
   // Procesa los errores de validación del backend

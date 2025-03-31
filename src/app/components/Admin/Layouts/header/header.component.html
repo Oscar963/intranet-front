@@ -1,5 +1,6 @@
 <header class="navbar navbar-expand-md d-print-none bg-primary">
   <div class="container">
+    <!-- Botón toggle para móviles -->
     <button
       class="navbar-toggler"
       type="button"
@@ -11,6 +12,8 @@
     >
       <span class="navbar-toggler-icon text-white"></span>
     </button>
+
+    <!-- Logo -->
     <h1
       class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-md-3 pe-0"
     >
@@ -24,11 +27,19 @@
         />
       </a>
     </h1>
+
+    <!-- Menú de usuario -->
     <div class="navbar-nav order-md-last flex-row">
+      <!-- Botón Sitio Web -->
       <div class="nav-item d-none d-md-flex me-3">
         <div class="btn-list">
-          <a href="/" class="btn btn-primary" target="_blank" rel="noreferrer">
-            <!-- Download SVG icon from http://tabler-icons.io/i/brand-github -->
+          <a
+            href="/"
+            class="btn btn-primary"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Ir al sitio web público"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -40,6 +51,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               class="icon icon-tabler icons-tabler-outline icon-tabler-world-www"
+              aria-hidden="true"
             >
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M19.5 7a9 9 0 0 0 -7.5 -4a8.991 8.991 0 0 0 -7.484 4" />
@@ -57,20 +69,26 @@
         </div>
       </div>
 
+      <!-- Dropdown de usuario -->
       <div class="nav-item dropdown">
         <a
           href="#"
           class="nav-link d-flex lh-1 text-reset p-0"
           data-bs-toggle="dropdown"
-          aria-label="Open user menu"
+          aria-label="Menú de usuario"
+          aria-expanded="false"
         >
-          <span class="avatar avatar-sm">{{ nameAvatar() }}</span>
+          <span class="avatar avatar-sm" aria-hidden="true">
+            {{ nameAvatar() }}
+          </span>
 
           <div class="d-none d-xl-block ps-2 text-white">
-            <div>{{ user().name }} {{ user().paternal_surname }}</div>
-            <div class="small mt-1 text-white">{{ user().rut }}</div>
+            <div>{{ user()?.name }} {{ user()?.paternal_surname }}</div>
+            <div class="small mt-1 text-white">{{ user()?.rut }}</div>
           </div>
         </a>
+
+        <!-- Menú desplegable -->
         <div
           class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
           data-bs-theme="light"
@@ -78,14 +96,22 @@
           <a
             [routerLink]="['/admin/users/profile-update']"
             class="dropdown-item"
-            >Mi Perfil</a
+            aria-label="Editar perfil"
           >
+            Mi Perfil
+          </a>
           <a
             [routerLink]="['/admin/users/password-update']"
             class="dropdown-item"
-            >Cambiar contraseña</a
+            aria-label="Cambiar contraseña"
           >
-          <button (click)="logout()" class="dropdown-item">
+            Cambiar contraseña
+          </a>
+          <button
+            (click)="logout()"
+            class="dropdown-item"
+            aria-label="Cerrar sesión"
+          >
             Cerrar sesión
           </button>
         </div>

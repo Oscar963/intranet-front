@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { PopupService } from '@services/popup.service';
@@ -15,6 +15,7 @@ import dayjs from 'dayjs/esm';
   imports: [UploadSimpleImgComponent, ReactiveFormsModule, BsDatepickerModule],
   templateUrl: './store-popup.component.html',
   styleUrl: './store-popup.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StorePopupComponent {
   // Referencia al componente de subida de imágenes.
@@ -39,65 +40,13 @@ export class StorePopupComponent {
   }
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     title: ['', Validators.required],
     date_expiration: ['', Validators.required],
     status: ['', Validators.required],
     link: '',
   });
 
-  // onSubmit(): void {
-  //   this.loading = true;
-  //   this.errorMessage = '';
-  //   this.successMessage = '';
-
-  //   this.form.markAllAsTouched();
-  //   // Verificar si el formulario es válido antes de enviarlo
-  //   if (this.form.invalid) {
-  //     this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-  //     this.loading = false;
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append('title', this.form.value.title);
-  //   formData.append(
-  //     'date_expiration',
-  //     this.formatDateToInternal(this.form.value.date_expiration),
-  //   );
-  //   formData.append('status', this.form.value.status);
-  //   formData.append('link', this.form.value.link);
-
-  //   // Obtener el archivo desde Dropzone
-  //   const image = this.UploadSimpleImg.getFile();
-  //   if (image) {
-  //     formData.append('image', image);
-  //   } else {
-  //     //   console.error('No hay imagen seleccionada');
-  //   }
-
-  //   this.popupService
-  //     .storePopup(formData)
-  //     .subscribe({
-  //       next: (success: string) => {
-  //         this.form.reset();
-  //         this.UploadSimpleImg.removeAllFiles();
-  //         this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-  //         this.router.navigate(['/admin/popups']);
-  //       },
-  //       error: (error) => {
-  //         if (error.status === 422) {
-  //           this.errorMessage = this.processErrors(error.error.errors);
-  //           window.scroll(0, 0);
-  //         } else {
-  //           this.errorMessage = error;
-  //         }
-  //       },
-  //     })
-  //     .add(() => {
-  //       this.loading = false;
-  //     });
-  // }
 
   //Maneja el envío del formulario.
   //Valida el formulario, construye los datos y los envía al backend.
@@ -157,6 +106,7 @@ export class StorePopupComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

@@ -1,18 +1,18 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AnexoService } from '@services/anexo.service';
 import { Anexo } from '@interfaces/Anexo';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ImportAnexoComponent } from '../import-anexo/import-anexo.component';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-index-anexo',
-  imports: [RouterLink, ReactiveFormsModule, FormsModule, ImportAnexoComponent],
+  imports: [RouterLink, ImportAnexoComponent],
   templateUrl: './index-anexo.component.html',
   styleUrl: './index-anexo.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexAnexoComponent {
   // Inyección de dependencias
@@ -21,7 +21,8 @@ export class IndexAnexoComponent {
   private router = inject(Router);
 
   // Estado reactivo con signals
-  public show = signal<number>(50);
+  public query = signal<string>('');
+  public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 
@@ -40,18 +41,53 @@ export class IndexAnexoComponent {
         .pipe(map((params) => +params['page'] || 1))
         .subscribe(this.page.set);
     });
+
+    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
+    effect(() => {
+      if (this.page() !== 1 && this.query() !== '') {
+        this.page.set(1);
+        this.router.navigate(['admin/anexos/page', 1]);
+      }
+    });
   }
 
   // Recurso reactivo que obtiene los anexos
-  public anexoRs = rxResource<Anexo[], { page: number; show: number }>({
-    request: () => ({ page: this.page(), show: this.show() }),
-    loader: ({ request }) =>
-      this.anexoService.fetchAnexos(request.page, request.show).pipe(
-        map((response) => {          
-          this.updateMeta(response.meta);
-          return response.data.data;
-        }),
-      ),
+  public anexoRs = rxResource<
+    Anexo[],
+    { query: string; page: number; show: number }
+  >({
+    request: () => ({
+      query: this.query(),
+      page: this.page(),
+      show: this.show(),
+    }),
+    loader: ({ request }) => {
+      return this.anexoService
+        .fetchAnexos(request.query, request.page, request.show)
+        .pipe(
+          // Usamos map para transformar la respuesta
+          map((response) => {
+            // Actualizamos la metadata
+            this.meta.set({
+              current_page: response.data.meta?.current_page ?? 1,
+              last_page: response.data.meta?.last_page ?? 1,
+              from: response.data.meta?.from ?? 0,
+              to: response.data.meta?.to ?? 0,
+              total: response.data.meta?.total ?? 0,
+              links:
+                response.data.meta?.links?.map((link: any, index: number) => ({
+                  id: `link-${index}`, // Clave única generada para cada enlace
+                  label: link.label ?? '',
+                  page: this.extractPage(link.url) ?? null,
+                  active: link.active ?? false,
+                })) ?? [],
+            });
+
+            // Convertimos explícitamente a Anexo[] y retornamos los datos
+            return response.data.data as Anexo[];
+          }),
+        );
+    },
   });
 
   // Actualiza los metadatos de la paginación

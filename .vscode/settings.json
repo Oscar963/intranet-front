@@ -1,3 +1,8 @@
 {
-    "window.autoDetectColorScheme": false
+    "window.autoDetectColorScheme": false,
+    "angular-schematics.schematicsDefaultOptions": {
+        "angular-*": {
+            "externalTemplate": true
+        }
+    }
 }

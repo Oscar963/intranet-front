@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebService } from '@services/web.service';
@@ -10,6 +10,7 @@ import { switchMap } from 'rxjs';
   imports: [FormsModule],
   templateUrl: './anexos.component.html',
   styleUrl: './anexos.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AnexosComponent {
   private webService = inject(WebService);
@@ -17,7 +18,7 @@ export class AnexosComponent {
   private router = inject(Router);
 
   public query = signal<string>('');
-  public show = signal<number>(50);
+  public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 

@@ -1,4 +1,10 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { BannerService } from '@services/banner.service';
@@ -7,7 +13,6 @@ import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
 import { Router } from '@angular/router';
 import { ToastService } from '@services/toast.service';
-
 import { take } from 'rxjs';
 import dayjs from 'dayjs/esm';
 
@@ -16,6 +21,7 @@ import dayjs from 'dayjs/esm';
   imports: [UploadSimpleImgComponent, ReactiveFormsModule, BsDatepickerModule],
   templateUrl: './store-banner.component.html',
   styleUrl: './store-banner.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreBannerComponent {
   // Referencia al componente de subida de imágenes.
@@ -40,7 +46,7 @@ export class StoreBannerComponent {
   }
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     title: ['', Validators.required],
     date_expiration: ['', Validators.required],
     status: ['', Validators.required],
@@ -51,6 +57,7 @@ export class StoreBannerComponent {
   //Valida el formulario, construye los datos y los envía al backend.
   onSubmit(): void {
     if (!this.validateForm()) return;
+
     this.loading.set(true);
     this.clearMessages();
 
@@ -63,9 +70,6 @@ export class StoreBannerComponent {
         next: (success: string) => this.handleSuccess(success),
         error: (error) => this.handleError(error),
         complete: () => this.loading.set(false),
-      })
-      .add(() => {
-        this.loading.set(false);
       });
   }
 
@@ -77,13 +81,13 @@ export class StoreBannerComponent {
   // Construye los datos a enviar en `FormData`
   private buildFormData(): FormData {
     const formData = new FormData();
-    formData.append('title', this.form.value.title!);
+    formData.append('title', this.form.get('title')?.value ?? '');
     formData.append(
       'date_expiration',
-      this.formatDateToInternal(this.form.value.date_expiration!),
+      this.formatDateToInternal(this.form.get('date_expiration')?.value ?? ''),
     );
-    formData.append('status', this.form.value.status!);
-    formData.append('link', this.form.value.link!);
+    formData.append('status', this.form.get('status')?.value ?? '');
+    formData.append('link', this.form.get('link')?.value ?? '');
 
     // Agregar la imagen si está disponible
     const image = this.UploadSimpleImg.getFile();
@@ -105,6 +109,7 @@ export class StoreBannerComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scrollTo(0, 0);
       return false;
     }
     return true;
@@ -114,12 +119,11 @@ export class StoreBannerComponent {
   private handleError(error: any): void {
     if (error.status === 422) {
       this.errorMessage.set(this.processErrors(error.error.errors));
-      window.scroll(0, 0);
     } else {
-      this.errorMessage.set(error);
+      this.errorMessage.set(error.message || 'Ocurrió un error inesperado.');
     }
+    window.scrollTo(0, 0);
   }
-
   // Reinicia el formulario y limpia los archivos
   private resetForm(): void {
     this.form.reset();
@@ -128,18 +132,15 @@ export class StoreBannerComponent {
 
   // Procesa los errores de validación del backend
   private processErrors(errors: { [key: string]: string[] }): string {
-    const errorList = Object.keys(errors)
-      .flatMap((key) => errors[key])
-      .map((error) => `${error}</br>`)
-      .join('');
-    return `${errorList}`;
+    return Object.values(errors).flat().join('\n');
   }
 
   // Maneja el cambio de fecha en el datepicker
   public onDateChange(value: any): void {
     if (value) {
-      const formattedDate = this.formatDateToInternal(value);
-      this.form.value.date_expiration = formattedDate;
+      this.form
+        .get('date_expiration')
+        ?.setValue(this.formatDateToInternal(value));
     }
   }
 

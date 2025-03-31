@@ -17,9 +17,9 @@ export class PopupService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de popups.
    */
-  fetchPopup(page: number = 1, show: number): Observable<any> {
+  fetchPopup(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/popups?page=${page}&show=${show}` // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/popups?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -34,7 +34,7 @@ export class PopupService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -46,11 +46,11 @@ export class PopupService {
    */
   updatePopup(id: number, data: {}): Observable<string> {
     return this.http
-      .post<{ message: string }>(`${this.apiUrl}/api/popups/${id}`, data) 
+      .post<{ message: string }>(`${this.apiUrl}/api/popups/${id}`, data)
       .pipe(
         map((response) => {
-          return response.message; 
-        })
+          return response.message;
+        }),
       );
   }
 
@@ -65,7 +65,7 @@ export class PopupService {
       .pipe(
         map((response) => {
           return response.data; // Extraer los datos del popup del servidor
-        })
+        }),
       );
   }
 
@@ -80,7 +80,7 @@ export class PopupService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { AuthService } from '@services/auth.service';
 import {
   AbstractControl,
@@ -16,6 +16,7 @@ import { Router, RouterLink } from '@angular/router';
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   public authService = inject(AuthService);

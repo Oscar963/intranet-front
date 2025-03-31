@@ -1,7 +1,13 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { User } from '@interfaces/User';
 
-import { Component, inject, input } from '@angular/core';
+import { User } from '@interfaces/User';
 import { AuthService } from '@services/auth.service';
 
 @Component({
@@ -9,37 +15,37 @@ import { AuthService } from '@services/auth.service';
   imports: [RouterLink],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  user = input<User>({
-    id: 0,
-    name: '',
-    paternal_surname: '',
-    maternal_surname: '',
-    rut: '',
-    email: '',
-    status: 0,
-  });
-  nameAvatar = input<string>('');
+  // Inyección de dependencias
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  // Propiedades de entrada
+  public nameAvatar = input.required<string>();
+  public user = input<User | null>();
 
-  public loading: boolean = false;
-  public validationErrors: string[] = [];
-  public showPassword: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
+  // Estados reactivos
+  public loading = signal<boolean>(false);
+  public errorMessage = signal<string>('');
 
+  /**
+   * Maneja el cierre de sesión del usuario
+   * Actualiza los estados de carga y errores durante el proceso
+   */
   logout(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+
     this.authService.logout().subscribe({
-      next: (response: string) => {
-        this.loading = false;
+      next: () => {
+        this.loading.set(false);
         this.router.navigate(['/']);
       },
       error: (error) => {
-        this.loading = false;
-        this.errorMessage = error;
+        this.loading.set(false);
+        this.errorMessage.set(error.message || 'Error al cerrar sesión');
       },
     });
   }

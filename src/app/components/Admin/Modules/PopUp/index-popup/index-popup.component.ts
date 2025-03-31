@@ -1,24 +1,25 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PopupService } from '@services/popup.service';
 import { Popup } from '@interfaces/Popup';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-index-popup',
-  imports: [RouterLink, ReactiveFormsModule, FormsModule],
+  imports: [RouterLink],
   templateUrl: './index-popup.component.html',
   styleUrl: './index-popup.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexPopupComponent {
   private popupService = inject(PopupService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  public show = signal<number>(50);
+  public query = signal<string>('');
+  public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 
@@ -36,34 +37,51 @@ export class IndexPopupComponent {
         this.page.set(+params['page'] || 1);
       });
     });
+
+    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
+    effect(() => {
+      if (this.page() !== 1 && this.query() !== '') {
+        this.page.set(1);
+        this.router.navigate(['admin/popups/page', 1]);
+      }
+    });
   }
 
-  public popupsRs = rxResource<Popup[], { page: number; show: number }>({
+  public popupsRs = rxResource<
+    Popup[],
+    { query: string; page: number; show: number }
+  >({
     request: () => ({
+      query: this.query(),
       page: this.page(),
       show: this.show(),
     }),
     loader: ({ request }) => {
-      return this.popupService.fetchPopup(request.page, request.show).pipe(
-        switchMap((response) => {
-          this.meta.set({
-            current_page: response.meta?.current_page ?? 1,
-            last_page: response.meta?.last_page ?? 1,
-            from: response.meta?.from ?? 0,
-            to: response.meta?.to ?? 0,
-            total: response.meta?.total ?? 0,
-            links:
-              response.meta?.links?.map((link: any, index: number) => ({
-                id: `link-${index}`,
-                label: link.label ?? '',
-                page: this.extractPage(link.url) ?? null,
-                active: link.active ?? false,
-              })) ?? [],
-          });
+      return this.popupService
+        .fetchPopup(request.query, request.page, request.show)
+        .pipe(
+          // Usamos map para transformar la respuesta
+          map((response) => {
+            // Actualizamos la metadata
+            this.meta.set({
+              current_page: response.data.meta?.current_page ?? 1,
+              last_page: response.data.meta?.last_page ?? 1,
+              from: response.data.meta?.from ?? 0,
+              to: response.data.meta?.to ?? 0,
+              total: response.data.meta?.total ?? 0,
+              links:
+                response.data.meta?.links?.map((link: any, index: number) => ({
+                  id: `link-${index}`, // Clave única generada para cada enlace
+                  label: link.label ?? '',
+                  page: this.extractPage(link.url) ?? null,
+                  active: link.active ?? false,
+                })) ?? [],
+            });
 
-          return [response.data.data];
-        }),
-      );
+            // Convertimos explícitamente a Popup[] y retornamos los datos
+            return response.data.data as Popup[];
+          }),
+        );
     },
   });
 

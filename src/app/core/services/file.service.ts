@@ -17,9 +17,9 @@ export class FileService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de archivos.
    */
-  fetchFile(page: number = 1, show: number): Observable<any> {
+  fetchFile(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/files?page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/files?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -59,7 +59,7 @@ export class FileService {
    * @param id Identificador del archivo.
    * @returns Observable con los datos del archivo.
    */
-  getFileById(id: number): Observable<any> {
+  getFileById(id: number): Observable<any> {    
     return this.http
       .get<{ data: any }>(`${this.apiUrl}/api/files/${id}`) // Realizar solicitud GET
       .pipe(

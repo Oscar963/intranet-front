@@ -1,7 +1,22 @@
 <div class="page">
-  <app-header [user]="user" [nameAvatar]="nameAvatar" />
-  <app-navbar />
-  <div class="page-wrapper">
-    <router-outlet />
-  </div>
+  <!-- Header condicional mientras carga -->
+  @if (usersRs.isLoading()) {
+    <div class="loading-placeholder">
+      <!-- Opcional: Puedes añadir un spinner de carga aquí -->
+    </div>
+  } @else {
+    <app-header
+      [user]="usersRs.value()"
+      [nameAvatar]="nameAvatar()"
+      aria-label="Cabecera de administración"
+    />
+  }
+
+  <!-- Barra de navegación -->
+  <app-navbar aria-label="Navegación principal" />
+
+  <!-- Contenido principal -->
+  <main class="page-wrapper" role="main">
+    <router-outlet aria-label="Contenido dinámico" />
+  </main>
 </div>

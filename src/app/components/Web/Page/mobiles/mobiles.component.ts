@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WebService } from '@services/web.service';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
   imports: [FormsModule],
   templateUrl: './mobiles.component.html',
   styleUrl: './mobiles.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MobilesComponent {
   private webService = inject(WebService);
@@ -17,7 +18,7 @@ export class MobilesComponent {
   private router = inject(Router);
 
   public query = signal<string>('');
-  public show = signal<number>(50);
+  public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FileService } from '@services/file.service';
 import { ToastService } from '@services/toast.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { File } from '@interfaces/File';
   imports: [ReactiveFormsModule],
   templateUrl: './file-update-page.component.html',
   styleUrl: './file-update-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileUpdatePageComponent {
   //Inyección de servicios usando la nueva API de Angular.
@@ -32,7 +33,7 @@ export class FileUpdatePageComponent {
   );
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     name: ['', Validators.required],
     description: '',
   });
@@ -44,6 +45,7 @@ export class FileUpdatePageComponent {
         .getFileById(this.fileId())
         .pipe(tap((response) => this.setData(response))),
   });
+  
 
   //Maneja el envío del formulario.
   //Valida el formulario, construye los datos y los envía al backend.
@@ -103,6 +105,7 @@ export class FileUpdatePageComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

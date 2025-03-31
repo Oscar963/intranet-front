@@ -1,37 +1,55 @@
-import { Component, inject, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  ViewEncapsulation,
+} from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { tap } from 'rxjs';
+
 import { AuthService } from '@services/auth.service';
+import { User } from '@interfaces/User';
 import { HeaderComponent } from '../header/header.component';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { User } from '@interfaces/User';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-index',
   imports: [RouterOutlet, HeaderComponent, NavbarComponent],
   templateUrl: './index.component.html',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './index.component.css',
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class IndexAdminComponent implements OnInit {
-  private authService = inject(AuthService);
-  public user: User = {
-    id: 0,
-    name: '',
-    paternal_surname: '',
-    maternal_surname: '',
-    rut: '',
-    email: '',
-    status: 0,
-  };
+export class IndexAdminComponent {
+  // Inyección de dependencias
+  private readonly authService = inject(AuthService);
 
-  public nameAvatar: string = '';
+  /**
+   * Recurso reactivo para obtener el usuario autenticado
+   * Utiliza rxResource para manejar el estado de carga y errores automáticamente
+   */
+  public readonly usersRs = rxResource<User, void>({
+    loader: () =>
+      this.authService.getUserObservable().pipe(
+        tap((user) => console.debug('Usuario obtenido:', user)), // Opcional: para debugging
+      ),
+  });
 
-  constructor() {}
+  /**
+   * Calcula las iniciales del usuario para mostrarlas en el avatar
+   * @returns String con las iniciales (ej. "JP" para Juan Pérez)
+   */
+  public readonly nameAvatar = computed(() => {
+    const user = this.usersRs.value();
 
-  ngOnInit() {
-    this.authService.getUserObservable().subscribe((user) => {
-      this.user = user;
-      this.nameAvatar =
-        this.user.name.charAt(0) + this.user.paternal_surname.charAt(0);
-    });
-  }
+    if (!user) return '';
+
+    const nameInitial = user.name?.charAt(0)?.toUpperCase() || '';
+    const surnameInitial =
+      user.paternal_surname?.charAt(0)?.toUpperCase() || '';
+
+    return `${nameInitial}${surnameInitial}`;
+  });
 }

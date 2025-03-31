@@ -203,14 +203,6 @@ export const routes: Routes = [
       },
 
       {
-        path: 'pages/files/store/:idpage',
-        loadComponent: () =>
-          import(
-            '@components/Admin/Modules/Page/file-store-page/file-store-page.component'
-          ).then((m) => m.FileStorePageComponent),
-      },
-
-      {
         path: 'pages/files/:idpage',
         loadComponent: () =>
           import(

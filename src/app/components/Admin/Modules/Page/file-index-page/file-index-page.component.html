@@ -10,32 +10,8 @@
       <!-- Page title actions -->
       <div class="d-print-none col-auto ms-auto">
         <div class="btn-list">
-          <a
-            [routerLink]="['/admin/pages/files/store/' + pageId]"
-            class="btn btn-primary d-none d-sm-inline-block"
-          >
-            <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon icon-tabler icons-tabler-outline icon-tabler-cloud-upload"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path
-                d="M7 18a4.6 4.4 0 0 1 0 -9a5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7h-1"
-              />
-              <path d="M9 15l3 -3l3 3" />
-              <path d="M12 12l0 9" />
-            </svg>
-            Subir Archivo
-          </a>
+          <app-modal-file-upload [pageId]="pageId()" />
+          <app-modal-update-file-upload #uploadModalFileEditRef />
         </div>
       </div>
     </div>
@@ -47,76 +23,44 @@
     <!-- Content here -->
     <div class="row row-cards">
       <div class="col-12">
-        @if (successMessage) {
-          <div
-            class="alert alert-important alert-success alert-dismissible"
-            role="alert"
-          >
-            <div class="d-flex">
-              <div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="icon icon-tabler icons-tabler-outline icon-tabler-check"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <path d="M5 12l5 5l10 -10" />
-                </svg>
-              </div>
-              <span class="ms-1">{{ successMessage }}</span>
-            </div>
-            <a
-              class="btn-close btn-close-white"
-              data-bs-dismiss="alert"
-              aria-label="close"
-            ></a>
-          </div>
-        }
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Listado de Archivos</h3>
+            <h3 class="card-title">Listado de Archivos |</h3>
           </div>
           <div class="card-body border-bottom py-3">
-            <form [formGroup]="form">
-              <div class="d-flex">
-                <div class="text-secondary">
-                  Mostrar
-                  <div class="d-inline-block mx-2">
-                    <select
-                      formControlName="show"
-                      (change)="onChange($event)"
-                      class="form-select form-select-sm"
-                    >
-                      @for (
-                        value of values;
-                        track value.value;
-                        let idx = $index
-                      ) {
-                        <option value="{{ value.value }}">
-                          {{ value.label }}
-                        </option>
-                      }
-                    </select>
-                  </div>
-                  Registros
+            <div class="d-flex">
+              <div class="text-secondary">
+                Mostrar
+                <div class="d-inline-block mx-2">
+                  <select
+                    (change)="show.set(+selectShow.value)"
+                    name="show"
+                    class="form-select form-select-sm"
+                    #selectShow
+                  >
+                    @for (value of values; track value.value) {
+                      <option value="{{ value.value }}">
+                        {{ value.label }}
+                      </option>
+                    }
+                  </select>
                 </div>
-                <div class="text-secondary ms-auto">
-                  Buscar:
-                  <div class="d-inline-block ms-2">
-                    <input type="text" class="form-control form-control-sm" />
-                  </div>
+                Registros
+              </div>
+              <div class="text-secondary ms-auto">
+                Buscar:
+                <div class="d-inline-block ms-2">
+                  <input
+                    (input)="query.set(txtSearch.value)"
+                    type="text"
+                    class="form-control form-control-sm"
+                    #txtSearch
+                  />
                 </div>
               </div>
-            </form>
+            </div>
           </div>
-          @if (loading) {
+          @if (filesRs.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
@@ -135,14 +79,14 @@
                 </tr>
               </thead>
               <tbody class="align-middle">
-                @if (loading) {
+                @if (filesRs.isLoading()) {
                   <tr>
                     <td colspan="8" class="text-secondary text-center">
                       Cargando datos...
                     </td>
                   </tr>
                 } @else {
-                  @for (item of files; track item.id) {
+                  @for (item of filesRs.value(); track item.id) {
                     <tr>
                       <td>
                         <img
@@ -231,15 +175,8 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
                           title="Editar"
-                          [routerLink]="[
-                            '/admin/pages/files/update/' +
-                              item.id +
-                              '/page/' +
-                              pageId,
-                          ]"
+                          (click)="openModalEdit(item)"
                         >
                           <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                           <svg
@@ -267,8 +204,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
                           title="Copiar URL"
                           (click)="copyToClipboard(item.url)"
                         >
@@ -283,22 +218,21 @@
                             stroke-width="2"
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-copy"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-link"
                           >
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9 15l6 -6" />
                             <path
-                              d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"
+                              d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464"
                             />
                             <path
-                              d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1"
+                              d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463"
                             />
                           </svg>
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
                           title="Descargar"
                           download
                           (click)="downloadFile(item.id, item.name)"
@@ -326,8 +260,6 @@
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
                           title="Eliminar"
                           (click)="deleteItem(item.id)"
                         >
@@ -369,77 +301,27 @@
             </table>
           </div>
 
-          <div class="card-footer d-flex align-items-center">
-            <p class="text-secondary m-0">
-              Mostrando <span>{{ meta.from }}</span> a
-              <span>{{ meta.to }}</span> de
-              <span>{{ meta.total }}</span> registros
-            </p>
-            <ul class="pagination m-0 ms-auto">
-              <!-- Botón anterior -->
-              <li class="page-item" [class.disabled]="!links.prev">
-                <button
-                  class="page-link"
-                  (click)="goToPage(meta.current_page - 1)"
-                  [attr.aria-disabled]="!links.prev"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M15 6l-6 6l6 6"></path>
-                  </svg>
-                  prev
-                </button>
-              </li>
-
-              <!-- Enlaces de páginas -->
-              @for (page of meta.links; track page.id; let idx = $index) {
-                <li class="page-item" [class.active]="page.active">
-                  <a
-                    class="page-link"
-                    (click)="goToPage(page.page)"
-                    [innerHTML]="page.label"
-                    href="javascript:void(0)"
-                  ></a>
-                </li>
-              }
-              <!-- Botón siguiente -->
-              <li class="page-item" [class.disabled]="!links.next">
-                <a
-                  class="page-link"
-                  (click)="goToPage(meta.current_page + 1)"
-                  [attr.aria-disabled]="!links.next"
-                  href="javascript:void(0)"
-                >
-                  next
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="icon"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M9 6l6 6l-6 6"></path>
-                  </svg>
-                </a>
-              </li>
-            </ul>
+          <div class="d-sm-none d-md-block">
+            <div class="card-footer d-flex align-items-center">
+              <p class="text-secondary m-0">
+                Mostrando <span>{{ meta().from }}</span> a
+                <span>{{ meta().to }}</span> de
+                <span>{{ meta().total }}</span> registros
+              </p>
+              <ul class="pagination m-0 ms-auto">
+                <!-- Enlaces de páginas -->
+                @for (page of meta().links; track page.id) {
+                  <li class="page-item" [class.active]="page.active">
+                    <a
+                      class="page-link"
+                      (click)="goToPage(page.page)"
+                      [innerHTML]="page.label"
+                      href="javascript:void(0)"
+                    ></a>
+                  </li>
+                }
+              </ul>
+            </div>
           </div>
         </div>
       </div>

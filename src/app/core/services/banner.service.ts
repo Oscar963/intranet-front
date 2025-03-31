@@ -17,9 +17,9 @@ export class BannerService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de banners.
    */
-  fetchBanner(page: number = 1, show: number): Observable<any> {
+  fetchBanner(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/banners?page=${page}&show=${show}` // Realizar la solicitud GET con paginación
+      `${this.apiUrl}/api/banners?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -34,7 +34,7 @@ export class BannerService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -50,7 +50,7 @@ export class BannerService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 
@@ -65,7 +65,7 @@ export class BannerService {
       .pipe(
         map((response) => {
           return response.data; // Extraer los datos del banner del servidor
-        })
+        }),
       );
   }
 
@@ -80,7 +80,7 @@ export class BannerService {
       .pipe(
         map((response) => {
           return response.message; // Extraer el mensaje de éxito del servidor
-        })
+        }),
       );
   }
 }

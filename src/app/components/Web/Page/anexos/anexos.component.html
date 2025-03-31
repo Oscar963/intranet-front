@@ -176,7 +176,7 @@
                 </p>
                 <ul class="pagination m-0 ms-auto">
                   <!-- Enlaces de páginas -->
-                  @for (page of meta().links; track page.id; let idx = $index) {
+                  @for (page of meta().links; track page.id; ) {
                     <li class="page-item" [class.active]="page.active">
                       <a
                         class="page-link"

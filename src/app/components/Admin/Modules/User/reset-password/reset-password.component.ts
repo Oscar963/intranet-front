@@ -1,5 +1,5 @@
 import { UserService } from '@services/user.service';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -18,6 +18,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   imports: [ReactiveFormsModule, BsDatepickerModule],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent {
   private userService = inject(UserService);

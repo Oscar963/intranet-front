@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NotificationService } from '@services/notification.service';
 
 @Component({
@@ -6,6 +6,7 @@ import { NotificationService } from '@services/notification.service';
   imports: [],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
   private notificationService = inject(NotificationService);

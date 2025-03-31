@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
   imports: [ReactiveFormsModule],
   templateUrl: './store-user.component.html',
   styleUrl: './store-user.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreUserComponent {
   private userService = inject(UserService);

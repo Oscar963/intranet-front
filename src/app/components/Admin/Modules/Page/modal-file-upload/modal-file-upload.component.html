@@ -1,0 +1,190 @@
+<button
+  (click)="openModal()"
+  class="btn btn-primary btn-5"
+>
+  <!-- Download SVG icon from http://tabler.io/icons/icon/plus -->
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="icon icon-tabler icons-tabler-outline icon-tabler-paperclip"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path
+      d="M15 7l-6.5 6.5a1.5 1.5 0 0 0 3 3l6.5 -6.5a3 3 0 0 0 -6 -6l-6.5 6.5a4.5 4.5 0 0 0 9 9l6.5 -6.5"
+    />
+  </svg>
+  Adjuntar Archivos
+</button>
+<!-- Modal -->
+<div
+  #modalRef
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Subir archivo</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        @if (loading()) {
+          <div class="progress progress-sm">
+            <div class="progress-bar progress-bar-indeterminate"></div>
+          </div>
+        }
+        <div class="modal-body">
+          @if (errorMessage()) {
+            <div
+              class="alert alert-important alert-danger alert-dismissible"
+              role="alert"
+            >
+              <div class="d-flex">
+                <div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="icon alert-icon"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <div>
+                  <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                </div>
+              </div>
+              <a
+                class="btn-close btn-close-white"
+                data-bs-dismiss="alert"
+                aria-label="close"
+              ></a>
+            </div>
+          }
+          <div class="row row-cards">
+            <div class="col-md-5 col-lg-5">
+              <label class="form-label required">Nombre</label>
+              <input
+                formControlName="name"
+                type="text"
+                class="form-control"
+                placeholder="PPT Capacitación DocDigital.pdf"
+                [class.is-invalid]="
+                  form.get('name')?.invalid &&
+                  (form.get('name')?.touched || form.get('name')?.dirty)
+                "
+                [class.is-valid]="
+                  form.get('name')?.valid &&
+                  (form.get('name')?.touched || form.get('name')?.dirty)
+                "
+              />
+              @if (
+                (form.get("name")?.invalid && form.get("name")?.touched) ||
+                form.get("name")?.dirty
+              ) {
+                @if (form.get("name")?.hasError("required")) {
+                  <span class="invalid-input"> El nombre es obligatorio. </span>
+                }
+              } @else {
+                <span class="invalid-input">&nbsp;</span>
+              }
+            </div>
+            <div class="col-md-7 col-lg-7">
+              <label class="form-label">Descripción</label>
+              <input
+                formControlName="description"
+                type="text"
+                class="form-control"
+                placeholder="Capacitación para usuarios de DocDigital"
+                [class.is-invalid]="
+                  form.get('description')?.invalid &&
+                  (form.get('description')?.touched ||
+                    form.get('description')?.dirty)
+                "
+                [class.is-valid]="
+                  form.get('description')?.valid &&
+                  (form.get('name')?.touched || form.get('description')?.dirty)
+                "
+              />
+              @if (
+                (form.get("description")?.invalid &&
+                  form.get("description")?.touched) ||
+                form.get("description")?.dirty
+              ) {
+                @if (form.get("description")?.hasError("required")) {
+                  <span class="invalid-input">
+                    La descripción es obligatoria.
+                  </span>
+                }
+              } @else {
+                <span class="invalid-input">&nbsp;</span>
+              }
+            </div>
+            <div class="col-sm-12 col-md-12">
+              <label class="form-label required">Archivo</label>
+              <app-upload-simple-file #uploadSimpleRef />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          @if (loading()) {
+            <button type="button" class="btn btn-primary" disabled>
+              <span
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              Cargando...
+            </button>
+          } @else {
+            <button type="submit" class="btn btn-primary">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path
+                  d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2"
+                />
+                <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                <path d="M14 4l0 4l-6 0l0 -4" />
+              </svg>
+              Guardar
+            </button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

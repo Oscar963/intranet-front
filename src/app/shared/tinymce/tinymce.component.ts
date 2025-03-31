@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -29,6 +30,7 @@ import {
       multi: true,
     },
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TinymceComponent implements ControlValueAccessor {
   @Input() initOptions: Partial<EditorComponent['init']> = {}; // Configuración personalizada

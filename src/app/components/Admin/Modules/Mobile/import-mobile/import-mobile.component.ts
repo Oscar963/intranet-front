@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MobileService } from '@services/mobile.service';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import Swal from 'sweetalert2';
@@ -9,7 +9,8 @@ import { saveAs } from 'file-saver';
   selector: 'app-import-mobile',
   imports: [],
   templateUrl: './import-mobile.component.html',
-  styleUrl: './import-mobile.component.css'
+  styleUrl: './import-mobile.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImportMobileComponent {
   private mobileService = inject(MobileService);

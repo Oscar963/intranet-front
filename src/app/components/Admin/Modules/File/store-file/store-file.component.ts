@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -16,6 +16,7 @@ import { UploadSimpleFileComponent } from '@shared/upload-simple-file/upload-sim
   imports: [UploadSimpleFileComponent, ReactiveFormsModule],
   templateUrl: './store-file.component.html',
   styleUrl: './store-file.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreFileComponent {
   @ViewChild(UploadSimpleFileComponent)

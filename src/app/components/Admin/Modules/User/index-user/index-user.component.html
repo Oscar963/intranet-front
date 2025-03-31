@@ -54,14 +54,15 @@
                 Mostrar
                 <div class="d-inline-block mx-2">
                   <select
-                    [(ngModel)]="show"
+                    (change)="show.set(+selectShow.value)"
                     name="show"
                     class="form-select form-select-sm"
+                    #selectShow
                   >
                     @for (
                       value of values;
                       track value.value;
-                      let idx = $index
+                      
                     ) {
                       <option value="{{ value.value }}">
                         {{ value.label }}
@@ -74,7 +75,12 @@
               <div class="text-secondary ms-auto">
                 Buscar:
                 <div class="d-inline-block ms-2">
-                  <input type="text" class="form-control form-control-sm" />
+                  <input
+                    (input)="query.set(txtSearch.value)"
+                    type="text"
+                    class="form-control form-control-sm"
+                    #txtSearch
+                  />
                 </div>
               </div>
             </div>
@@ -130,12 +136,12 @@
                         }
                       </td>
                       <td>
-                        @if (item.id !== userRs.value()?.id) { 
+                        @if (item.id !== userRs.value()?.id) {
                           <a
                             class="text-dark cursor-pointer px-1"
                             aria-label="Button"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
+                            
+                            
                             title="Restablecer contraseña"
                             [routerLink]="[
                               '/admin/users/password-reset/' + item.id,
@@ -172,8 +178,8 @@
                           <a
                             class="text-dark cursor-pointer px-1"
                             aria-label="Button"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
+                            
+                            
                             title="Editar"
                             [routerLink]="['/admin/users/update/' + item.id]"
                           >
@@ -206,8 +212,8 @@
                           </a>
                           <a
                             class="text-dark cursor-pointer px-1"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
+                            
+                            
                             title="Eliminar"
                             (click)="deleteItem(item.id)"
                           >
@@ -262,7 +268,7 @@
             </p>
             <ul class="pagination m-0 ms-auto">
               <!-- Enlaces de páginas -->
-              @for (page of meta().links; track page.id; let idx = $index) {
+              @for (page of meta().links; track page.id; ) {
                 <li class="page-item" [class.active]="page.active">
                   <a
                     class="page-link"

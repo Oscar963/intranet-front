@@ -17,9 +17,9 @@ export class AnexoService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de anexos.
    */
-  fetchAnexos(page: number = 1, show: number): Observable<any> {
+  fetchAnexos(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/anexos?page=${page}&show=${show}`
+      `${this.apiUrl}/api/anexos?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -85,7 +85,7 @@ export class AnexoService {
       {
         reportProgress: true,
         responseType: 'json',
-      }
+      },
     );
 
     return this.http.request(req);
@@ -95,7 +95,7 @@ export class AnexoService {
    * Descargar un archivo Excel o CSV para exportar anexos.
    * @returns Observable con el archivo.
    */
-  exportAnexos(): Observable<Blob> {    
+  exportAnexos(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/api/anexos/export`, {
       responseType: 'blob',
     });

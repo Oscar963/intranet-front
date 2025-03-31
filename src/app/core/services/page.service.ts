@@ -17,9 +17,9 @@ export class PageService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de páginas.
    */
-  fetchPage(page: number = 1, show: number): Observable<any> {
+  fetchPage(query: string, page: number = 1, show: number): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/pages?page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/pages?q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 
@@ -90,9 +90,14 @@ export class PageService {
    * @param show Número de elementos por página.
    * @returns Observable con la lista de archivos.
    */
-  fetchFile(idpage: number, page: number = 1, show: number): Observable<any> {
+  fetchFile(
+    idpage: number,
+    query: string,
+    page: number = 1,
+    show: number,
+  ): Observable<any> {
     return this.http.get<any>(
-      `${this.apiUrl}/api/pages/files?idpage=${idpage}&page=${page}&show=${show}`, // Realizar solicitud GET con parámetros de paginación
+      `${this.apiUrl}/api/pages/files?idpage=${idpage}&q=${query}&page=${page}&show=${show}`, // Realizar la solicitud GET con paginación
     );
   }
 

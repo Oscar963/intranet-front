@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { TinymceComponent } from '@shared/tinymce/tinymce.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
@@ -12,6 +12,7 @@ import { take } from 'rxjs';
   imports: [UploadSimpleImgComponent, ReactiveFormsModule, TinymceComponent],
   templateUrl: './store-page.component.html',
   styleUrl: './store-page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StorePageComponent {
   // Referencia al componente de subida de imágenes.
@@ -36,7 +37,7 @@ export class StorePageComponent {
   public errorMessage = signal<string>('');
 
   // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     title: ['', Validators.required],
     status: ['', Validators.required],
     content: '',
@@ -96,6 +97,7 @@ export class StorePageComponent {
 
     if (this.form.invalid) {
       this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
       return false;
     }
     return true;

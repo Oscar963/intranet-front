@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WebService } from '@services/web.service';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './page.component.html',
   styleUrl: './page.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageComponent {
   private webService = inject(WebService);
