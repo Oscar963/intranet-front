@@ -11,7 +11,7 @@ import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { File } from '@interfaces/File';
 import Swal from 'sweetalert2';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -31,12 +31,13 @@ export class NavbarComponent {
       name: this.name(),
     }),
     loader: ({ request }) => {
-      return this.webService.searchFiles(request.name).pipe(
-        // Usamos map para transformar la respuesta
-        map((response) => {
-          return response as File[];
-        }),
-      );
+      if (!request.name.trim()) {
+        // Si el campo name está vacío, retornamos un observable con un arreglo vacío
+        return of([]); // Puedes usar EMPTY si prefieres que no emita nada
+      }
+      return this.webService
+        .searchFiles(request.name)
+        .pipe(map((response) => response as File[]));
     },
   });
 

@@ -254,8 +254,8 @@ export class FileIndexPageComponent {
       });
   }
 
-  public openModalEdit(file: any) {    
-   this.uploadEditFile().openModal(file);
+  public openModalEdit(file: any) {
+    this.uploadEditFile().openModal(file);
   }
 
   public getFileImage(fileType: string): string {

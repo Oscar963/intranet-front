@@ -60,7 +60,10 @@ export class UpdateMobileComponent {
       .pipe(take(1))
       .subscribe({
         next: (success: string) => this.handleSuccess(success),
-        error: (error) => this.handleError(error),
+                error: (error) => {
+          this.loading.set(false);
+          this.handleError(error);
+        },
         complete: () => this.loading.set(false),
       })
       .add(() => {

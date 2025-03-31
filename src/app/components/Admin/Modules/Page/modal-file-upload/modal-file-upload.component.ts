@@ -14,6 +14,7 @@ import { UploadSimpleFileComponent } from '@shared/upload-simple-file/upload-sim
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { ToastService } from '@services/toast.service';
+import { PageService } from '@app/core/services/page.service';
 
 @Component({
   selector: 'app-modal-file-upload',
@@ -24,6 +25,8 @@ import { ToastService } from '@services/toast.service';
 })
 export class ModalFileUploadComponent {
   private fileService = inject(FileService);
+  private pageService = inject(PageService);
+
   private router = inject(Router);
   private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
@@ -38,7 +41,7 @@ export class ModalFileUploadComponent {
   public pageId = input<number>();
 
   // Definición del formulario con validaciones
-  form = this.fb.group({
+  form = this.fb.nonNullable.group({
     name: ['', Validators.required],
     description: [''],
   });
@@ -56,7 +59,7 @@ export class ModalFileUploadComponent {
 
     const formData = this.buildFormData();
 
-    this.fileService
+    this.pageService
       .storeFiles(formData)
       .pipe(take(1))
       .subscribe({
