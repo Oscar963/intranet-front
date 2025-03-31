@@ -1,16 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { WebService } from '@services/web.service';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { File } from '@interfaces/File';
-
 import Swal from 'sweetalert2';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -22,53 +23,22 @@ import Swal from 'sweetalert2';
 export class NavbarComponent {
   private webService = inject(WebService);
 
-  public menuItems = signal([
-    { icon: '', title: 'Inicio' },
-    { icon: 'anexos', title: 'Anexos' },
-    { icon: 'mobiles', title: 'Celulares' },
-    { icon: 'contact', title: 'Contacto' },
-  ]);
+  public name = signal<string>('');
+  public errorMessage = signal<string>('');
 
-  public files: File[] = [];
-  public loading: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
-
-  form: FormGroup = new FormGroup({
-    name: new FormControl('', [Validators.required]),
+  public filesRs = rxResource<File[], { name: string }>({
+    request: () => ({
+      name: this.name(),
+    }),
+    loader: ({ request }) => {
+      return this.webService.searchFiles(request.name).pipe(
+        // Usamos map para transformar la respuesta
+        map((response) => {
+          return response as File[];
+        }),
+      );
+    },
   });
-
-
-  onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.form.markAllAsTouched();
-
-    // Verificar si el formulario es válido antes de enviarlo
-    if (this.form.invalid) {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-      this.loading = false;
-      return;
-    }
-
-    this.webService
-      .searchFiles(this.form.value.name)
-      .subscribe({
-        next: (response) => {
-          if (!response || response.length === 0) {
-            this.successMessage = 'No se encontraron resultados';
-            this.files = [];
-          } else {
-            this.files = response;
-            this.successMessage = ''; // Limpiar mensaje si hay resultados
-          }
-        },
-      })
-      .add(() => {
-        this.loading = false;
-      });
-  }
 
   getFileImage(fileType: string): string {
     switch (fileType) {
