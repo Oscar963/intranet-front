@@ -34,24 +34,48 @@ jobs:
           <IfModule mod_rewrite.c>
             RewriteEngine On
             RewriteBase /
-
+      
             # Redirige todas las solicitudes a index.html, excepto las solicitudes de archivos existentes
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteCond %{REQUEST_FILENAME} !-d
             RewriteRule ^.*$ index.html [L]
           </IfModule>
-
-            # Configuración de PHP
+      
+          # Configuración de PHP
           <IfModule mod_php.c>
-            php_value post_max_size 300M
-            php_value upload_max_filesize 300M
+            php_value post_max_size 256M
+            php_value upload_max_filesize 256M
             php_value max_execution_time 300
             php_value memory_limit 128M
           </IfModule>
-
+      
           <IfModule mod_deflate.c>
-              AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css text/javascript application/javascript application/json
+            AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css text/javascript application/javascript application/json
           </IfModule>
+      
+          # 🔒 Restringir acceso solo a ciertas IPs
+          <RequireAll>
+            Require ip 152.230.211.90
+            Require ip 152.230.211.158
+            Require ip 152.230.214.48/28
+            Require ip 152.230.211.91
+            Require ip 152.230.211.191
+            Require ip 152.230.211.192
+            Require ip 152.230.211.69
+            Require ip 152.230.211.71
+            Require ip 152.230.211.167
+            Require ip 152.230.211.101
+            Require ip 152.230.211.96
+            Require ip 152.230.211.105
+            Require ip 152.230.211.110
+            Require ip 152.230.211.112
+            Require ip 152.230.211.144
+            Require ip 152.230.211.201
+            Require ip 152.230.211.151
+            Require ip 152.230.211.181
+            Require all denied
+          </RequireAll>
+
           EOF
 
       # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
