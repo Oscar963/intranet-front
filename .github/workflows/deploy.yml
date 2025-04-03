@@ -43,10 +43,10 @@ jobs:
 
             # Configuración de PHP
           <IfModule mod_php.c>
-            php_value post_max_size 256M
-            php_value upload_max_filesize 256M
+            php_value post_max_size 300M
+            php_value upload_max_filesize 300M
             php_value max_execution_time 300
-            php_value memory_limit 128M
+            php_value memory_limit 300M
           </IfModule>
 
           <IfModule mod_deflate.c>
@@ -58,7 +58,7 @@ jobs:
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
-          server: dev.imaarica.cl
+          server: intranet.imaarica.cl
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
