@@ -23,8 +23,11 @@ import { Modal } from 'bootstrap';
 })
 export class HomeComponent implements AfterViewInit {
   @ViewChild('modalPopUp', { static: true }) modalRef!: ElementRef;
+  @ViewChild('modalInit', { static: true }) modalInitRef!: ElementRef;
+
   private webService = inject(WebService);
   public modal = signal<Modal | null>(null);
+  public modal2 = signal<Modal | null>(null);
 
   // Con rxResource se carga automáticamente los datos de los banners
   public bannersRx = rxResource({
@@ -39,6 +42,9 @@ export class HomeComponent implements AfterViewInit {
   setModal() {
     const modalInstance = new Modal(this.modalRef.nativeElement);
     this.modal.set(modalInstance);
+
+    const modalInstanceInit = new Modal(this.modalInitRef.nativeElement);
+    this.modal2.set(modalInstanceInit);
   }
 
   openModal() {
@@ -46,10 +52,23 @@ export class HomeComponent implements AfterViewInit {
     if (modalInstance) {
       modalInstance.show();
     }
+
+    const modalInstanceInit = this.modal2();
+    if (modalInstanceInit) {
+      modalInstanceInit.show();
+    }
+  }
+
+  openModal2() {
+    const modalInstanceInit = this.modal2();
+    if (modalInstanceInit) {
+      modalInstanceInit.show();
+    }
   }
 
   ngAfterViewInit(): void {
     this.setModal(); // Inicializa el modal después de que la vista esté completamente inicializada
+    this.openModal2();
   }
 
   constructor() {
