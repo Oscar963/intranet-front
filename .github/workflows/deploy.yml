@@ -87,9 +87,44 @@ jobs:
               Require all denied
           </IfModule>
 
+          # Configurar redirección a la página 403.html en caso de denegación de acceso
+          ErrorDocument 403 /403.html
+
+
           EOF
 
-      # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
+      # Paso 5: Crear el archivo 403.html
+      - name: 🛠️ Crear archivo 403.html
+        run: |
+          cat <<EOF > ./dist/angular-19-app/browser/403.html
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Acceso Restringido</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      text-align: center;
+                      padding: 50px;
+                  }
+                  h1 {
+                      color: red;
+                  }
+                  p {
+                      font-size: 18px;
+                  }
+              </style>
+          </head>
+          <body>
+              <h1>Acceso Restringido</h1>
+              <p>No puedes acceder a este sitio web porque no estás conectado desde la red interna.</p>
+          </body>
+          </html>
+          EOF
+
+      # Paso 6: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
@@ -99,28 +134,12 @@ jobs:
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
 
-      # Paso 6: Notificar despliegue exitoso
+      # Paso 7: Notificar despliegue exitoso
       - name: ✅ Notificar despliegue exitoso
         if: success()
         run: echo "El despliegue fue exitoso 🚀"
 
-      # Paso 7: Notificar error en el despliegue
+      # Paso 8: Notificar error en el despliegue
       - name: 🚨 Notificar error en el despliegue
         if: failure()
-        run:
-          echo "El despliegue ha fallado 😢"
-
-          # 🔄 ¿Cómo activar las extensiones PHP?
-          # Si tu servidor es administrado (como en un hosting compartido), las opciones son:
-          #
-          # 1. Contactar al proveedor: Solicita que activen las extensiones necesarias.
-          #
-          # 2. Usar php.ini: Si te permiten usar un archivo php.ini personalizado, puedes intentar agregar:
-          #
-          # extension=mbstring
-          # extension=intl
-          # extension=bcmath
-          # extension=pdo
-          # extension=pdo_mysql
-          #
-          # Nota: La habilitación de extensiones PHP depende del entorno del servidor.
+        run: echo "El despliegue ha fallado 😢"
