@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WebService } from '@services/web.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Page } from '@interfaces/Page';
 import Swal from 'sweetalert2';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
-import { tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 
@@ -50,15 +56,22 @@ export class PageComponent {
     this.route.snapshot.paramMap.get('slug')?.toString() || '',
   );
 
-  public pageRs = rxResource({
-    request: () => ({
-      slug: this.slug(),
-    }),
-    loader: ({ request }) =>
+  public pageRs = rxResource<Page, void>({
+    loader: () =>
       this.webService
-        .getPageBySlug(request.slug)
-        .pipe(tap((response) => response.data)),
+        .getPageBySlug(this.slug())
+        .pipe(map((response) => response.data)),
   });
+
+  // public pageRs = rxResource<Page[]>({
+  //   request: () => ({
+  //     slug: this.slug(),
+  //   }),
+  //   loader: ({ request }) =>
+  //     this.webService.getPageBySlug(request.slug).pipe(
+  //       map((response) => response.data) // ← asegurate de mapear al objeto Page
+  //     ),
+  // });
 
   getFileImage(fileType: string): string {
     switch (fileType) {

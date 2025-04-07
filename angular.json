@@ -36,7 +36,10 @@
               "src/styles.css"
             ],
 
-            "scripts": ["node_modules/tinymce/tinymce.min.js"]
+            "scripts": [
+              "node_modules/@tabler/core/dist/js/tabler.min.js",
+              "node_modules/tinymce/tinymce.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -59,7 +59,7 @@
                     class="form-select form-select-sm"
                     #selectShow
                   >
-                    @for (value of values; track value.value) {
+                    @for (value of itemsPerPageOptions; track value.value) {
                       <option value="{{ value.value }}">
                         {{ value.label }}
                       </option>
@@ -81,7 +81,7 @@
               </div>
             </div>
           </div>
-          @if (pagesRs.isLoading()) {
+          @if (pagesResource.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
@@ -99,14 +99,14 @@
                 </tr>
               </thead>
               <tbody class="align-middle">
-                @if (pagesRs.isLoading()) {
+                @if (pagesResource.isLoading()) {
                   <tr>
                     <td colspan="8" class="text-secondary text-center">
                       Cargando datos...
                     </td>
                   </tr>
                 } @else {
-                  @for (item of pagesRs.value(); track item.id) {
+                  @for (item of pagesResource.value(); track item.id) {
                     <tr>
                       <td>
                         <img class="rounded" [src]="item.image" alt="" />
@@ -188,8 +188,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
-                          
                           title="Ver pagina URL"
                           target="_blank"
                           [routerLink]="['/page/' + item.slug]"
@@ -220,8 +218,6 @@
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
-                          
-                          
                           title="Archivos"
                           [routerLink]="['/admin/pages/files/' + item.id]"
                         >
@@ -250,8 +246,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
-                          
                           title="Editar"
                           [routerLink]="['/admin/pages/update/' + item.id]"
                         >
@@ -280,8 +274,6 @@
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
-                          
-                          
                           title="Eliminar"
                           (click)="deleteItem(item.id)"
                         >

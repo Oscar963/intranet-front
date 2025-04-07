@@ -9,6 +9,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { User } from '@interfaces/User';
 import { AuthService } from '@services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -18,35 +19,38 @@ import { AuthService } from '@services/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  // Inyección de dependencias
+  // === Inyección de dependencias ===
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  // Propiedades de entrada
-  public nameAvatar = input.required<string>();
-  public user = input<User | null>();
+  // === Inputs ===
+  public readonly nameAvatar = input.required<string>();
+  public readonly user = input<User | null>();
 
-  // Estados reactivos
-  public loading = signal<boolean>(false);
-  public errorMessage = signal<string>('');
+  // === Estado reactivo ===
+  public readonly loading = signal(false);
+  public readonly errorMessage = signal('');
 
+  // === Métodos ===
   /**
-   * Maneja el cierre de sesión del usuario
-   * Actualiza los estados de carga y errores durante el proceso
+   * Cierra la sesión del usuario
    */
-  logout(): void {
+  public async logout(): Promise<void> {
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.authService.logout().subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigate(['/']);
-      },
-      error: (error) => {
-        this.loading.set(false);
-        this.errorMessage.set(error.message || 'Error al cerrar sesión');
-      },
-    });
+    try {
+      await firstValueFrom(this.authService.logout());
+      await this.router.navigate(['/']);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Error desconocido al cerrar sesión';
+      this.errorMessage.set(message);
+      console.error('Logout error:', error);
+    } finally {
+      this.loading.set(false);
+    }
   }
 }

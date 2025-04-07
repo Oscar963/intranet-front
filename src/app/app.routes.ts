@@ -68,30 +68,6 @@ export const routes: Routes = [
             (m) => m.ContactComponent,
           ),
       },
-
-      /** Auth Routes **/
-      {
-        path: 'login',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('@components/Auth/login/login.component').then(
-            (m) => m.LoginComponent,
-          ),
-      },
-      {
-        path: 'forgot-password',
-        loadComponent: () =>
-          import(
-            '@components/Auth/forgot-password/forgot-password.component'
-          ).then((m) => m.ForgotPasswordComponent),
-      },
-      {
-        path: 'reset-password/:token',
-        loadComponent: () =>
-          import(
-            '@components/Auth/reset-password/reset-password.component'
-          ).then((m) => m.ResetPasswordComponent),
-      },
     ],
   },
 
@@ -391,12 +367,13 @@ export const routes: Routes = [
       ),
   },
   {
-    path: '**',
+    path: 'not-found',
     loadComponent: () =>
       import('@shared/not-found/not-found.component').then(
         (m) => m.NotFoundComponent,
       ),
-  },
+  }, // Ruta para la página de error 404
+  { path: '**', redirectTo: '/not-found' },
 
-  { path: '', redirectTo: '', pathMatch: 'full' },
+  // { path: '', redirectTo: '', pathMatch: 'full' },
 ];

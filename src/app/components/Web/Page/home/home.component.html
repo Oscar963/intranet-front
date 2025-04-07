@@ -1,11 +1,13 @@
 <section>
   <div class="container-xl pt-3">
     @defer {
-      @if (!bannersRx.isLoading() && bannersRx.value().length > 0) {
+      @let banners = bannersRx.value();
+
+      @if (!bannersRx.isLoading() && (banners ?? []).length > 0) {
         <div id="carousel-banners" class="carousel slide carousel-fade">
           <!-- Indicadores del carrusel -->
           <div class="carousel-indicators">
-            @for (banner of bannersRx.value(); track $index) {
+            @for (banner of banners ?? []; track $index) {
               <button
                 type="button"
                 [attr.data-bs-target]="'#carousel-banners'"
@@ -18,7 +20,7 @@
 
           <!-- Elementos del carrusel -->
           <div class="carousel-inner rounded-4">
-            @for (banner of bannersRx.value(); track $index) {
+            @for (banner of banners ?? []; track $index) {
               <div [class.carousel-item]="true" [class.active]="$index === 0">
                 <a [href]="banner.link">
                   <img

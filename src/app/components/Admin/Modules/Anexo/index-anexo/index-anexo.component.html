@@ -60,11 +60,7 @@
                     class="form-select form-select-sm"
                     #selectShow
                   >
-                    @for (
-                      value of values;
-                      track value.value;
-                      
-                    ) {
+                    @for (value of itemsPerPageOptions; track value.value) {
                       <option value="{{ value.value }}">
                         {{ value.label }}
                       </option>
@@ -86,7 +82,7 @@
               </div>
             </div>
           </div>
-          @if (anexoRs.isLoading()) {
+          @if (anexoResource.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
@@ -105,14 +101,14 @@
                 </tr>
               </thead>
               <tbody class="align-middle">
-                @if (anexoRs.isLoading()) {
+                @if (anexoResource.isLoading()) {
                   <tr>
                     <td colspan="8" class="text-secondary text-center">
                       Cargando datos...
                     </td>
                   </tr>
                 } @else {
-                  @for (item of anexoRs.value(); track item.id) {
+                  @for (item of anexoResource.value(); track item.id) {
                     <tr>
                       <td>{{ $index + 1 }}</td>
                       <td>
@@ -142,7 +138,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
                           data-bs-placement="top"
                           title="Editar"
                           [routerLink]="['/admin/anexos/update/' + item.id]"
@@ -172,7 +167,6 @@
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
-                          
                           data-bs-placement="top"
                           title="Eliminar"
                           (click)="deleteItem(item.id)"
@@ -223,7 +217,7 @@
             </p>
             <ul class="pagination m-0 ms-auto">
               <!-- Enlaces de páginas -->
-              @for (page of meta().links; track page.id; ) {
+              @for (page of meta().links; track page.id) {
                 <li class="page-item" [class.active]="page.active">
                   <a
                     class="page-link"

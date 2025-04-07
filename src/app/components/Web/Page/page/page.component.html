@@ -1,19 +1,21 @@
 <div class="page-wrapper">
+  @let currentPage = pageRs.value();
+
   <!-- Page header -->
   <div class="page-header d-print-none mt-0">
     @defer {
       <div class="container-fluid m-0 p-0">
         <div id="banner-title" class="banner-title dark-background">
-          @if (!pageRs.isLoading()) {
+          @if (!pageRs.isLoading() && currentPage) {
             <img
-              [src]="pageRs.value().image"
-              [alt]="pageRs.value().title"
+              [src]="currentPage.image"
+              [alt]="currentPage.title"
               class="h-100 w-100"
             />
             <div class="container">
               <div class="row">
                 <div class="col-lg-12 d-flex">
-                  <h2 class="text-white">{{ pageRs.value().title }}</h2>
+                  <h2 class="text-white">{{ currentPage.title }}</h2>
                   <img
                     src="/assets/img/logos/logo-blanco.png"
                     alt="logo-muni-arica"
@@ -27,22 +29,19 @@
       </div>
     }
   </div>
+
   <!-- Page body -->
   <div class="page-body">
     <div class="container-xl">
       <!-- Content here -->
       <div class="row row-cards">
-        @if (
-          !pageRs.isLoading() &&
-          pageRs.value().content != null &&
-          pageRs.value().content != ""
-        ) {
+        @if (!pageRs.isLoading() && currentPage?.content) {
           <div class="col-lg-12">
             <div class="card">
               <div class="card-body">
                 <div class="h3">Descripción</div>
                 <div
-                  [innerHTML]="pageRs.value().content"
+                  [innerHTML]="currentPage?.content"
                   class="markdown text-secondary"
                 ></div>
               </div>
@@ -51,8 +50,14 @@
         }
         <div class="col-lg-12">
           @defer {
-            <div class="row row-cards">
-              @if (!pageRs.isLoading() && pageRs.value().files.length > 0) {
+            @let filesExist =
+              !pageRs.isLoading() &&
+              currentPage &&
+              currentPage.files &&
+              currentPage.files.length > 0;
+
+            @if (filesExist) {
+              <div class="row row-cards">
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-body">
@@ -60,12 +65,10 @@
                     </div>
                   </div>
                 </div>
-                @for (item of pageRs.value().files; track $index) {
+                @for (item of currentPage.files; track $index) {
                   <div
                     [ngClass]="
-                      pageRs.value()?.files?.length === 1
-                        ? 'col-md-12'
-                        : 'col-md-6'
+                      currentPage.files.length === 1 ? 'col-md-12' : 'col-md-6'
                     "
                   >
                     <div class="card">
@@ -79,9 +82,7 @@
                             />
                           </div>
                           <div class="col">
-                            <h4 class="card-title m-0">
-                              {{ item.name }}
-                            </h4>
+                            <h4 class="card-title m-0">{{ item.name }}</h4>
                             <div class="text-secondary">
                               {{ item.description }}
                             </div>
@@ -135,8 +136,8 @@
                     </div>
                   </div>
                 }
-              }
-            </div>
+              </div>
+            }
           }
         </div>
       </div>
