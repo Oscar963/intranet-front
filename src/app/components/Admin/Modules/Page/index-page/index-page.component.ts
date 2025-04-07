@@ -21,40 +21,43 @@ import { ToastService } from '@services/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexPageComponent {
-  private pageService = inject(PageService);
-  private toastService = inject(ToastService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  // === INYECCIÓN DE DEPENDENCIAS === //
+  private readonly pageService = inject(PageService); // 🔹 Servicio de páginas
+  private readonly toastService = inject(ToastService); // 🔹 Servicio de notificaciones
+  private readonly route = inject(ActivatedRoute); // 🔹 Acceso a parámetros de ruta
+  private readonly router = inject(Router); // 🔹 Navegación programática
 
-  public query = signal<string>('');
-  public show = signal<number>(15);
-  public meta = signal<any>({});
-  public page = signal<number>(1);
+  // === ESTADOS REACTIVOS (SIGNALS) === //
+  public query = signal<string>(''); // 🔹 Término de búsqueda
+  public show = signal<number>(15); // 🔹 Items por página
+  public meta = signal<PaginationMeta>({
+    // 🔹 Metadatos paginación
+    current_page: 1,
+    last_page: 1,
+    from: 0,
+    to: 0,
+    total: 0,
+    links: [],
+  });
+  public page = signal<number>(1); // 🔹 Página actual
 
-  values = [
-    { value: '15', label: '15' },
-    { value: '50', label: '50' },
-    { value: '100', label: '100' },
-    { value: '500', label: '500' },
+  // === CONSTANTES === //
+  public readonly itemsPerPageOptions = [
+    // 🔸 Opciones de paginación
+    { value: 15, label: '15' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+    { value: 500, label: '500' },
   ];
 
   constructor() {
-    // Efecto para sincronizar `page` con la URL
-    effect(() => {
-      this.route.params.subscribe((params) => {
-        this.page.set(+params['page'] || 1);
-      });
-    });
-    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
-    effect(() => {
-      if (this.page() !== 1 && this.query() !== '') {
-        this.page.set(1);
-        this.router.navigate(['admin/pages/page', 1]);
-      }
-    });
+    // === CONFIGURACIÓN INICIAL === //
+    this.setupRouteSync(); // Sincroniza parámetros de ruta
+    this.setupQueryDebounce(); // Configura debounce para búsquedas
   }
 
-  public pagesRs = rxResource<
+  // === RECURSO REACTIVO PARA DATOS === //
+  public readonly pagesResource = rxResource<
     Page[],
     { query: string; page: number; show: number }
   >({
@@ -63,106 +66,257 @@ export class IndexPageComponent {
       page: this.page(),
       show: this.show(),
     }),
-    loader: ({ request }) => {
-      return this.pageService
-        .fetchPage(request.query, request.page, request.show)
-        .pipe(
-          // Usamos map para transformar la respuesta
-          map((response) => {
-            // Actualizamos la metadata
-            this.meta.set({
-              current_page: response.data.meta?.current_page ?? 1,
-              last_page: response.data.meta?.last_page ?? 1,
-              from: response.data.meta?.from ?? 0,
-              to: response.data.meta?.to ?? 0,
-              total: response.data.meta?.total ?? 0,
-              links:
-                response.data.meta?.links?.map((link: any, index: number) => ({
-                  id: `link-${index}`, // Clave única generada para cada enlace
-                  label: link.label ?? '',
-                  page: this.extractPage(link.url) ?? null,
-                  active: link.active ?? false,
-                })) ?? [],
-            });
-
-            // Convertimos explícitamente a Page[] y retornamos los datos
-            return response.data.data as Page[];
-          }),
-        );
-    },
+    loader: ({ request }) => this.loadPagesData(request),
   });
 
-  public deleteItem(id: number) {
-    Swal.fire({
-      title: '¿Estás seguro que desea eliminar la página?',
-      text: '¡Esta acción no podrá ser revertida!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#06048c',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonColor: '#d63939',
-      cancelButtonText: 'No, cancelar',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Eliminando...',
-          html: 'Por favor, espera mientras se elimina el registro.',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
+  // === MÉTODOS PÚBLICOS === //
 
-        this.pageService.deletePage(id).subscribe({
-          next: (success: string) => {
-            Swal.close();
-            Swal.fire({
-              title: '¡Eliminado!',
-              text: success,
-              icon: 'success',
-              confirmButtonColor: '#06048c',
-              confirmButtonText: 'Cerrar',
-            });
-            this.pagesRs.reload();
-          },
-          error: (error) => {
-            Swal.close();
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo eliminar el registro.',
-              icon: 'error',
-              confirmButtonColor: '#d63939',
-              confirmButtonText: 'Cerrar',
-            });
-          },
-        });
+  /**
+   * Elimina una página con confirmación visual
+   * @param id - ID de la página a eliminar
+   */
+  public deleteItem(id: number): void {
+    this.showDeleteConfirmation().then((result) => {
+      if (result.isConfirmed) {
+        this.executeDelete(id);
       }
     });
   }
 
+  /**
+   * Navega a una página específica con validación
+   * @param page - Número de página destino (1-based)
+   */
   public goToPage(page: number | null): void {
-    if (page && page > 0 && page <= this.meta().last_page) {
+    if (this.isValidPage(page)) {
       this.router.navigate(['admin/pages/page', page]);
     }
   }
 
-  private extractPage(url: string | null): number | null {
-    if (!url) return null;
-    const match = url.match(/page=(\d+)/);
-    return match ? parseInt(match[1], 10) : null;
-  }
-
+  /**
+   * Copia la URL completa de la página al portapapeles
+   * @param slug - Identificador único de la página
+   */
   public copyToClipboard(slug: string): void {
-    const baseUrl = window.location.origin; // Obtiene la URL base (ej. http://localhost:4200 o https://midominio.com)
-    const fullUrl = `${baseUrl}/page/${slug}`; // Construye la URL completa
+    const baseUrl = window.location.origin;
+    const fullUrl = `${baseUrl}/page/${slug}`;
 
     navigator.clipboard
       .writeText(fullUrl)
       .then(() => {
-        this.toastService.info('URL copiada al portapapeles.');
+        this.toastService.info('URL copiada al portapapeles');
       })
       .catch((err) => {
         this.toastService.error('Error al copiar al portapapeles', err);
       });
   }
+
+  // === MÉTODOS PRIVADOS === //
+
+  /**
+   * Sincroniza los parámetros de ruta con el estado interno
+   */
+  private setupRouteSync(): void {
+    this.route.params
+      .pipe(map((params) => +params['page'] || 1))
+      .subscribe((page) => this.page.set(page));
+  }
+
+  /**
+   * Configura el debounce para cambios en la búsqueda
+   */
+  private setupQueryDebounce(): void {
+    effect(() => {
+      const currentQuery = this.query();
+      if (currentQuery && this.page() !== 1) {
+        this.resetToFirstPage();
+      }
+    });
+  }
+
+  /**
+   * Carga los datos de páginas desde el servicio
+   * @param request - Parámetros de búsqueda y paginación
+   * @returns Observable con los datos
+   */
+  private loadPagesData(request: {
+    query: string;
+    page: number;
+    show: number;
+  }) {
+    return this.pageService
+      .fetchPage(request.query, request.page, request.show)
+      .pipe(
+        map((response) => {
+          this.updatePaginationMeta(response.data.meta);
+          return response.data.data as Page[];
+        }),
+      );
+  }
+
+  /**
+   * Actualiza los metadatos de paginación
+   * @param meta - Metadatos de la API
+   */
+  private updatePaginationMeta(meta: any): void {
+    this.meta.set({
+      current_page: meta?.current_page ?? 1,
+      last_page: meta?.last_page ?? 1,
+      from: meta?.from ?? 0,
+      to: meta?.to ?? 0,
+      total: meta?.total ?? 0,
+      links: this.parsePaginationLinks(meta?.links),
+    });
+  }
+
+  /**
+   * Parsea los enlaces de paginación
+   * @param links - Enlaces crudos de la API
+   * @returns Array de enlaces formateados
+   */
+  private parsePaginationLinks(links: any[]): PaginationLink[] {
+    return (
+      links?.map((link, index) => ({
+        id: `link-${index}`,
+        label: link.label ?? '',
+        page: this.extractPageFromUrl(link.url),
+        active: link.active ?? false,
+      })) ?? []
+    );
+  }
+
+  /**
+   * Extrae el número de página de una URL
+   * @param url - URL a analizar
+   * @returns Número de página o null
+   */
+  private extractPageFromUrl(url: string | null): number | null {
+    if (!url) return null;
+    try {
+      const parsedUrl = new URL(url);
+      return +(parsedUrl.searchParams.get('page') || 0);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Muestra diálogo de confirmación para eliminar
+   * @returns Promise con resultado de la confirmación
+   */
+  private showDeleteConfirmation() {
+    return Swal.fire({
+      title: '¿Eliminar página?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#06048c',
+      confirmButtonText: 'Confirmar',
+      cancelButtonColor: '#d63939',
+      cancelButtonText: 'Cancelar',
+    });
+  }
+
+  /**
+   * Ejecuta el proceso de eliminación
+   * @param id - ID de la página a eliminar
+   */
+  private executeDelete(id: number): void {
+    this.showLoadingIndicator();
+    this.pageService.deletePage(id).subscribe({
+      next: (success) => this.handleDeleteSuccess(success),
+      error: (error) => this.handleDeleteError(error),
+    });
+  }
+
+  /**
+   * Muestra indicador de carga durante eliminación
+   */
+  private showLoadingIndicator(): void {
+    Swal.fire({
+      title: 'Eliminando...',
+      html: 'Por favor espere',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+  }
+
+  /**
+   * Maneja eliminación exitosa
+   * @param success - Mensaje de confirmación
+   */
+  private handleDeleteSuccess(success: string): void {
+    Swal.close();
+    this.showSuccessAlert(success);
+    this.pagesResource.reload();
+  }
+
+  /**
+   * Muestra alerta de éxito
+   * @param message - Mensaje a mostrar
+   */
+  private showSuccessAlert(message: string): void {
+    Swal.fire({
+      title: '¡Eliminado!',
+      text: message,
+      icon: 'success',
+      confirmButtonColor: '#06048c',
+    });
+  }
+
+  /**
+   * Maneja errores durante eliminación
+   * @param error - Error recibido
+   */
+  private handleDeleteError(error: any): void {
+    Swal.close();
+    this.showErrorAlert(error.message || 'Error al eliminar');
+  }
+
+  /**
+   * Muestra alerta de error
+   * @param message - Mensaje de error
+   */
+  private showErrorAlert(message: string): void {
+    Swal.fire({
+      title: 'Error',
+      text: message,
+      icon: 'error',
+      confirmButtonColor: '#d63939',
+    });
+  }
+
+  /**
+   * Valida si una página es navegable
+   * @param page - Página a validar
+   * @returns true si la página es válida
+   */
+  private isValidPage(page: number | null): boolean {
+    return !!page && page > 0 && page <= this.meta().last_page;
+  }
+
+  /**
+   * Reinicia a la primera página
+   */
+  private resetToFirstPage(): void {
+    this.page.set(1);
+    this.router.navigate(['admin/pages/page', 1]);
+  }
+}
+
+// === INTERFACES DE TIPADO === //
+interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  from: number;
+  to: number;
+  total: number;
+  links: PaginationLink[];
+}
+
+interface PaginationLink {
+  id: string;
+  label: string;
+  page: number | null;
+  active: boolean;
 }

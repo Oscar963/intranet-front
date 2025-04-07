@@ -1,12 +1,11 @@
 <div class="page">
   <!-- Header condicional mientras carga -->
-  @if (usersRs.isLoading()) {
-    <div class="loading-placeholder">
-      <!-- Opcional: Puedes añadir un spinner de carga aquí -->
-    </div>
+  @if (userResource.isLoading()) {
+    <!-- Opcional: Puedes añadir un spinner de carga aquí -->
+    <div class="spinner-border">Cargando...</div>
   } @else {
     <app-header
-      [user]="usersRs.value()"
+      [user]="userResource.value()"
       [nameAvatar]="nameAvatar()"
       aria-label="Cabecera de administración"
     />

@@ -62,11 +62,7 @@
                     class="form-select form-select-sm"
                     #selectShow
                   >
-                    @for (
-                      value of values;
-                      track value.value;
-                      
-                    ) {
+                    @for (value of itemsPerPageOptions; track value.value) {
                       <option value="{{ value.value }}">
                         {{ value.label }}
                       </option>
@@ -88,7 +84,7 @@
               </div>
             </div>
           </div>
-          @if (filesRs.isLoading()) {
+          @if (filesResource.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
@@ -108,19 +104,19 @@
                 </tr>
               </thead>
               <tbody class="align-middle">
-                @if (filesRs.isLoading()) {
+                @if (filesResource.isLoading()) {
                   <tr>
                     <td colspan="8" class="text-secondary text-center">
                       Cargando datos...
                     </td>
                   </tr>
                 } @else {
-                  @for (item of filesRs.value(); track item.id) {
+                  @for (item of filesResource.value(); track item.id) {
                     <tr>
                       <td>
                         <img
                           style="max-width: 50px"
-                          [src]="getFileImage(item.type)"
+                          [src]="getFileIcon(item.type)"
                           [alt]="item.name"
                         />
                       </td>
@@ -202,8 +198,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
-                          
                           title="Editar"
                           [routerLink]="['/admin/files/update/' + item.id]"
                         >
@@ -233,8 +227,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
-                          
                           title="Copiar URL"
                           (click)="copyToClipboard(item.url)"
                         >
@@ -263,8 +255,6 @@
                         <a
                           class="text-dark cursor-pointer px-1"
                           aria-label="Button"
-                          
-                          
                           title="Descargar"
                           download
                           (click)="downloadFile(item.id, item.name)"
@@ -292,8 +282,6 @@
                         </a>
                         <a
                           class="text-dark cursor-pointer px-1"
-                          
-                          
                           title="Eliminar"
                           (click)="deleteItem(item.id)"
                         >
@@ -343,7 +331,7 @@
             </p>
             <ul class="pagination m-0 ms-auto">
               <!-- Enlaces de páginas -->
-              @for (page of meta().links; track page.id; ) {
+              @for (page of meta().links; track page.id) {
                 <li class="page-item" [class.active]="page.active">
                   <a
                     class="page-link"

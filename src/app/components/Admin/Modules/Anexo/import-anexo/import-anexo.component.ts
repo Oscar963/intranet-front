@@ -1,13 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { saveAs } from 'file-saver';
-
 import { AnexoService } from '@services/anexo.service';
 import { ToastService } from '@app/core/services/toast.service';
 
@@ -18,158 +19,152 @@ import { ToastService } from '@app/core/services/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ImportAnexoComponent {
-  // Inyección de dependencias
+  // === SERVICIOS INYECTADOS === //
   private readonly anexoService = inject(AnexoService);
   private readonly toastService = inject(ToastService);
 
-  // Estados reactivos
-  public readonly isUploading = signal<boolean>(false);
-  public readonly uploadProgress = signal<number>(0);
-  public readonly selectedFile = signal<File | null>(null);
-  public readonly loading = signal<boolean>(false);
-  public readonly errorMessage = signal<string>('');
+  // === SEÑALES REACTIVAS === //
+  readonly isUploading = signal(false);
+  readonly uploadProgress = signal(0);
+  readonly selectedFile = signal<File | null>(null);
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
 
-  // Tipos de archivo permitidos
+  // === ELEMENTOS DEL DOM === //
+  public fileInput =
+    viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
+
+  // === CONSTANTES === //
   private readonly validFileTypes = [
     'text/csv',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel
   ];
 
-  /**
-   * Maneja la selección de archivos con validación de tipo
-   * @param event Evento de cambio del input file
-   */
-  public onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
+  // === MÉTODOS PÚBLICOS === //
 
-    if (!input.files?.length) {
+  /**
+   * Valida y asigna el archivo seleccionado.
+   * @param event - Evento del input file
+   */
+  onFileSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) {
       this.toastService.error('No se seleccionó ningún archivo');
       return;
     }
 
-    const file = input.files[0];
-    const fileType = file.type?.toLowerCase();
-
-    if (this.validFileTypes.includes(fileType)) {
-      this.selectedFile.set(file);
-      this.resetMessages();
-      this.toastService.info('Archivo seleccionado correctamente');
-    } else {
-      this.toastService.error(
-        'Formato no válido. Use archivos Excel (.xlsx) o CSV (.csv)',
-      );
+    if (!this.validFileTypes.includes(file.type.toLowerCase())) {
+      this.toastService.error('Formato no válido. Use archivos Excel o CSV');
       this.selectedFile.set(null);
+      return;
     }
+
+    this.selectedFile.set(file);
+    this.resetMessages();
+    this.toastService.info('Archivo seleccionado correctamente');
   }
 
   /**
-   * Confirma y ejecuta la importación de datos
+   * Valida y confirma la importación del archivo seleccionado.
    */
-  public onSubmit(): void {
+  onSubmit(): void {
     if (!this.selectedFile()) {
       this.toastService.error('Seleccione un archivo antes de continuar');
       return;
     }
 
-    this.showConfirmationDialog();
+    this.confirmImport(); // Muestra confirmación antes de subir
   }
 
   /**
-   * Exporta los anexos a un archivo Excel
+   * Exporta los anexos como un archivo Excel.
+   * Usa `file-saver` para descargar el blob recibido.
    */
-  public exportAnexos(): void {
+  exportAnexos(): void {
     this.loading.set(true);
 
     this.anexoService.exportAnexos().subscribe({
-      next: (data: Blob) => {
-        saveAs(data, `anexos_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      next: (blob: Blob) => {
+        const fileName = `anexos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        saveAs(blob, fileName);
         this.toastService.success('Exportación completada con éxito');
       },
-      error: (error) => this.handleExportError(error),
+      error: (err) => {
+        const message = err?.error?.message ?? 'Error al exportar los datos';
+        this.toastService.error(message);
+      },
       complete: () => this.loading.set(false),
     });
   }
 
-  // -------------------- Métodos privados -------------------- //
+  // === MÉTODOS PRIVADOS (LÓGICA INTERNA) === //
 
   /**
-   * Muestra el diálogo de confirmación para la importación
+   * Muestra un diálogo de confirmación antes de importar.
    */
-  private showConfirmationDialog(): void {
+  private confirmImport(): void {
     Swal.fire({
       title: 'Confirmar Importación',
       text: 'Esta acción reemplazará todos los anexos existentes. ¿Desea continuar?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, importar',
       cancelButtonText: 'Cancelar',
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.uploadFile();
-      }
+      if (result.isConfirmed) this.uploadFile();
     });
   }
 
   /**
-   * Sube el archivo seleccionado al servidor
+   * Sube el archivo al servidor y maneja el progreso.
    */
   private uploadFile(): void {
     const file = this.selectedFile();
     if (!file) return;
 
     this.prepareUpload();
-    this.showLoadingAlert();
+    this.showProgressAlert();
 
     this.anexoService.uploadAnexos(file).subscribe({
-      next: (event) => this.handleUploadProgress(event),
+      next: (event) => this.trackUploadProgress(event),
       error: (error) => this.handleUploadError(error),
       complete: () => this.completeUpload(),
     });
   }
 
   /**
-   * Maneja el progreso de la subida
-   * @param event Evento HTTP de progreso
+   * Actualiza el progreso de la subida y maneja la respuesta final.
+   * @param event - Evento HTTP (UploadProgress o Response)
    */
-  private handleUploadProgress(event: HttpEvent<any>): void {
+  private trackUploadProgress(event: HttpEvent<any>): void {
     if (event.type === HttpEventType.UploadProgress && event.total) {
-      const progress = Math.round((100 * event.loaded) / event.total);
-      this.uploadProgress.set(progress);
-    } else if (event.type === HttpEventType.Response && event.body?.message) {
-      this.toastService.success(event.body.message);
-      this.resetFileSelection();
+      const percent = Math.round((100 * event.loaded) / event.total);
+      this.uploadProgress.set(percent);
+    }
+
+    if (event.type === HttpEventType.Response) {
+      const msg = event.body?.message ?? 'Importación completada';
+      this.toastService.success(msg);
+      this.clearFileInput();
       Swal.close();
     }
   }
 
   /**
-   * Maneja errores durante la exportación
-   * @param error Error recibido
-   */
-  private handleExportError(error: any): void {
-    const message = error?.error?.message ?? 'Error al exportar los datos';
-    this.toastService.error(message);
-    this.loading.set(false);
-  }
-
-  /**
-   * Maneja errores durante la subida
-   * @param error Error recibido
+   * Maneja errores durante la subida.
+   * @param error - Error HTTP
    */
   private handleUploadError(error: any): void {
-    this.errorMessage.set(
-      error?.message ?? 'Error desconocido durante la importación',
-    );
-    this.toastService.error(this.errorMessage());
+    const message =
+      error?.message ?? 'Error desconocido durante la importación';
+    this.errorMessage.set(message);
+    this.toastService.error(message);
     this.resetUploadState();
     Swal.close();
   }
 
-  /**
-   * Prepara el estado para una nueva subida
-   */
+  // === HELPERS (FUNCIONES DE UTILIDAD) === //
+
   private prepareUpload(): void {
     this.isUploading.set(true);
     this.loading.set(true);
@@ -177,18 +172,26 @@ export class ImportAnexoComponent {
     this.errorMessage.set('');
   }
 
-  /**
-   * Completa el proceso de subida
-   */
-  private completeUpload(): void {
+  private resetUploadState(): void {
     this.isUploading.set(false);
     this.loading.set(false);
+    this.uploadProgress.set(0);
   }
 
-  /**
-   * Muestra alerta de carga durante la subida
-   */
-  private showLoadingAlert(): void {
+  private resetMessages(): void {
+    this.errorMessage.set('');
+    this.uploadProgress.set(0);
+  }
+
+  private clearFileInput(): void {
+    this.selectedFile.set(null);
+
+    if (this.fileInput()?.nativeElement) {
+      this.fileInput().nativeElement.value = '';
+    }
+  }
+
+  private showProgressAlert(): void {
     Swal.fire({
       title: 'Procesando archivo',
       html: `Progreso: <b>${this.uploadProgress()}%</b>`,
@@ -197,30 +200,8 @@ export class ImportAnexoComponent {
     });
   }
 
-  /**
-   * Resetea la selección de archivo
-   */
-  private resetFileSelection(): void {
-    this.selectedFile.set(null);
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
-  }
-
-  /**
-   * Resetea el estado de la subida
-   */
-  private resetUploadState(): void {
+  private completeUpload(): void {
     this.isUploading.set(false);
     this.loading.set(false);
-    this.uploadProgress.set(0);
-  }
-
-  /**
-   * Resetea todos los mensajes y estados
-   */
-  private resetMessages(): void {
-    this.errorMessage.set('');
-    this.loading.set(false);
-    this.uploadProgress.set(0);
   }
 }

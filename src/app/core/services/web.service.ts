@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import { map, Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Page } from '../interfaces/Page';
 
 @Injectable({
   providedIn: 'root',
@@ -85,10 +86,10 @@ export class WebService {
    * @param id Identificador del popup.
    * @returns Observable con los datos del popup.
    */
-  getPageBySlug(slug: string): Observable<any> {
-    return this.http
-      .get<{ data: any }>(`${this.apiUrl}/api/web/pages/slug/${slug}`)
-      .pipe(map((response) => response.data));
+  getPageBySlug(slug: string): Observable<{ data: Page }> {
+    return this.http.get<{ data: Page }>(
+      `${this.apiUrl}/api/web/pages/slug/${slug}`,
+    );
   }
 
   /**

@@ -367,12 +367,13 @@ export const routes: Routes = [
       ),
   },
   {
-    path: '**',
+    path: 'not-found',
     loadComponent: () =>
       import('@shared/not-found/not-found.component').then(
         (m) => m.NotFoundComponent,
       ),
-  },
+  }, // Ruta para la página de error 404
+  { path: '**', redirectTo: '/not-found' },
 
-  { path: '', redirectTo: '', pathMatch: 'full' },
+  // { path: '', redirectTo: '', pathMatch: 'full' },
 ];
