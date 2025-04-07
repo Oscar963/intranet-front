@@ -68,30 +68,6 @@ export const routes: Routes = [
             (m) => m.ContactComponent,
           ),
       },
-
-      /** Auth Routes **/
-      {
-        path: 'login',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('@components/Auth/login/login.component').then(
-            (m) => m.LoginComponent,
-          ),
-      },
-      {
-        path: 'forgot-password',
-        loadComponent: () =>
-          import(
-            '@components/Auth/forgot-password/forgot-password.component'
-          ).then((m) => m.ForgotPasswordComponent),
-      },
-      {
-        path: 'reset-password/:token',
-        loadComponent: () =>
-          import(
-            '@components/Auth/reset-password/reset-password.component'
-          ).then((m) => m.ResetPasswordComponent),
-      },
     ],
   },
 
