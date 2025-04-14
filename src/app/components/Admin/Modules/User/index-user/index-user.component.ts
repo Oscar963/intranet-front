@@ -15,7 +15,7 @@ import { UserService } from '@services/user.service';
 import { AuthService } from '@services/auth.service';
 import { User } from '@interfaces/User';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-user',

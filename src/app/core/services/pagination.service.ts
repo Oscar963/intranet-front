@@ -1,6 +1,6 @@
 // src/app/services/pagination.service.ts
 import { Injectable } from '@angular/core';
-import { PaginationMeta, PaginationLink } from '@interfaces/pagination';
+import { PaginationMeta, PaginationLink } from '@interfaces/Pagination';
 
 @Injectable({ providedIn: 'root' })
 export class PaginationService {
