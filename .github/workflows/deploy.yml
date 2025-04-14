@@ -141,10 +141,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
-          dangerous-clean-slate: true  # Elimina todo en el server...
-          exclude: |
-            intranet/**
-            403.html
 
       # Paso 8: Notificar despliegue exitoso
       - name: ✅ Notificar despliegue exitoso
