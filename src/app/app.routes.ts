@@ -373,7 +373,7 @@ export const routes: Routes = [
         (m) => m.NotFoundComponent,
       ),
   }, // Ruta para la página de error 404
-  { path: '**', redirectTo: '/not-found' },
+  // { path: '**', redirectTo: '/not-found' },
 
   // { path: '', redirectTo: '', pathMatch: 'full' },
 ];
