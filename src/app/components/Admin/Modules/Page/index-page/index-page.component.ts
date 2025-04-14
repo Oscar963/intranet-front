@@ -15,7 +15,7 @@ import { PageService } from '@services/page.service';
 import { ToastService } from '@services/toast.service';
 import { Page } from '@interfaces/Page';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-page',

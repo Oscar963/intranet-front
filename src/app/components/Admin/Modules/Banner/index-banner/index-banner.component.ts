@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { BannerService } from '@services/banner.service';
 import { Banner } from '@interfaces/Banner';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-banner',

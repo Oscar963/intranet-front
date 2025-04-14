@@ -26,7 +26,6 @@ export class HomeComponent implements AfterViewInit {
   public modal = signal<Modal | null>(null);
   private webService = inject(WebService);
 
-
   // Con rxResource se carga automáticamente los datos de los banners
   public bannersRx = rxResource({
     loader: () =>

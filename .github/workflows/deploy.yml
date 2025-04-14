@@ -32,60 +32,124 @@ jobs:
         run: |
           cat <<EOF > ./dist/angular-19-app/browser/.htaccess
           <IfModule mod_rewrite.c>
-            RewriteEngine On
-            RewriteBase /
+              RewriteEngine On
+              RewriteBase /
 
-            # Redirige todas las solicitudes a index.html, excepto las solicitudes de archivos existentes
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME} !-d
-            RewriteRule ^.*$ index.html [L]
+              # Redirige todas las solicitudes a index.html, excepto las solicitudes de archivos existentes
+              RewriteCond %{REQUEST_FILENAME} !-f
+              RewriteCond %{REQUEST_FILENAME} !-d
+              RewriteRule ^.*$ index.html [L]
           </IfModule>
 
-            # Configuración de PHP
+          # Configuración de PHP
           <IfModule mod_php.c>
-            php_value post_max_size 256M
-            php_value upload_max_filesize 256M
-            php_value max_execution_time 300
-            php_value memory_limit 128M
+              php_value post_max_size 300M
+              php_value upload_max_filesize 300M
+              php_value max_execution_time 300
+              php_value memory_limit 300M
           </IfModule>
 
+          # Compresión de contenido
           <IfModule mod_deflate.c>
               AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css text/javascript application/javascript application/json
           </IfModule>
+
+          # Restricción por IP (Apache 2.4+)
+          <IfModule mod_authz_core.c>
+              Require ip 152.230.211.90
+              Require ip 152.230.211.158
+              Require ip 152.230.214.48
+              Require ip 152.230.211.91
+              Require ip 152.230.211.191
+              Require ip 152.230.211.192
+              Require ip 152.230.211.69
+              Require ip 152.230.211.71
+              Require ip 152.230.211.167
+              Require ip 152.230.211.101
+              Require ip 152.230.211.96
+              Require ip 152.230.211.105
+              Require ip 152.230.211.110
+              Require ip 152.230.211.112
+              Require ip 152.230.211.144
+              Require ip 152.230.211.201
+              Require ip 152.230.211.151
+              Require ip 152.230.211.181
+              Require ip 152.172.158.122
+
+              # DISAM
+              Require ip 152.230.68.146
+              Require ip 152.230.68.138
+
+              # Permitir acceso a IP home
+              Require ip 152.173.156.187
+
+              # Denegar el acceso a todos los demás
+              Require all denied
+          </IfModule>
+
+          # Configurar redirección a la página 403.html en caso de denegación de acceso
+          ErrorDocument 403 /403.html
           EOF
 
-      # Paso 5: Sincronizar los archivos generados con el servidor vía FTP
+      # Paso 5: Crear el archivo 403.html
+      - name: 🛠️ Crear archivo 403.html
+        run: |
+          cat <<EOF > ./dist/angular-19-app/browser/403.html
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Acceso Restringido</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      text-align: center;
+                      padding: 50px;
+                  }
+                  h1 {
+                      color: red;
+                  }
+                  p {
+                      font-size: 18px;
+                  }
+              </style>
+          </head>
+          <body>
+              <h1>Acceso Restringido</h1>
+              <p>No puedes acceder a este sitio web porque no estás conectado desde la red interna.</p>
+          </body>
+          </html>
+          EOF
+
+      # Paso 6: Verificar que los archivos se crearon correctamente
+      - name: 🔍 Verificar archivos antes del deploy
+        run: |
+          echo "Archivos en ./dist/angular-19-app/browser/:"
+          ls -la ./dist/angular-19-app/browser/
+          echo "Contenido de .htaccess:"
+          cat ./dist/angular-19-app/browser/.htaccess
+          echo "Contenido de 403.html:"
+          cat ./dist/angular-19-app/browser/403.html
+
+      # Paso 7: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
-          server: dev.imaarica.cl
+          server: intranet.imaarica.cl
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
+          exclude: ''  # No excluir ningún archivo
+          dangerous-clean-slate: false  # No eliminar archivos del servidor
 
-      # Paso 6: Notificar despliegue exitoso
+      # Paso 8: Notificar despliegue exitoso
       - name: ✅ Notificar despliegue exitoso
         if: success()
         run: echo "El despliegue fue exitoso 🚀"
 
-      # Paso 7: Notificar error en el despliegue
+      # Paso 9: Notificar error en el despliegue
       - name: 🚨 Notificar error en el despliegue
         if: failure()
-        run:
-          echo "El despliegue ha fallado 😢"
-
-          # 🔄 ¿Cómo activar las extensiones PHP?
-          # Si tu servidor es administrado (como en un hosting compartido), las opciones son:
-          #
-          # 1. Contactar al proveedor: Solicita que activen las extensiones necesarias.
-          #
-          # 2. Usar php.ini: Si te permiten usar un archivo php.ini personalizado, puedes intentar agregar:
-          #
-          # extension=mbstring
-          # extension=intl
-          # extension=bcmath
-          # extension=pdo
-          # extension=pdo_mysql
-          #
-          # Nota: La habilitación de extensiones PHP depende del entorno del servidor.
+        run: echo "El despliegue ha fallado 😢"

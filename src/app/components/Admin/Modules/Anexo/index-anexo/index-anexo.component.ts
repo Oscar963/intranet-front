@@ -15,7 +15,7 @@ import { AnexoService } from '@services/anexo.service';
 import { Anexo } from '@interfaces/Anexo';
 import { ImportAnexoComponent } from '../import-anexo/import-anexo.component';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-anexo',

@@ -15,7 +15,7 @@ import { MobileService } from '@services/mobile.service';
 import { Mobile } from '@interfaces/Mobile';
 import { ImportMobileComponent } from '../import-mobile/import-mobile.component';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-mobile',

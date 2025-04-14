@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import { PopupService } from '@services/popup.service';
 import { Popup } from '@interfaces/Popup';
 import { PaginationService } from '@services/pagination.service';
-import { PaginationMeta } from '@interfaces/pagination';
+import { PaginationMeta } from '@interfaces/Pagination';
 
 @Component({
   selector: 'app-index-popup',
