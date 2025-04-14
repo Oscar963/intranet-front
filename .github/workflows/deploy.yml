@@ -89,8 +89,6 @@ jobs:
 
           # Configurar redirección a la página 403.html en caso de denegación de acceso
           ErrorDocument 403 /403.html
-
-
           EOF
 
       # Paso 5: Crear el archivo 403.html
@@ -124,7 +122,17 @@ jobs:
           </html>
           EOF
 
-      # Paso 6: Sincronizar los archivos generados con el servidor vía FTP
+      # Paso 6: Verificar que los archivos se crearon correctamente
+      - name: 🔍 Verificar archivos antes del deploy
+        run: |
+          echo "Archivos en ./dist/angular-19-app/browser/:"
+          ls -la ./dist/angular-19-app/browser/
+          echo "Contenido de .htaccess:"
+          cat ./dist/angular-19-app/browser/.htaccess
+          echo "Contenido de 403.html:"
+          cat ./dist/angular-19-app/browser/403.html
+
+      # Paso 7: Sincronizar los archivos generados con el servidor vía FTP
       - name: 📂 Sincronizar archivos por FTP
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
@@ -133,13 +141,15 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/angular-19-app/browser/
           server-dir: ./public_html/
+          exclude: ''  # No excluir ningún archivo
+          dangerous-clean-slate: false  # No eliminar archivos del servidor
 
-      # Paso 7: Notificar despliegue exitoso
+      # Paso 8: Notificar despliegue exitoso
       - name: ✅ Notificar despliegue exitoso
         if: success()
         run: echo "El despliegue fue exitoso 🚀"
 
-      # Paso 8: Notificar error en el despliegue
+      # Paso 9: Notificar error en el despliegue
       - name: 🚨 Notificar error en el despliegue
         if: failure()
         run: echo "El despliegue ha fallado 😢"
