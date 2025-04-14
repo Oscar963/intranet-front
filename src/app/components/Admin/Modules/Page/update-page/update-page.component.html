@@ -58,8 +58,13 @@
             </div>
           }
           <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            @if (pageLoader.isLoading()) {
+              <div class="progress progress-sm">
+                <div class="progress-bar progress-bar-indeterminate"></div>
+              </div>
+            }
             <div class="card-body">
-              @if (errorMessage()) {
+              @if (errorMessage().length) {
                 <div
                   class="alert alert-important alert-danger alert-dismissible"
                   role="alert"
@@ -89,7 +94,11 @@
                       </svg>
                     </div>
                     <div>
-                      <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                      <ul class="mb-0">
+                        @for (error of errorMessage(); track $index) {
+                          <li>{{ error }}</li>
+                        }
+                      </ul>
                     </div>
                   </div>
                   <a
@@ -201,13 +210,15 @@
                 <div class="col-md-12">
                   <div class="mb-3">
                     <label class="form-label required">Contenido</label>
-                    <app-tinymce
-                      formControlName="content"
-                      [initOptions]="{
-                        height: 300,
-                        menubar: true,
-                      }"
-                    ></app-tinymce>
+                    @if (!pageLoader.isLoading()) {
+                      <app-tinymce
+                        formControlName="content"
+                        [initOptions]="{
+                          height: 300,
+                          menubar: true,
+                        }"
+                      ></app-tinymce>
+                    }
                   </div>
                 </div>
               </div>

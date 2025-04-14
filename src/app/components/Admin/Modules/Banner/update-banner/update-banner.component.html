@@ -21,13 +21,13 @@
           <div class="card-header">
             <h3 class="card-title">Formulario de actualización</h3>
           </div>
-          @if (bannerRs.isLoading()) {
+          @if (bannerLoader.isLoading()) {
             <div class="progress progress-sm">
               <div class="progress-bar progress-bar-indeterminate"></div>
             </div>
           }
           <div class="card-body">
-            @if (errorMessage()) {
+            @if (errorMessage().length) {
               <div
                 class="alert alert-important alert-danger alert-dismissible"
                 role="alert"
@@ -53,7 +53,11 @@
                     </svg>
                   </div>
                   <div>
-                    <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                    <ul class="mb-0">
+                      @for (error of errorMessage(); track $index) {
+                        <li>{{ error }}</li>
+                      }
+                    </ul>
                   </div>
                 </div>
                 <a
@@ -229,7 +233,7 @@
                 <label class="form-label required"
                   >Imagen (1920px × 600px)</label
                 >
-                <app-upload-simple-img />
+                <app-upload-simple-img #uploadSimpleImgRef />
               </div>
             </div>
           </div>

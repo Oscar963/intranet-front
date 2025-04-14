@@ -1,4 +1,3 @@
-import { FileService } from '@services/file.service';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -9,13 +8,18 @@ import {
   input,
 } from '@angular/core';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { Modal } from 'bootstrap';
-import { UploadSimpleFileComponent } from '@shared/upload-simple-file/upload-simple-file.component';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
+import { Modal } from 'bootstrap';
+
 import { ToastService } from '@services/toast.service';
 import { PageService } from '@app/core/services/page.service';
+import { UploadSimpleFileComponent } from '@shared/upload-simple-file/upload-simple-file.component';
 
+/**
+ * Componente modal para subir archivos a una página.
+ * Permite la selección de archivos y el envío de metadatos asociados.
+ */
 @Component({
   selector: 'app-modal-file-upload',
   imports: [UploadSimpleFileComponent, ReactiveFormsModule],
@@ -24,35 +28,41 @@ import { PageService } from '@app/core/services/page.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalFileUploadComponent {
-  private fileService = inject(FileService);
-  private pageService = inject(PageService);
+  // Servicios
+  private readonly pageService = inject(PageService);
+  private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
+  private readonly fb = inject(FormBuilder);
 
-  private router = inject(Router);
-  private toastService = inject(ToastService);
-  private fb = inject(FormBuilder);
-
-  public modal = signal<Modal | null>(null); // Signal para almacenar la instancia del modal de Bootstrap
-  public modalElementRef = viewChild.required<ElementRef>('modalRef'); // Capturamos la referencia al elemento del modal en el template
+  // Referencias
+  public modal = signal<Modal | null>(null);
+  public modalElementRef = viewChild.required<ElementRef>('modalRef');
   public uploadSimpleFile =
-    viewChild.required<UploadSimpleFileComponent>('uploadSimpleRef'); // Capturamos la referencia del componente  UploadSimpleFileComponent
+    viewChild.required<UploadSimpleFileComponent>('uploadSimpleRef');
 
-  public loading = signal<Boolean>(false);
+  // Estado
+  public loading = signal<boolean>(false);
   public errorMessage = signal<string>('');
   public pageId = input<number>();
 
-  // Definición del formulario con validaciones
-  form = this.fb.nonNullable.group({
+  // Formulario
+  public form = this.fb.nonNullable.group({
     name: ['', Validators.required],
     description: [''],
   });
 
-  ngAfterViewInit(): void {
-    // Inicializa el modal después de que la vista esté completamente inicializada
+  /**
+   * Inicializa el modal después de que la vista esté completamente inicializada.
+   */
+  public ngAfterViewInit(): void {
     this.setModal();
   }
 
-  onSubmit(): void {
-    //Valida el formulario, construye los datos y los envía al backend.
+  /**
+   * Maneja el envío del formulario de subida de archivo.
+   * Valida los datos, construye el FormData y envía la solicitud al servidor.
+   */
+  public onSubmit(): void {
     if (!this.validateForm()) return;
     this.loading.set(true);
     this.clearMessages();
@@ -63,11 +73,8 @@ export class ModalFileUploadComponent {
       .storeFiles(formData)
       .pipe(take(1))
       .subscribe({
-        next: (success: string) => this.handleSuccess(success),
-        error: (error) => {
-          this.handleError(error);
-          this.loading.set(false);
-        },
+        next: (success) => this.handleSuccess(success),
+        error: (error) => this.handleError(error),
         complete: () => {
           this.loading.set(false);
           this.closeModal();
@@ -75,19 +82,37 @@ export class ModalFileUploadComponent {
       });
   }
 
+  /**
+   * Abre el modal y reinicia el estado del formulario.
+   */
+  public openModal(): void {
+    this.errorMessage.set('');
+    this.resetForm();
+    this.modal()?.show();
+  }
+
+  /**
+   * Cierra el modal.
+   */
+  public closeModal(): void {
+    this.modal()?.hide();
+  }
+
+  // Métodos privados
+  private setModal(): void {
+    this.modal.set(new Modal(this.modalElementRef().nativeElement));
+  }
+
   private clearMessages(): void {
-    // Limpia los mensajes de error y éxito
     this.errorMessage.set('');
   }
 
   private buildFormData(): FormData {
-    // Construye los datos a enviar en `FormData`
     const formData = new FormData();
     formData.append('name', this.form.value.name!);
     formData.append('description', this.form.value.description!);
     formData.append('page_id', this.pageId()?.toString()!);
 
-    // Obtener el archivo desde Dropzone
     const file = this.uploadSimpleFile().getFile();
     if (file) {
       formData.append('file', file);
@@ -96,14 +121,12 @@ export class ModalFileUploadComponent {
   }
 
   private handleSuccess(success: string): void {
-    // Maneja la respuesta exitosa del backend
     this.resetForm();
     this.toastService.success(success);
     this.router.navigate(['admin/pages/files', this.pageId()]);
   }
 
   private validateForm(): boolean {
-    // Valida el formulario antes de enviarlo
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
@@ -115,7 +138,6 @@ export class ModalFileUploadComponent {
   }
 
   private handleError(error: any): void {
-    // Maneja los errores del backend
     if (error.status === 422) {
       this.errorMessage.set(this.processErrors(error.error.errors));
       window.scroll(0, 0);
@@ -125,32 +147,15 @@ export class ModalFileUploadComponent {
   }
 
   private resetForm(): void {
-    // Reinicia el formulario y limpia los archivos
     this.form.reset();
     this.uploadSimpleFile().removeAllFiles();
   }
 
   private processErrors(errors: { [key: string]: string[] }): string {
-    // Procesa los errores de validación del backend
     const errorList = Object.keys(errors)
       .flatMap((key) => errors[key])
       .map((error) => `${error}</br>`)
       .join('');
     return `${errorList}`;
-  }
-
-  setModal() {
-    // Guarda la instancia en el signal
-    this.modal.set(new Modal(this.modalElementRef().nativeElement));
-  }
-
-  openModal() {
-    this.errorMessage.set('');
-    this.resetForm();
-    this.modal()?.show();
-  }
-
-  closeModal() {
-    this.modal()?.hide();
   }
 }

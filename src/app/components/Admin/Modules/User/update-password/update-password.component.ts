@@ -1,18 +1,27 @@
-import { UserService } from '@services/user.service';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  FormBuilder,
   FormControl,
-  FormGroup,
   Validators,
   ReactiveFormsModule,
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-import { NotificationService } from '@services/notification.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
+import { UserService } from '@services/user.service';
+import { ToastService } from '@app/core/services/toast.service';
+
+/**
+ * Componente para la actualización de contraseña de usuario.
+ * Permite cambiar la contraseña actual por una nueva con validación de seguridad.
+ */
 @Component({
   selector: 'app-update-password',
   imports: [ReactiveFormsModule, BsDatepickerModule],
@@ -21,18 +30,23 @@ import { ActivatedRoute, Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdatePasswordComponent {
-  private userService = inject(UserService);
-  private notificationService = inject(NotificationService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  // Servicios
+  private readonly userService = inject(UserService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
 
-  public loading: boolean = false;
-  public errorMessage: string = '';
-  public successMessage: string = '';
-  public showPassword: boolean = true;
-  public userId!: number;
+  // Estado
+  public loading = signal(false);
+  public errorMessage = signal<string>('');
+  public showPassword = signal(true);
+  public userId = signal<number>(
+    Number(this.route.snapshot.paramMap.get('id')),
+  );
 
-  form: FormGroup = new FormGroup({
+  // Formulario
+  public form = this.fb.group({
     current_password: new FormControl('', [Validators.required]),
     new_password: new FormControl(this.generatePassword(), [
       Validators.required,
@@ -41,131 +55,140 @@ export class UpdatePasswordComponent {
     ]),
   });
 
-  ngOnInit(): void {
-    this.userId = Number(this.route.snapshot.paramMap.get('id'));
+  /**
+   * Procesa el envío del formulario de actualización de contraseña.
+   */
+  public onSubmit(): void {
+    if (!this.validateForm()) return;
+    this.loading.set(true);
+    this.clearMessages();
+
+    const formData = this.buildFormData();
+
+    this.userService.updatePassword(formData).subscribe({
+      next: (success: string) => this.handleSuccess(success),
+      error: (error) => this.handleError(error),
+      complete: () => this.loading.set(false),
+    });
   }
 
-  onSubmit(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.form.markAllAsTouched();
-    // Verificar si el formulario es válido antes de enviarlo
-    if (this.form.invalid) {
-      this.errorMessage = 'Por favor, complete todos los campos requeridos.';
-      this.loading = false;
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('new_password', this.form.value.new_password);
-    formData.append('current_password', this.form.value.current_password);
-
-    this.userService
-      .updatePassword(formData)
-      .subscribe({
-        next: (success: string) => {
-          this.form.reset();
-          this.notificationService.showSuccess(success); // Mostrar mensaje de éxito
-          this.router.navigate(['/admin/dashboard']);
-        },
-        error: (error) => {
-          if (error.status === 422) {
-            this.errorMessage = this.processErrors(error.error.errors);
-            window.scroll(0, 0);
-          } else {
-            this.errorMessage = error;
-          }
-        },
-      })
-      .add(() => {
-        this.loading = false;
-      });
+  /**
+   * Alterna la visibilidad de la contraseña.
+   */
+  public toggleShowPassword(): void {
+    this.showPassword.set(!this.showPassword());
   }
 
-  processErrors(errors: { [key: string]: string[] }): string {
-    const errorList = Object.keys(errors)
-      .flatMap((key) => errors[key])
-      .map((error) => `${error}</br>`)
-      .join('');
-    return `${errorList}`;
+  /**
+   * Copia una cadena de texto al portapapeles.
+   * @param text - Texto a copiar
+   */
+  public copyToClipboard(text: string): void {
+    navigator.clipboard
+      .writeText(text)
+      .then(() =>
+        this.toastService.success('Contraseña copiada al portapapeles.'),
+      )
+      .catch(() => this.toastService.error('Error al copiar la contraseña.'));
   }
 
-  toggleShowPassword(): void {
-    this.showPassword = !this.showPassword;
-  }
+  /**
+   * Genera una contraseña aleatoria segura.
+   * @returns Cadena con la contraseña generada
+   */
+  public generatePassword(): string {
+    const length = 12;
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const numbers = '0123456789';
+    const symbols = '!@#$%^&*(),.?":{}|<>';
+    const allChars = upper + lower + numbers + symbols;
 
-  passwordValidator() {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const password = control.value;
-
-      // Validar que la contraseña tenga al menos una letra mayúscula
-      const hasUpperCase = /[A-Z]/.test(password);
-
-      // Validar que la contraseña tenga al menos una letra minúscula
-      const hasLowerCase = /[a-z]/.test(password);
-
-      // Validar que la contraseña tenga al menos un número
-      const hasNumber = /\d/.test(password);
-
-      // Validar que la contraseña tenga al menos un carácter especial
-      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-      // Verificar que todas las condiciones se cumplan
-      if (hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
-        return null; // Si la contraseña cumple con todos los requisitos, es válida
-      } else {
-        return {
-          passwordStrength:
-            'La contraseña debe contener al menos: 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.',
-        };
-      }
-    };
-  }
-
-  generatePassword(): string {
-    const length = 12; // Longitud de la contraseña generada
-    const upperCaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowerCaseChars = 'abcdefghijklmnopqrstuvwxyz';
-    const numberChars = '0123456789';
-    const specialChars = '!@#$%^&*(),.?":{}|<>';
-    const allChars =
-      upperCaseChars + lowerCaseChars + numberChars + specialChars;
-
-    // Asegurar al menos un carácter de cada tipo
     const getRandomChar = (chars: string) =>
       chars.charAt(Math.floor(Math.random() * chars.length));
-    const upperCase = getRandomChar(upperCaseChars);
-    const lowerCase = getRandomChar(lowerCaseChars);
-    const number = getRandomChar(numberChars);
-    const special = getRandomChar(specialChars);
 
-    // Rellenar el resto de la contraseña con caracteres aleatorios
-    let password = upperCase + lowerCase + number + special;
+    let password = [
+      getRandomChar(upper),
+      getRandomChar(lower),
+      getRandomChar(numbers),
+      getRandomChar(symbols),
+    ].join('');
+
     for (let i = password.length; i < length; i++) {
       password += getRandomChar(allChars);
     }
 
-    // Mezclar los caracteres para mayor aleatoriedad
     return password
       .split('')
       .sort(() => 0.5 - Math.random())
       .join('');
   }
 
-  copyToClipboard(text: string): void {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        alert('Contraseña copiada al portapapeles.');
-        this.notificationService.showSuccess(
-          'Contraseña copiada al portapapeles.'
-        );
-      })
-      .catch((err) => {
-        this.notificationService.showError('Error al copiar la contraseña.');
-        console.error('Error al copiar al portapapeles:', err);
-      });
+  // Métodos privados
+
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
+      window.scroll(0, 0);
+      this.loading.set(false);
+      return false;
+    }
+
+    return true;
+  }
+
+  private clearMessages(): void {
+    this.errorMessage.set('');
+  }
+
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    formData.append('new_password', this.form.value.new_password!);
+    formData.append('current_password', this.form.value.current_password!);
+    return formData;
+  }
+
+  private handleSuccess(success: string): void {
+    this.form.reset();
+    this.toastService.success(success);
+    this.router.navigate(['/admin/dashboard']);
+  }
+
+  private handleError(error: any): void {
+    if (error.status === 422) {
+      this.errorMessage.set(this.processErrors(error.error.errors));
+      window.scroll(0, 0);
+    } else {
+      this.errorMessage.set(error);
+    }
+  }
+
+  private processErrors(errors: { [key: string]: string[] }): string {
+    return Object.keys(errors)
+      .flatMap((key) => errors[key])
+      .map((err) => `${err}</br>`)
+      .join('');
+  }
+
+  private passwordValidator() {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const password = control.value;
+
+      const hasUpper = /[A-Z]/.test(password);
+      const hasLower = /[a-z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+      if (hasUpper && hasLower && hasNumber && hasSymbol) {
+        return null;
+      }
+
+      return {
+        passwordStrength:
+          'La contraseña debe contener al menos: 8 caracteres, una letra mayúscula, una letra minúscula, un número y un carácter especial.',
+      };
+    };
   }
 }

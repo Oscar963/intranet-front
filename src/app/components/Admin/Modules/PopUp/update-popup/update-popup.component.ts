@@ -1,18 +1,34 @@
-import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
-import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
-import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import dayjs from 'dayjs/esm';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { PopupService } from '@services/popup.service';
+/** Componente para actualizar un popup */
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { ReactiveFormsModule, Validators, FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ViewportScroller } from '@angular/common';
+import { take, finalize, tap } from 'rxjs';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
-import { ActivatedRoute } from '@angular/router';
-import { Router } from '@angular/router';
+import dayjs from 'dayjs/esm';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+import { PopupService } from '@services/popup.service';
 import { ToastService } from '@services/toast.service';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { take, tap } from 'rxjs';
 import { Popup } from '@interfaces/Popup';
+import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
+
+// Interfaz para errores HTTP esperados
+interface HttpValidationError {
+  status: number;
+  error: {
+    errors: { [key: string]: string[] };
+  };
+}
 
 @Component({
   selector: 'app-update-popup',
@@ -22,52 +38,69 @@ import { Popup } from '@interfaces/Popup';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdatePopupComponent {
-  // Referencia al componente de subida de imágenes.
-  // Se usa para obtener la imagen seleccionada.
-  @ViewChild(UploadSimpleImgComponent)
-  UploadSimpleImg!: UploadSimpleImgComponent;
+  // Servicios inyectados
+  private readonly popupService = inject(PopupService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
+  private readonly scroller = inject(ViewportScroller);
+  private readonly bsLocaleService = inject(BsLocaleService);
 
-  //Inyección de servicios usando la nueva API de Angular.
-  private popupService = inject(PopupService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private fb = inject(FormBuilder);
+  // Referencias a componentes hijos
+  public uploadSimpleImg =
+    viewChild.required<UploadSimpleImgComponent>('uploadSimpleImgRef');
 
-  // Variables de estado reactivas
+  // Estado de carga y errores
   public loading = signal(false);
-  public errorMessage = signal<string>('');
-  public popupId = signal<number>(
+  public errorMessage = signal<string[]>([]);
+
+  // ID del popup desde la URL
+  public readonly popupId = signal<number>(
     Number(this.route.snapshot.paramMap.get('id')),
   );
 
-  constructor(private bsLocaleService: BsLocaleService) {
-    // Configura el idioma del datepicker
-    defineLocale('es', esLocale);
-    this.bsLocaleService.use('es');
-    dayjs.extend(customParseFormat);
-  }
+  // Estado local del popup cargado
+  public popupResource = signal<Popup | null>(null);
 
-  // Definición del formulario con validaciones
-  form = this.fb.group({
-    title: ['', Validators.required],
-    date_expiration: ['', Validators.required],
-    status: ['', Validators.required],
-    link: '',
-  });
-
-  //Cargando datos de objeto
-  popupRs = rxResource<Popup, void>({
+  // Recurso reactivo usando rxResource
+  public popupLoader = rxResource<Popup, void>({
     loader: () =>
       this.popupService
         .getPopupById(this.popupId())
         .pipe(tap((response) => this.setData(response))),
   });
 
-  //Maneja el envío del formulario.
-  //Valida el formulario, construye los datos y los envía al backend.
-  onSubmit(): void {
+  // Formulario reactivo
+  public form = this.fb.nonNullable.group({
+    title: this.fb.nonNullable.control('', Validators.required),
+    date_expiration: this.fb.nonNullable.control('', Validators.required),
+    status: this.fb.nonNullable.control('', Validators.required),
+    link: this.fb.nonNullable.control(''),
+  });
+
+  constructor() {
+    defineLocale('es', esLocale);
+    this.bsLocaleService.use('es');
+    dayjs.extend(customParseFormat);
+  }
+
+  /** Guarda los datos en el signal y rellena el formulario */
+  private setData(popup: Popup): void {
+    this.popupResource.set(popup);
+
+    this.form.patchValue({
+      title: popup.title,
+      date_expiration: popup.date_expiration,
+      status: popup.status,
+      link: popup.link || '',
+    });
+  }
+
+  /** Envía el formulario si es válido */
+  public onSubmit(): void {
     if (!this.validateForm()) return;
+
     this.loading.set(true);
     this.clearMessages();
 
@@ -75,110 +108,99 @@ export class UpdatePopupComponent {
 
     this.popupService
       .updatePopup(this.popupId(), formData)
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        finalize(() => this.loading.set(false)),
+      )
       .subscribe({
         next: (success: string) => this.handleSuccess(success),
-                error: (error) => {
-          this.loading.set(false);
-          this.handleError(error);
-        },
-        complete: () => this.loading.set(false),
-      })
-      .add(() => {
-        this.loading.set(false);
+        error: (error: HttpValidationError) => this.handleError(error),
       });
   }
 
-  private setData(response: Popup) {
-    if (response) {
-      this.form.patchValue({
-        title: response.title,
-        date_expiration: response.date_expiration,
-        status: response.status,
-        link: response.link || '',
-      });
-    }
-  }
-
+  // Limpia los mensajes de error anteriores
   private clearMessages(): void {
-    this.errorMessage.set('');
+    this.errorMessage.set([]);
   }
 
-  // Construye los datos a enviar en `FormData`
+  // Valida el formulario y muestra errores si es inválido
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set([
+        'Por favor, complete todos los campos requeridos.',
+      ]);
+      this.scroller.scrollToPosition([0, 0]);
+      return false;
+    }
+
+    return true;
+  }
+
+  // Construye el FormData para enviar al backend
   private buildFormData(): FormData {
     const formData = new FormData();
-    formData.append('_method', 'PUT');
-    formData.append('title', this.form.value.title!);
+    const controls = this.form.controls;
+
+    formData.append('_method', 'PUT'); // Laravel necesita esto si usas POST para update
+    formData.append('title', controls.title.value);
     formData.append(
       'date_expiration',
-      this.formatDate(this.form.value.date_expiration),
+      this.formatDate(controls.date_expiration.value),
     );
+    formData.append('status', controls.status.value);
+    formData.append('link', controls.link.value);
 
-    formData.append('status', this.form.value.status!);
-    formData.append('link', this.form.value.link!);
-
-    // Agregar la imagen si está disponible
-    const image = this.UploadSimpleImg.getFile();
-    if (image) formData.append('image', image);
+    const image = this.uploadSimpleImg().getFile();
+    if (image) {
+      formData.append('image', image);
+    }
 
     return formData;
   }
 
-  // Maneja la respuesta exitosa del backend
+  // Maneja una respuesta exitosa del backend
   private handleSuccess(success: string): void {
     this.resetForm();
     this.toastService.success(success);
     this.router.navigate(['/admin/popups']);
   }
 
-  // Valida el formulario antes de enviarlo
-  private validateForm(): boolean {
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
-      window.scroll(0, 0);
-      return false;
-    }
-    return true;
-  }
-
-  // Maneja los errores del backend
-  private handleError(error: any): void {
+  // Procesa errores HTTP y muestra mensajes adecuados
+  private handleError(error: HttpValidationError): void {
     if (error.status === 422) {
       this.errorMessage.set(this.processErrors(error.error.errors));
-      window.scroll(0, 0);
+      this.scroller.scrollToPosition([0, 0]);
     } else {
-      this.errorMessage.set(error);
+      this.errorMessage.set(['Ocurrió un error inesperado.']);
     }
   }
 
-  // Reinicia el formulario y limpia los archivos
+  // Convierte errores de validación a un arreglo de strings
+  private processErrors(errors: { [key: string]: string[] }): string[] {
+    return Object.values(errors).flat();
+  }
+
+  // Resetea el formulario
   private resetForm(): void {
     this.form.reset();
-    this.UploadSimpleImg.removeAllFiles();
+    this.uploadSimpleImg().removeAllFiles();
   }
 
-  // Procesa los errores de validación del backend
-  private processErrors(errors: { [key: string]: string[] }): string {
-    const errorList = Object.keys(errors)
-      .flatMap((key) => errors[key])
-      .map((error) => `${error}</br>`)
-      .join('');
-    return `${errorList}`;
-  }
-
-  // Formatea la fecha para el backend
-  public formatDate(date: any): string {
+  /**
+   * Formatea la fecha para el backend
+   * @param date - Fecha a formatear
+   * @returns Fecha formateada en formato 'YYYY-MM-DD HH:mm'
+   */
+  private formatDate(date: any): string {
     if (
       typeof date === 'string' &&
       dayjs(date, 'DD-MM-YYYY HH:mm:ss', true).isValid()
     ) {
-      // Si la fecha es un string con formato 'DD-MM-YYYY HH:mm:ss', convertir a 'YYYY-MM-DD HH:mm'
       return dayjs(date, 'DD-MM-YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm');
     }
 
-    // Si la fecha es un objeto Date o una fecha en formato largo, convertirla directamente
     const fechaParseada = dayjs(date);
     if (fechaParseada.isValid()) {
       return fechaParseada.format('YYYY-MM-DD HH:mm');

@@ -1,20 +1,34 @@
+/** Componente para crear un nuevo banner */
 import {
   ChangeDetectionStrategy,
   Component,
   inject,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
-import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { BannerService } from '@services/banner.service';
+import { Router } from '@angular/router';
+import { take, finalize } from 'rxjs';
+import { ViewportScroller } from '@angular/common';
+
+// Componentes y servicios de terceros
 import { BsDatepickerModule, BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { defineLocale } from 'ngx-bootstrap/chronos';
 import { esLocale } from 'ngx-bootstrap/locale';
-import { Router } from '@angular/router';
-import { ToastService } from '@services/toast.service';
-import { take } from 'rxjs';
 import dayjs from 'dayjs/esm';
+
+// Componentes y servicios locales
+import { UploadSimpleImgComponent } from '@shared/upload-simple-img/upload-simple-img.component';
+import { BannerService } from '@services/banner.service';
+import { ToastService } from '@services/toast.service';
+
+// Interfaz para errores HTTP esperados
+interface HttpValidationError {
+  status: number;
+  error: {
+    errors: { [key: string]: string[] };
+  };
+}
 
 @Component({
   selector: 'app-store-banner',
@@ -24,38 +38,37 @@ import dayjs from 'dayjs/esm';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreBannerComponent {
-  // Referencia al componente de subida de imágenes.
-  // Se usa para obtener la imagen seleccionada.
-  @ViewChild(UploadSimpleImgComponent)
-  UploadSimpleImg!: UploadSimpleImgComponent;
+  // Referencias a componentes
+  public uploadSimpleFileImg =
+    viewChild.required<UploadSimpleImgComponent>('uploadSimpleImgRef');
 
-  //Inyección de servicios usando la nueva API de Angular.
-  private bannerService = inject(BannerService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
+  // Servicios inyectados
+  private readonly bannerService = inject(BannerService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly scroller = inject(ViewportScroller);
+  private readonly bsLocaleService = inject(BsLocaleService);
 
-  // Variables de estado reactivas
+  // Estado de carga y mensajes de error
   public loading = signal(false);
-  public errorMessage = signal<string>('');
+  public errorMessage = signal<string[]>([]);
 
-  constructor(private bsLocaleService: BsLocaleService) {
-    // Configura el idioma del datepicker
+  // Formulario reactivo para el banner
+  public form = this.fb.nonNullable.group({
+    title: this.fb.nonNullable.control('', Validators.required),
+    date_expiration: this.fb.nonNullable.control('', Validators.required),
+    status: this.fb.nonNullable.control('', Validators.required),
+    link: this.fb.nonNullable.control(''),
+  });
+
+  constructor() {
     defineLocale('es', esLocale);
     this.bsLocaleService.use('es');
   }
 
-  // Definición del formulario con validaciones
-  form = this.fb.group({
-    title: ['', Validators.required],
-    date_expiration: ['', Validators.required],
-    status: ['', Validators.required],
-    link: '',
-  });
-
-  //Maneja el envío del formulario.
-  //Valida el formulario, construye los datos y los envía al backend.
-  onSubmit(): void {
+  /** Envía el formulario si es válido */
+  public onSubmit(): void {
     if (!this.validateForm()) return;
 
     this.loading.set(true);
@@ -65,80 +78,17 @@ export class StoreBannerComponent {
 
     this.bannerService
       .storeBanner(formData)
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        finalize(() => this.loading.set(false)),
+      )
       .subscribe({
         next: (success: string) => this.handleSuccess(success),
-        error: (error) => {
-          this.loading.set(false);
-          this.handleError(error);
-        },
-        complete: () => this.loading.set(false),
+        error: (error: HttpValidationError) => this.handleError(error),
       });
   }
 
-  // Limpia los mensajes de error y éxito
-  private clearMessages(): void {
-    this.errorMessage.set('');
-  }
-
-  // Construye los datos a enviar en `FormData`
-  private buildFormData(): FormData {
-    const formData = new FormData();
-    formData.append('title', this.form.get('title')?.value ?? '');
-    formData.append(
-      'date_expiration',
-      this.formatDateToInternal(this.form.get('date_expiration')?.value ?? ''),
-    );
-    formData.append('status', this.form.get('status')?.value ?? '');
-    formData.append('link', this.form.get('link')?.value ?? '');
-
-    // Agregar la imagen si está disponible
-    const image = this.UploadSimpleImg.getFile();
-    if (image) formData.append('image', image);
-
-    return formData;
-  }
-
-  // Maneja la respuesta exitosa del backend
-  private handleSuccess(success: string): void {
-    this.resetForm();
-    this.toastService.success(success);
-    this.router.navigate(['/admin/banners']);
-  }
-
-  // Valida el formulario antes de enviarlo
-  private validateForm(): boolean {
-    this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
-      window.scrollTo(0, 0);
-      return false;
-    }
-    return true;
-  }
-
-  // Maneja los errores del backend
-  private handleError(error: any): void {
-    if (error.status === 422) {
-      this.errorMessage.set(this.processErrors(error.error.errors));
-    } else {
-      this.errorMessage.set(error.message || 'Ocurrió un error inesperado.');
-    }
-    window.scrollTo(0, 0);
-  }
-  // Reinicia el formulario y limpia los archivos
-  private resetForm(): void {
-    this.form.reset();
-    this.UploadSimpleImg.removeAllFiles();
-  }
-
-  // Procesa los errores de validación del backend
-  private processErrors(errors: { [key: string]: string[] }): string {
-    return Object.values(errors).flat().join('\n');
-  }
-
-  // Maneja el cambio de fecha en el datepicker
+  /** Maneja el cambio de fecha en el datepicker */
   public onDateChange(value: any): void {
     if (value) {
       this.form
@@ -147,7 +97,75 @@ export class StoreBannerComponent {
     }
   }
 
-  // Convierte la fecha al formato interno deseado
+  // Limpia los mensajes de error anteriores
+  private clearMessages(): void {
+    this.errorMessage.set([]);
+  }
+
+  // Reinicia el formulario tras éxito
+  private resetForm(): void {
+    this.form.reset();
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+    this.uploadSimpleFileImg().removeAllFiles();
+  }
+
+  // Valida el formulario y muestra errores si es inválido
+  private validateForm(): boolean {
+    this.form.markAllAsTouched();
+
+    if (this.form.invalid) {
+      this.errorMessage.set([
+        'Por favor, complete todos los campos requeridos.',
+      ]);
+      this.scroller.scrollToPosition([0, 0]);
+      return false;
+    }
+    return true;
+  }
+
+  // Construye el FormData para enviar al backend
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    const controls = this.form.controls;
+
+    formData.append('title', controls.title.value);
+    formData.append(
+      'date_expiration',
+      this.formatDateToInternal(controls.date_expiration.value),
+    );
+    formData.append('status', controls.status.value);
+    formData.append('link', controls.link.value);
+
+    const image = this.uploadSimpleFileImg().getFile();
+    if (image) formData.append('image', image);
+
+    return formData;
+  }
+
+  // Maneja una respuesta exitosa del backend
+  private handleSuccess(success: string): void {
+    this.toastService.success(success);
+    this.router.navigate(['/admin/banners']);
+    this.resetForm();
+  }
+
+  // Procesa errores HTTP y muestra mensajes adecuados
+  private handleError(error: HttpValidationError): void {
+    if (error.status === 422) {
+      this.errorMessage.set(this.processErrors(error.error.errors));
+      this.scroller.scrollToPosition([0, 0]);
+    } else {
+      this.errorMessage.set(['Ocurrió un error inesperado.']);
+    }
+  }
+
+  // Convierte errores de validación a un arreglo de strings
+  private processErrors(errors: { [key: string]: string[] }): string[] {
+    return Object.values(errors).flat();
+  }
+
+  // Formatea la fecha al formato interno
   private formatDateToInternal(date: any): string {
     return dayjs(date).format('YYYY-MM-DD HH:mm');
   }

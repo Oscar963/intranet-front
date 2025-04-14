@@ -19,7 +19,7 @@ export class AuthService {
     maternal_surname: '',
     rut: '',
     email: '',
-    status: 0,
+    status: '',
   });
 
   constructor(

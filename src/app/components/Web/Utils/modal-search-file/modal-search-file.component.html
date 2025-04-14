@@ -1,0 +1,164 @@
+<div
+  class="modal modal-blur fade"
+  id="modal-search"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  #modalSearchFileRef
+>
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Buscar documento</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      @if (filesLoader.isLoading()) {
+        <div class="progress progress-sm">
+          <div class="progress-bar progress-bar-indeterminate"></div>
+        </div>
+      }
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label"></label>
+          <div class="row g-2">
+            <div class="col">
+              <input
+                (input)="name.set(txtNameRef.value)"
+                type="text"
+                class="form-control form-control-rounded"
+                placeholder="Escribe el nombre del archivo..."
+                #txtNameRef
+              />
+            </div>
+            <div class="col-auto">
+              @if (!filesLoader.isLoading()) {
+                <a href="#" class="btn btn-icon" aria-label="Button">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-search"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                    <path d="M21 21l-6 -6" />
+                  </svg>
+                </a>
+              } @else {
+                <a href="#" class="btn btn-icon" aria-label="Button">
+                  <div
+                    class="spinner-border spinner-border-sm text-secondary"
+                    role="status"
+                  ></div>
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table-vcenter table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Tamaño</th>
+                <th>Tipo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody class="align-middle">
+              @if (filesLoader.isLoading()) {
+                <tr>
+                  <td colspan="8" class="text-secondary text-center">
+                    Cargando datos...
+                  </td>
+                </tr>
+              } @else {
+                @for (item of filesLoader.value(); track item.id) {
+                  <tr>
+                    <td>
+                      <img
+                        style="max-width: 50px"
+                        [src]="getFileImage(item.type)"
+                        [alt]="item.name"
+                      />
+                    </td>
+                    <td>
+                      <span class="text-secondary">{{ item.name }}</span>
+                    </td>
+                    <td>
+                      <span class="text-secondary">{{ item.description }}</span>
+                    </td>
+                    <td>
+                      <span class="text-secondary">{{ item.size }}MB</span>
+                    </td>
+                    <td>
+                      <span class="text-secondary">{{ item.type }}</span>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="btn"
+                        (click)="downloadFile(item.id, item.name)"
+                      >
+                        <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="icon icon-tabler icons-tabler-outline icon-tabler-download"
+                        >
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path
+                            d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"
+                          />
+                          <path d="M7 11l5 5l5 -5" />
+                          <path d="M12 4l0 12" />
+                        </svg>
+                        Descargar
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="8" class="text-secondary text-center">
+                      No se encontraron registros
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a
+          href="#"
+          class="btn btn-link link-secondary btn-3"
+          data-bs-dismiss="modal"
+        >
+          Cerrar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

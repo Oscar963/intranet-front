@@ -1,12 +1,19 @@
-<header class="navbar-expand-md">
+<nav class="navbar-expand-md" role="navigation" aria-label="Menú principal">
   <div class="navbar-collapse collapse" id="navbar-menu">
     <div class="navbar">
       <div class="container-xl">
-        <ul class="navbar-nav">
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/dashboard']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+        <ul class="navbar-nav" role="menubar">
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/dashboard']"
+              role="menuitem"
+              aria-label="Ir al dashboard"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="icon"
@@ -18,6 +25,8 @@
                   fill="none"
                   stroke-linecap="round"
                   stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M5 12l-2 0l9 -9l9 9l-2 0" />
@@ -25,13 +34,21 @@
                   <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Inicio </span>
+              <span class="nav-link-title">Inicio</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/banners']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/banners']"
+              role="menuitem"
+              aria-label="Gestionar banners"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -43,6 +60,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-photo"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M15 8h.01" />
@@ -53,13 +72,21 @@
                   <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Banners </span>
+              <span class="nav-link-title">Banners</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/pages']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/pages']"
+              role="menuitem"
+              aria-label="Gestionar páginas"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -71,6 +98,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-world-download"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M21 12a9 9 0 1 0 -9 9" />
@@ -81,13 +110,21 @@
                   <path d="M18 14v7m-3 -3l3 3l3 -3" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Páginas </span>
+              <span class="nav-link-title">Páginas</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/popups']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/popups']"
+              role="menuitem"
+              aria-label="Gestionar popups"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -99,6 +136,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-app-window"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path
@@ -108,13 +147,21 @@
                   <path d="M9 8h.01" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Popups </span>
+              <span class="nav-link-title">Popups</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/anexos']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/anexos']"
+              role="menuitem"
+              aria-label="Gestionar anexos"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -126,6 +173,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-device-landline-phone"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path
@@ -141,13 +190,21 @@
                   <path d="M6 17v.01" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Anexos </span>
+              <span class="nav-link-title">Anexos</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/mobiles']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/mobiles']"
+              role="menuitem"
+              aria-label="Gestionar celulares"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -159,6 +216,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-device-mobile"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path
@@ -168,13 +227,21 @@
                   <path d="M12 17v.01" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Celulares </span>
+              <span class="nav-link-title">Celulares</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/users']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/users']"
+              role="menuitem"
+              aria-label="Gestionar usuarios"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -186,6 +253,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
@@ -194,13 +263,21 @@
                   <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Usuarios </span>
+              <span class="nav-link-title">Usuarios</span>
             </a>
           </li>
-          <li class="nav-item" [routerLinkActive]="['active']">
-            <a class="nav-link" [routerLink]="['/admin/files']">
-              <span class="nav-link-icon d-md-none d-lg-inline-block"
-                ><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+
+          <li class="nav-item" [routerLinkActive]="['active']" role="none">
+            <a
+              class="nav-link"
+              [routerLink]="['/admin/files']"
+              role="menuitem"
+              aria-label="Gestionar archivos"
+            >
+              <span
+                class="nav-link-icon d-md-none d-lg-inline-block"
+                aria-hidden="true"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -212,6 +289,8 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="icon icon-tabler icons-tabler-outline icon-tabler-file-upload"
+                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                   <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -222,12 +301,11 @@
                   <path d="M9.5 13.5l2.5 -2.5l2.5 2.5" />
                 </svg>
               </span>
-              <span class="nav-link-title"> Archivos </span>
+              <span class="nav-link-title">Archivos</span>
             </a>
           </li>
         </ul>
       </div>
     </div>
   </div>
-</header>
-
+</nav>

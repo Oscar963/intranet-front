@@ -1,21 +1,23 @@
-<div class="page">
-  <!-- Header condicional mientras carga -->
+<div class="page" role="document">
   @if (userResource.isLoading()) {
-    <!-- Opcional: Puedes añadir un spinner de carga aquí -->
-    <div class="spinner-border">Cargando...</div>
+    <div class="spinner-border" role="status" aria-live="polite">
+      <span class="visually-hidden">Cargando contenido de la página...</span>
+    </div>
   } @else {
     <app-header
       [user]="userResource.value()"
-      [nameAvatar]="nameAvatar()"
+      [avatarName]="avatarName()"
       aria-label="Cabecera de administración"
+      role="banner"
     />
   }
 
-  <!-- Barra de navegación -->
-  <app-navbar aria-label="Navegación principal" />
+  <app-navbar aria-label="Navegación principal" role="navigation" />
 
-  <!-- Contenido principal -->
-  <main class="page-wrapper" role="main">
-    <router-outlet aria-label="Contenido dinámico" />
+  <main class="page-wrapper" role="main" aria-label="Contenido principal">
+    <router-outlet
+      aria-label="Contenido dinámico de la aplicación"
+      role="region"
+    />
   </main>
 </div>
