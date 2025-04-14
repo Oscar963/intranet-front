@@ -19,6 +19,10 @@ import { ModalFileUploadComponent } from '@components/Admin/Modules/Page/modal-f
 import { PageService } from '@services/page.service';
 import { ModalUpdateFileUploadComponent } from '@components/Admin/Modules/Page/modal-update-file-upload/modal-update-file-upload.component';
 
+/**
+ * Componente para gestionar y visualizar archivos asociados a una página.
+ * Permite la visualización, descarga, eliminación y actualización de archivos.
+ */
 @Component({
   selector: 'app-file-index-page',
   imports: [
@@ -31,27 +35,30 @@ import { ModalUpdateFileUploadComponent } from '@components/Admin/Modules/Page/m
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileIndexPageComponent {
-  private fileService = inject(FileService);
-  private toastService = inject(ToastService);
-  private pageService = inject(PageService);
+  // Servicios
+  private readonly fileService = inject(FileService);
+  private readonly toastService = inject(ToastService);
+  private readonly pageService = inject(PageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
+  // Referencias
+  public readonly uploadEditFile =
+    viewChild.required<ModalUpdateFileUploadComponent>(
+      'uploadModalFileEditRef',
+    );
 
+  // Estado
   public pageId = signal<number>(
     Number(this.route.snapshot.paramMap.get('idpage')),
   );
-
-  public uploadEditFile = viewChild.required<ModalUpdateFileUploadComponent>(
-    'uploadModalFileEditRef',
-  ); // Capturamos la referencia del componente  ModalUpdateFileUploadComponent
-
   public query = signal<string>('');
   public show = signal<number>(15);
   public meta = signal<any>({});
   public page = signal<number>(1);
 
-  values = [
+  // Configuración
+  public readonly values = [
     { value: '15', label: '15' },
     { value: '50', label: '50' },
     { value: '100', label: '100' },
@@ -59,22 +66,14 @@ export class FileIndexPageComponent {
   ];
 
   constructor() {
-    // Efecto para sincronizar `page` con la URL
-    effect(() => {
-      this.route.params.subscribe((params) => {
-        this.page.set(+params['page'] || 1);
-      });
-    });
-    // Efecto para actualizar la URL en 1 cuando se cambia la consulta
-    effect(() => {
-      if (this.page() !== 1 && this.query() !== '') {
-        this.page.set(1);
-        this.router.navigate(['admin/pages/files', this.pageId()]);
-      }
-    });
+    this.setupEffects();
   }
 
-  public filesRs = rxResource<
+  /**
+   * Recurso reactivo para obtener la lista de archivos.
+   * Actualiza automáticamente cuando cambian los parámetros de búsqueda.
+   */
+  public readonly filesRs = rxResource<
     File[],
     { idpage: number; query: string; page: number; show: number }
   >({
@@ -88,32 +87,119 @@ export class FileIndexPageComponent {
       return this.pageService
         .fetchFile(request.idpage, request.query, request.page, request.show)
         .pipe(
-          // Usamos map para transformar la respuesta
           map((response) => {
-            // Actualizamos la metadata
-            this.meta.set({
-              current_page: response.data.meta?.current_page ?? 1,
-              last_page: response.data.meta?.last_page ?? 1,
-              from: response.data.meta?.from ?? 0,
-              to: response.data.meta?.to ?? 0,
-              total: response.data.meta?.total ?? 0,
-              links:
-                response.data.meta?.links?.map((link: any, index: number) => ({
-                  id: `link-${index}`, // Clave única generada para cada enlace
-                  label: link.label ?? '',
-                  page: this.extractPage(link.url) ?? null,
-                  active: link.active ?? false,
-                })) ?? [],
-            });
-
-            // Convertimos explícitamente a File[] y retornamos los datos
+            this.updateMeta(response.data.meta);
             return response.data.data as File[];
           }),
         );
     },
   });
 
-  public deleteItem(id: number) {
+  /**
+   * Elimina un archivo después de confirmación del usuario.
+   * @param id - ID del archivo a eliminar
+   */
+  public deleteItem(id: number): void {
+    this.showDeleteConfirmation(id);
+  }
+
+  /**
+   * Navega a una página específica de resultados.
+   * @param page - Número de página a la que navegar
+   */
+  public goToPage(page: number | null): void {
+    if (page && page > 0 && page <= this.meta().last_page) {
+      this.router.navigate(['admin/pages/files', this.pageId(), 'page', page]);
+    }
+  }
+
+  /**
+   * Descarga un archivo específico.
+   * @param fileId - ID del archivo a descargar
+   * @param fileName - Nombre del archivo
+   */
+  public downloadFile(fileId: number, fileName: string): void {
+    this.showLoadingIndicator('Descargando...');
+    this.fileService.downloadFile(fileId).subscribe({
+      next: (response) => this.handleDownloadSuccess(response, fileName),
+      error: (error) => this.handleDownloadError(error),
+    });
+  }
+
+  /**
+   * Copia una URL al portapapeles.
+   * @param text - Texto a copiar
+   */
+  public copyToClipboard(text: string): void {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => this.toastService.info('URL copiada al portapapeles.'))
+      .catch(() => this.toastService.error('Error al copiar la URL.'));
+  }
+
+  /**
+   * Abre el modal de edición para un archivo específico.
+   * @param file - Datos del archivo a editar
+   */
+  public openModalEdit(file: any): void {
+    this.uploadEditFile().openModal(file);
+  }
+
+  /**
+   * Obtiene la ruta del icono según el tipo de archivo.
+   * @param fileType - Tipo de archivo
+   * @returns Ruta del icono correspondiente
+   */
+  public getFileImage(fileType: string): string {
+    const iconMap: Record<string, string> = {
+      PDF: '/assets/icons/files/pdf.png',
+      Word: '/assets/icons/files/doc.png',
+      Excel: '/assets/icons/files/xls.png',
+      PowerPoint: '/assets/icons/files/ppt.png',
+      'Video MP4': '/assets/icons/files/mp4.png',
+      'Imagen JPEG': '/assets/icons/files/jpg-file.png',
+      'Imagen JPG': '/assets/icons/files/jpg-file.png',
+      'Imagen PNG': '/assets/icons/files/png.png',
+      'Imagen GIF': '/assets/icons/files/gif.png',
+      'Archivo ZIP': '/assets/icons/files/zip.png',
+    };
+    return iconMap[fileType] || '/assets/icons/files/failure.png';
+  }
+
+  // Métodos privados
+  private setupEffects(): void {
+    effect(() => {
+      this.route.params.subscribe((params) => {
+        this.page.set(+params['page'] || 1);
+      });
+    });
+
+    effect(() => {
+      if (this.page() !== 1 && this.query() !== '') {
+        this.page.set(1);
+        this.router.navigate(['admin/pages/files', this.pageId()]);
+      }
+    });
+  }
+
+  private updateMeta(meta: any): void {
+    this.meta.set({
+      current_page: meta?.current_page ?? 1,
+      last_page: meta?.last_page ?? 1,
+      from: meta?.from ?? 0,
+      to: meta?.to ?? 0,
+      total: meta?.total ?? 0,
+      links:
+        meta?.links?.map((link: any, index: number) => ({
+          id: `link-${index}`,
+          label: link.label ?? '',
+          page: this.extractPage(link.url) ?? null,
+          active: link.active ?? false,
+        })) ?? [],
+    });
+  }
+
+  private showDeleteConfirmation(id: number): void {
     Swal.fire({
       title: '¿Estás seguro que desea eliminar el archivo?',
       text: '¡Esta acción no podrá ser revertida!',
@@ -125,107 +211,95 @@ export class FileIndexPageComponent {
       cancelButtonText: 'No, cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Eliminando...',
-          html: 'Por favor, espera mientras se elimina el registro.',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          },
-        });
-
-        this.fileService.deleteFile(id).subscribe({
-          next: (success: string) => {
-            Swal.close();
-            Swal.fire({
-              title: '¡Eliminado!',
-              text: success,
-              icon: 'success',
-              confirmButtonColor: '#06048c',
-              confirmButtonText: 'Cerrar',
-            });
-            this.filesRs.reload();
-          },
-          error: (error) => {
-            Swal.close();
-            Swal.fire({
-              title: 'Error',
-              text: error.message || 'No se pudo eliminar el registro.',
-              icon: 'error',
-              confirmButtonColor: '#d63939',
-              confirmButtonText: 'Cerrar',
-            });
-          },
-        });
+        this.executeDelete(id);
       }
     });
   }
 
-  public goToPage(page: number | null): void {
-    if (page && page > 0 && page <= this.meta().last_page) {
-      this.router.navigate(['admin/pages/files', this.pageId(), 'page', page]);
-    }
+  private executeDelete(id: number): void {
+    this.showLoadingIndicator('Eliminando...');
+    this.fileService.deleteFile(id).subscribe({
+      next: (success) => this.handleDeleteSuccess(success),
+      error: (error) => this.handleDeleteError(error),
+    });
+  }
+
+  private showLoadingIndicator(title: string): void {
+    Swal.fire({
+      title,
+      html: 'Por favor, espera mientras se procesa la solicitud.',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+  }
+
+  private handleDeleteSuccess(success: string): void {
+    Swal.close();
+    Swal.fire({
+      title: '¡Eliminado!',
+      text: success,
+      icon: 'success',
+      confirmButtonColor: '#06048c',
+      confirmButtonText: 'Cerrar',
+    });
+    this.filesRs.reload();
+  }
+
+  private handleDeleteError(error: any): void {
+    Swal.close();
+    Swal.fire({
+      title: 'Error',
+      text: error.message || 'No se pudo eliminar el registro.',
+      icon: 'error',
+      confirmButtonColor: '#d63939',
+      confirmButtonText: 'Cerrar',
+    });
+  }
+
+  private handleDownloadSuccess(
+    response: HttpResponse<Blob>,
+    fileName: string,
+  ): void {
+    Swal.close();
+    const headers = response.headers;
+    const fileExtension = this.getFileExtension(headers, fileName);
+    const url = window.URL.createObjectURL(response.body!);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileExtension);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    Swal.fire({
+      title: '¡Listo!',
+      text: 'Archivo descargado',
+      icon: 'success',
+      confirmButtonColor: '#06048c',
+      confirmButtonText: 'Cerrar',
+    });
+  }
+
+  private handleDownloadError(error: any): void {
+    Swal.close();
+    const errorMessage =
+      error.error?.message ||
+      error.message ||
+      'No se pudo descargar el archivo.';
+    Swal.fire({
+      title: 'Error',
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonColor: '#d63939',
+      confirmButtonText: 'Cerrar',
+    });
   }
 
   private extractPage(url: string | null): number | null {
     if (!url) return null;
     const match = url.match(/page=(\d+)/);
     return match ? parseInt(match[1], 10) : null;
-  }
-
-  public downloadFile(fileId: number, fileName: string) {
-    Swal.fire({
-      title: 'Descargando...',
-      html: 'Por favor, espera mientras se descarga el archivo.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    this.fileService.downloadFile(fileId).subscribe({
-      next: (response: HttpResponse<Blob>) => {
-        Swal.close();
-
-        const headers = response.headers;
-        const fileExtension = this.getFileExtension(headers, fileName);
-        const url = window.URL.createObjectURL(response.body!);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', fileExtension);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.URL.revokeObjectURL(url);
-
-        Swal.fire({
-          title: '¡Listo!',
-          text: 'Archivo descargado',
-          icon: 'success',
-          confirmButtonColor: '#06048c',
-          confirmButtonText: 'Cerrar',
-        });
-      },
-      error: (error) => {
-        Swal.close();
-        console.error('Error descargando archivo:', error);
-
-        let errorMessage = 'No se pudo descargar el archivo.';
-        if (error.error && error.error.message) {
-          errorMessage = error.error.message;
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-
-        Swal.fire({
-          title: 'Error',
-          text: errorMessage,
-          icon: 'error',
-          confirmButtonColor: '#d63939',
-          confirmButtonText: 'Cerrar',
-        });
-      },
-    });
   }
 
   private getFileExtension(headers: HttpHeaders, fileName: string): string {
@@ -237,50 +311,9 @@ export class FileIndexPageComponent {
           fileExtension = '.jpg';
         } else if (contentType.startsWith('application/pdf')) {
           fileExtension = '.pdf';
-        } // Puedes añadir más tipos de contenido aquí
+        }
       }
     }
     return fileExtension;
-  }
-
-  public copyToClipboard(text: string): void {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        this.toastService.info('URL copiada al portapapeles.');
-      })
-      .catch((err) => {
-        this.toastService.error('Error al copiar la URL.');
-      });
-  }
-
-  public openModalEdit(file: any) {
-    this.uploadEditFile().openModal(file);
-  }
-
-  public getFileImage(fileType: string): string {
-    switch (fileType) {
-      case 'PDF':
-        return '/assets/icons/files/pdf.png'; // Ruta a tu imagen PDF
-      case 'Word':
-        return '/assets/icons/files/doc.png'; // Ruta a tu imagen Word
-      case 'Excel':
-        return '/assets/icons/files/xls.png'; // Ruta a tu imagen Excel
-      case 'PowerPoint':
-        return '/assets/icons/files/ppt.png'; // Ruta a tu imagen PowerPoint
-      case 'Video MP4':
-        return '/assets/icons/files/mp4.png'; // Ruta a tu imagen de video
-      case 'Imagen JPEG':
-      case 'Imagen JPG':
-        return '/assets/icons/files/jpg-file.png'; // Icono JPEG
-      case 'Imagen PNG':
-        return '/assets/icons/files/png.png'; // Icono PNG
-      case 'Imagen GIF':
-        return '/assets/icons/files/gif.png'; // Icono GIF
-      case 'Archivo ZIP':
-        return '/assets/icons/files/zip.png'; // Ruta a tu imagen ZIP
-      default:
-        return '/assets/icons/files/failure.png'; // Ruta a tu imagen para tipo desconocido
-    }
   }
 }

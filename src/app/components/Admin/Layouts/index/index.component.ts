@@ -20,29 +20,23 @@ import { NavbarComponent } from '../navbar/navbar.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexAdminComponent {
-  // === Inyección de dependencias ===
+  // Services
   private readonly authService = inject(AuthService);
 
-  // === Recurso reactivo: Usuario autenticado ===
-  public readonly userResource = rxResource<User, void>({
+  // State
+  public userResource = rxResource<User, void>({
     loader: () =>
       this.authService
         .getUserObservable()
         .pipe(tap((user) => console.debug('Usuario obtenido:', user))),
   });
 
-  // === Valor computado: Iniciales para el avatar ===
-  public readonly nameAvatar = computed(() => {
-    const user = this.userResource.value();
-    return this.getInitialsFromUser(user);
-  });
+  // Computed
+  public avatarName = computed(() =>
+    this.extractInitials(this.userResource.value()),
+  );
 
-  /**
-   * Extrae las iniciales del usuario para el avatar
-   * @param user - Objeto usuario o null/undefined
-   * @returns Iniciales concatenadas (ej: "JP") o string vacío
-   */
-  private getInitialsFromUser(user: User | undefined): string {
+  private extractInitials(user?: User): string {
     if (!user) return '';
 
     return [

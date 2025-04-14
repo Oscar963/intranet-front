@@ -1,19 +1,16 @@
-<!-- Dropdown para acciones de datos -->
-<div class="dropdown" aria-label="Menú de acciones de datos">
+<!-- Componente de importación/exportación de anexos -->
+<div class="dropdown" role="menu" aria-label="Menú de acciones de datos">
   <button
+    #dropdownButton
     type="button"
-    class="btn btn-success dropdown-toggle"
-    data-bs-toggle="dropdown"
     aria-expanded="false"
     aria-haspopup="true"
-    [disabled]="loading()"
+    class="btn btn-success dropdown-toggle"
+    (click)="toggleDropdown()"
+    [disabled]="state().loading"
   >
-    @if (loading()) {
-      <span
-        class="spinner-border spinner-border-sm me-2"
-        role="status"
-        aria-hidden="true"
-      ></span>
+    @if (state().loading) {
+      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
       <span class="visually-hidden">Cargando...</span>
     } @else {
       <svg
@@ -27,7 +24,7 @@
         stroke-linecap="round"
         stroke-linejoin="round"
         class="icon icon-tabler icons-tabler-outline icon-tabler-table-import"
-        aria-hidden="true"
+        focusable="false"
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
         <path
@@ -45,12 +42,10 @@
   <ul class="dropdown-menu" role="menu">
     <li role="none">
       <a
-        href="#"
-        role="menuitem"
         class="dropdown-item"
-        data-bs-toggle="modal"
-        data-bs-target="#modal-import"
+        role="menuitem"
         aria-label="Importar datos"
+        (click)="openModal($event)"
       >
         Importar
       </a>
@@ -60,7 +55,7 @@
         class="dropdown-item"
         role="menuitem"
         (click)="exportAnexos()"
-        [disabled]="loading()"
+        [disabled]="state().isUploading"
         aria-label="Exportar datos"
       >
         Exportar
@@ -69,18 +64,18 @@
   </ul>
 </div>
 
-<!-- Modal de importación -->
+<!-- Modal de importación de datos -->
 <div
+  #modalImportRef
   class="modal modal-blur fade"
+  aria-labelledby="modalImportLabel"
+  aria-hidden="true"
   id="modal-import"
   tabindex="-1"
   role="dialog"
-  aria-labelledby="modalImportTitle"
-  aria-hidden="true"
 >
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-      <!-- Encabezado del modal -->
       <div class="modal-header">
         <h5 class="modal-title" id="modalImportTitle">Importar Anexos</h5>
         <button
@@ -91,8 +86,7 @@
         ></button>
       </div>
 
-      <!-- Barra de progreso indeterminada -->
-      @if (loading()) {
+      @if (state().isUploading) {
         <div
           class="progress progress-sm"
           role="progressbar"
@@ -102,10 +96,8 @@
         </div>
       }
 
-      <!-- Cuerpo del modal -->
-      <div class="modal-body">
-        <!-- Mensaje de error -->
-        @if (errorMessage()) {
+      <div class="modal-body" aria-live="polite">
+        @if (state().errorMessage) {
           <div
             class="alert alert-important alert-danger alert-dismissible"
             role="alert"
@@ -123,7 +115,7 @@
                   fill="none"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  aria-hidden="true"
+                  focusable="false"
                 >
                   <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                   <circle cx="12" cy="12" r="9"></circle>
@@ -132,7 +124,7 @@
                 </svg>
               </div>
               <div class="ms-1">
-                <div [innerHTML]="errorMessage()"></div>
+                <div [innerHTML]="state().errorMessage"></div>
               </div>
             </div>
             <button
@@ -144,11 +136,13 @@
           </div>
         }
 
-        <!-- Selector de archivo -->
         <div class="mb-3">
           <label for="fileInput" class="form-label"
-            >Seleccionar un archivo</label
-          >
+            >Seleccionar un archivo
+            <span class="form-text"
+              >(Formatos aceptados: .xlsx (Excel) o .csv)</span
+            >
+          </label>
           <input
             #fileInput
             id="fileInput"
@@ -158,16 +152,18 @@
             (change)="onFileSelected($event)"
             aria-describedby="fileHelp"
           />
-          <div id="fileHelp" class="form-text">
-            Formatos aceptados: .xlsx (Excel) o .csv
-          </div>
-
-          <!-- Enlace para descargar plantilla -->
+          @if (state().selectedFile) {
+            <p class="form-text mt-2">
+              Archivo seleccionado:
+              <strong>{{ state().selectedFile?.name }}</strong>
+            </p>
+          }
           <div class="mt-2">
             <a
               href="/assets/templates/plantilla_anexos.xlsx"
               download="plantilla_anexos.xlsx"
               class="text-decoration-none"
+              aria-label="Descargar plantilla de anexos"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +176,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 class="icon icon-tabler icons-tabler-outline icon-tabler-download"
-                aria-hidden="true"
+                focusable="false"
               >
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                 <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
@@ -189,31 +185,30 @@
               </svg>
               Descargar plantilla
             </a>
-            <small class="text-muted d-block">(Fila N°2 es un ejemplo)</small>
+            <small class="text-muted">(Fila N°2 es un ejemplo)</small>
           </div>
         </div>
 
-        <!-- Barra de progreso de carga -->
-        @if (uploadProgress() > 0) {
+        @if (state().uploadProgress > 0) {
           <div
             class="progressbg"
             role="progressbar"
-            [attr.aria-valuenow]="uploadProgress()"
+            [attr.aria-valuenow]="state().uploadProgress"
             aria-valuemin="0"
             aria-valuemax="100"
+            aria-label="Progreso de carga"
           >
             <div class="progress">
               <div
                 class="progress-bar progress-bar-striped progress-bar-animated"
-                [style.width.%]="uploadProgress()"
+                [style.width.%]="state().uploadProgress"
               ></div>
             </div>
-            <div class="progressbg-value">{{ uploadProgress() }}%</div>
+            <div class="progressbg-value">{{ state().uploadProgress }}%</div>
           </div>
         }
       </div>
 
-      <!-- Pie del modal -->
       <div class="modal-footer">
         <button
           type="button"
@@ -224,35 +219,33 @@
           Cancelar
         </button>
 
-        @if (selectedFile()) {
-          <button
-            type="button"
-            class="btn btn-primary ms-auto"
-            (click)="onSubmit()"
-            [disabled]="isUploading()"
-            aria-label="Confirmar importación"
+        <button
+          type="button"
+          class="btn btn-primary ms-auto"
+          (click)="onSubmit()"
+          [disabled]="isSubmitDisabled()"
+          aria-label="Confirmar importación"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-upload"
+            focusable="false"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon icon-tabler icons-tabler-outline icon-tabler-upload"
-              aria-hidden="true"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-              <path d="M7 9l5 -5l5 5" />
-              <path d="M12 4l0 12" />
-            </svg>
-            Importar
-          </button>
-        }
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+            <path d="M7 9l5 -5l5 5" />
+            <path d="M12 4l0 12" />
+          </svg>
+          Importar
+        </button>
       </div>
     </div>
   </div>

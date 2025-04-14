@@ -5,5 +5,5 @@ export interface User {
   maternal_surname: string;
   rut: string;
   email: string;
-  status: number;
+  status: string;
 }

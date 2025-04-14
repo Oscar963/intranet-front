@@ -26,7 +26,7 @@
             </div>
           }
           <div class="card-body">
-            @if (errorMessage()) {
+            @if (errorMessage().length) {
               <div
                 class="alert alert-important alert-danger alert-dismissible"
                 role="alert"
@@ -52,7 +52,11 @@
                     </svg>
                   </div>
                   <div>
-                    <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                    <ul class="mb-0">
+                      @for (error of errorMessage(); track $index) {
+                        <li>{{ error }}</li>
+                      }
+                    </ul>
                   </div>
                 </div>
                 <a
@@ -67,9 +71,10 @@
                 <label class="form-label required">Número </label>
                 <input
                   formControlName="number"
-                  type="number"
+                  type="text"
                   class="form-control"
                   placeholder="56957197587"
+                  maxlength="15"
                   [class.is-invalid]="
                     form.get('number')?.invalid &&
                     (form.get('number')?.touched || form.get('number')?.dirty)
@@ -87,6 +92,16 @@
                   @if (form.get("number")?.hasError("required")) {
                     <span class="invalid-input">
                       El número interno es obligatorio.
+                    </span>
+                  }
+                  @if (form.get("number")?.hasError("pattern")) {
+                    <span class="invalid-input">
+                      El número debe tener el formato correcto. Ej: +56912345678
+                    </span>
+                  }
+                  @if (form.get("number")?.hasError("maxlength")) {
+                    <span class="invalid-input">
+                      El número debe tener entre 10 y 15 dígitos.
                     </span>
                   }
                 } @else {

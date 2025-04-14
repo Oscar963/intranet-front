@@ -26,7 +26,7 @@
             </div>
           }
           <div class="card-body">
-            @if (errorMessage()) {
+            @if (errorMessage().length) {
               <div
                 class="alert alert-important alert-danger alert-dismissible"
                 role="alert"
@@ -52,7 +52,11 @@
                     </svg>
                   </div>
                   <div>
-                    <div [innerHTML]="errorMessage()" class="ms-1"></div>
+                    <ul class="mb-0">
+                      @for (error of errorMessage(); track $index) {
+                        <li>{{ error }}</li>
+                      }
+                    </ul>
                   </div>
                 </div>
                 <a
@@ -67,9 +71,10 @@
                 <label class="form-label required">Número interno </label>
                 <input
                   formControlName="internal_number"
-                  type="number"
+                  type="text"
                   class="form-control"
                   placeholder="6869"
+                  maxlength="4"
                   [class.is-invalid]="
                     form.get('internal_number')?.invalid &&
                     (form.get('internal_number')?.touched ||
@@ -91,6 +96,16 @@
                       El número interno es obligatorio.
                     </span>
                   }
+                  @if (form.get("internal_number")?.hasError("maxlength")) {
+                    <span class="invalid-input">
+                      El número interno debe tener máximo 4 caracteres.
+                    </span>
+                  }
+                  @if (form.get("internal_number")?.hasError("pattern")) {
+                    <span class="invalid-input">
+                      El número interno debe ser un número.
+                    </span>
+                  }
                 } @else {
                   <span class="invalid-input">&nbsp;</span>
                 }
@@ -99,9 +114,10 @@
                 <label class="form-label required">Número externo </label>
                 <input
                   formControlName="external_number"
-                  type="number"
+                  type="text"
                   class="form-control"
                   placeholder="432380968"
+                  maxlength="9"
                   [class.is-invalid]="
                     form.get('external_number')?.invalid &&
                     (form.get('external_number')?.touched ||
@@ -121,6 +137,16 @@
                   @if (form.get("external_number")?.hasError("required")) {
                     <span class="invalid-input">
                       El número externo es obligatorio.
+                    </span>
+                  }
+                  @if (form.get("external_number")?.hasError("maxlength")) {
+                    <span class="invalid-input">
+                      El número externo debe tener máximo 9 caracteres.
+                    </span>
+                  }
+                  @if (form.get("external_number")?.hasError("pattern")) {
+                    <span class="invalid-input">
+                      El número externo debe ser un número.
                     </span>
                   }
                 } @else {

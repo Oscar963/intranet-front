@@ -25,13 +25,13 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimations(),
     provideToastr({
-      timeOut: 10000,
+      timeOut: 2000,
       positionClass: 'toast-top-right',
-      preventDuplicates: false,
+      preventDuplicates: true,
       tapToDismiss: true,
       progressBar: true,
       closeButton: true,
-      extendedTimeOut: 5000,
+      extendedTimeOut: 2000,
     }),
   ],
 };

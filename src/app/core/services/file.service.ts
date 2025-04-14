@@ -3,6 +3,26 @@ import { environment } from '@env/environment';
 import { map, Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 
+/**
+ * Servicio para la gestión de archivos.
+ * 
+ * @description
+ * Proporciona métodos para interactuar con la API de archivos:
+ * - Creación de archivos
+ * - Eliminación de archivos
+ * - Descarga de archivos
+ * 
+ * @example
+ * ```typescript
+ * constructor(private fileService: FileService) {}
+ * 
+ * // Crear un archivo
+ * this.fileService.storeFiles(data).subscribe();
+ * 
+ * // Descargar un archivo
+ * this.fileService.downloadFile(id).subscribe();
+ * ```
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -24,16 +44,26 @@ export class FileService {
   }
 
   /**
-   * Crear un nuevo archivo.
-   * @param data Objeto con los datos del nuevo archivo.
-   * @returns Observable con el mensaje de éxito.
+   * Crea un nuevo archivo en el sistema.
+   * 
+   * @param data - Objeto con los datos del archivo a crear
+   * @returns Observable<string> - Mensaje de éxito de la operación
+   * 
+   * @example
+   * ```typescript
+   * const data = {
+   *   name: 'documento.pdf',
+   *   description: 'Documento importante'
+   * };
+   * this.fileService.storeFiles(data).subscribe();
+   * ```
    */
   storeFiles(data: {}): Observable<string> {
     return this.http
-      .post<{ message: string }>(`${this.apiUrl}/api/files`, data) // Realizar solicitud POST
+      .post<{ message: string }>(`${this.apiUrl}/api/files`, data)
       .pipe(
         map((response) => {
-          return response.message; // Extraer el mensaje de éxito del servidor
+          return response.message;
         }),
       );
   }
@@ -70,30 +100,45 @@ export class FileService {
   }
 
   /**
-   * Eliminar un archivo específico.
-   * @param id Identificador del archivo que se va a eliminar.
-   * @returns Observable con el mensaje de éxito.
+   * Elimina un archivo específico del sistema.
+   * 
+   * @param id - Identificador único del archivo a eliminar
+   * @returns Observable<string> - Mensaje de éxito de la operación
+   * 
+   * @example
+   * ```typescript
+   * this.fileService.deleteFile(123).subscribe();
+   * ```
    */
   deleteFile(id: number): Observable<string> {
     return this.http
-      .delete<{ message: string }>(`${this.apiUrl}/api/files/${id}`) // Realizar solicitud DELETE
+      .delete<{ message: string }>(`${this.apiUrl}/api/files/${id}`)
       .pipe(
         map((response) => {
-          return response.message; // Extraer el mensaje de éxito del servidor
+          return response.message;
         }),
       );
   }
 
   /**
-   * Descargar un archivo por su ID.
-   * @param id Identificador del archivo.
-   * @param fileName Nombre del archivo para la descarga.
+   * Descarga un archivo específico del sistema.
+   * 
+   * @param id - Identificador único del archivo a descargar
+   * @returns Observable<HttpResponse<Blob>> - Respuesta HTTP con el archivo
+   * 
+   * @example
+   * ```typescript
+   * this.fileService.downloadFile(123).subscribe(response => {
+   *   const blob = response.body;
+   *   const filename = 'documento.pdf';
+   *   saveAs(blob, filename);
+   * });
+   * ```
    */
   downloadFile(id: number): Observable<HttpResponse<Blob>> {
-    // <-- Cambio aquí
     return this.http.get(`${this.apiUrl}/api/files/${id}/download`, {
       responseType: 'blob',
-      observe: 'response', // <-- Añade esta opción
+      observe: 'response',
     });
   }
 }

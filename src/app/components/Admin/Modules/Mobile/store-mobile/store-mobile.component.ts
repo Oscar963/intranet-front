@@ -1,9 +1,25 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+/** Componente para crear un nuevo móvil */
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { Validators, ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { MobileService } from '@services/mobile.service';
 import { Router } from '@angular/router';
+import { ViewportScroller } from '@angular/common';
+import { take, finalize } from 'rxjs';
+
+import { MobileService } from '@services/mobile.service';
 import { ToastService } from '@services/toast.service';
-import { take } from 'rxjs';
+
+// Interfaz para errores HTTP esperados
+interface HttpValidationError {
+  status: number;
+  error: {
+    errors: { [key: string]: string[] };
+  };
+}
 
 @Component({
   selector: 'app-store-mobile',
@@ -13,28 +29,33 @@ import { take } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StoreMobileComponent {
-  //Inyección de servicios usando la nueva API de Angular.
-  private mobileService = inject(MobileService);
-  private toastService = inject(ToastService);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
+  // Servicios inyectados
+  private readonly mobileService = inject(MobileService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly scroller = inject(ViewportScroller);
 
-  // Variables de estado reactivas
+  // Estado de carga y mensajes de error
   public loading = signal(false);
-  public errorMessage = signal<string>('');
+  public errorMessage = signal<string[]>([]);
 
-  // Definición del formulario con validaciones
-  form = this.fb.group({
-    number: ['', Validators.required],
-    office: '',
-    direction: '',
-    person: '',
+  // Formulario reactivo para el móvil (usando signals)
+  public form = this.fb.nonNullable.group({
+    number: this.fb.nonNullable.control('', [
+      Validators.required,
+      Validators.pattern(/^\+[1-9]\d{6,14}$/), // formato E.164
+      Validators.maxLength(15),
+    ]),
+    office: this.fb.nonNullable.control('', Validators.maxLength(100)),
+    direction: this.fb.nonNullable.control('', Validators.maxLength(100)),
+    person: this.fb.nonNullable.control('', Validators.maxLength(100)),
   });
 
-  //Maneja el envío del formulario.
-  //Valida el formulario, construye los datos y los envía al backend.
-  onSubmit(): void {
+  /** Envía el formulario si es válido */
+  public onSubmit(): void {
     if (!this.validateForm()) return;
+
     this.loading.set(true);
     this.clearMessages();
 
@@ -42,76 +63,74 @@ export class StoreMobileComponent {
 
     this.mobileService
       .storeMobile(formData)
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        finalize(() => this.loading.set(false)),
+      )
       .subscribe({
         next: (success: string) => this.handleSuccess(success),
-                error: (error) => {
-          this.loading.set(false);
-          this.handleError(error);
-        },
-        complete: () => this.loading.set(false),
-      })
-      .add(() => {
-        this.loading.set(false);
+        error: (error: HttpValidationError) => this.handleError(error),
       });
   }
 
-  // Limpia los mensajes de error y éxito
+  // Limpia los mensajes de error anteriores
   private clearMessages(): void {
-    this.errorMessage.set('');
+    this.errorMessage.set([]);
   }
 
-  // Construye los datos a enviar en `FormData`
-  private buildFormData(): FormData {
-    const formData = new FormData();
-    formData.append('number', this.form.value.number!);
-    formData.append('office', this.form.value.office!);
-    formData.append('direction', this.form.value.direction!);
-    formData.append('person', this.form.value.person!);
-
-    return formData;
+  // Reinicia el formulario tras éxito
+  private resetForm(): void {
+    this.form.reset();
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
-  // Maneja la respuesta exitosa del backend
-  private handleSuccess(success: string): void {
-    this.resetForm();
-    this.toastService.success(success);
-    this.router.navigate(['/admin/mobiles']);
-  }
-
-  // Valida el formulario antes de enviarlo
+  // Valida el formulario y muestra errores si es inválido
   private validateForm(): boolean {
     this.form.markAllAsTouched();
 
     if (this.form.invalid) {
-      this.errorMessage.set('Por favor, complete todos los campos requeridos.');
-      window.scroll(0, 0);
+      this.errorMessage.set([
+        'Por favor, complete todos los campos requeridos.',
+      ]);
+      this.scroller.scrollToPosition([0, 0]);
       return false;
     }
     return true;
   }
 
-  // Maneja los errores del backend
-  private handleError(error: any): void {
+  // Construye el FormData para enviar al backend
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    const controls = this.form.controls;
+
+    formData.append('number', controls.number.value);
+    formData.append('office', controls.office.value);
+    formData.append('direction', controls.direction.value);
+    formData.append('person', controls.person.value);
+
+    return formData;
+  }
+
+  // Maneja una respuesta exitosa del backend
+  private handleSuccess(success: string): void {
+    this.toastService.success(success);
+    this.router.navigate(['/admin/mobiles']);
+    this.resetForm();
+  }
+
+  // Procesa errores HTTP y muestra mensajes adecuados
+  private handleError(error: HttpValidationError): void {
     if (error.status === 422) {
       this.errorMessage.set(this.processErrors(error.error.errors));
-      window.scroll(0, 0);
+      this.scroller.scrollToPosition([0, 0]);
     } else {
-      this.errorMessage.set(error);
+      this.errorMessage.set(['Ocurrió un error inesperado.']);
     }
   }
 
-  // Reinicia el formulario y limpia los archivos
-  private resetForm(): void {
-    this.form.reset();
-  }
-
-  // Procesa los errores de validación del backend
-  private processErrors(errors: { [key: string]: string[] }): string {
-    const errorList = Object.keys(errors)
-      .flatMap((key) => errors[key])
-      .map((error) => `${error}</br>`)
-      .join('');
-    return `${errorList}`;
+  // Convierte errores de validación a un arreglo de strings
+  private processErrors(errors: { [key: string]: string[] }): string[] {
+    return Object.values(errors).flat();
   }
 }

@@ -1,3 +1,4 @@
+/** Componente principal para listar y gestionar archivos */
 import {
   ChangeDetectionStrategy,
   Component,
@@ -6,13 +7,16 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FileService } from '@services/file.service';
-import { File } from '@interfaces/File';
-import Swal from 'sweetalert2';
 import { HttpResponse, HttpHeaders } from '@angular/common/http';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, take } from 'rxjs';
+import Swal from 'sweetalert2';
+
+import { FileService } from '@services/file.service';
+import { File } from '@interfaces/File';
 import { ToastService } from '@services/toast.service';
+import { PaginationService } from '@services/pagination.service';
+import { PaginationMeta } from '@interfaces/pagination';
 
 @Component({
   selector: 'app-index-file',
@@ -22,42 +26,28 @@ import { ToastService } from '@services/toast.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IndexFileComponent {
-  // === SERVICIOS INYECTADOS === //
-  private readonly fileService = inject(FileService); // Servicio para operaciones con archivos
-  private readonly toastService = inject(ToastService); // Servicio para notificaciones
-  private readonly route = inject(ActivatedRoute); // Acceso a parámetros de ruta
-  private readonly router = inject(Router); // Navegación programática
+  // Servicios inyectados
+  private readonly fileService = inject(FileService);
+  private readonly toastService = inject(ToastService);
+  private readonly paginationService = inject(PaginationService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-  // === ESTADOS REACTIVOS === //
-  public query = signal<string>(''); // 🔹 Término de búsqueda actual
-  public show = signal<number>(15); // 🔹 Items mostrados por página
-  public meta = signal<PaginationMeta>({
-    // 🔹 Metadatos de paginación
-    current_page: 1,
-    last_page: 1,
-    from: 0,
-    to: 0,
-    total: 0,
-    links: [],
-  });
-  public page = signal<number>(1); // 🔹 Página actual
+  // Estado de búsqueda, paginación y metadatos
+  public query = signal<string>('');
+  public show = signal<number>(15);
+  public page = signal<number>(1);
+  public meta = signal<PaginationMeta>(this.paginationService.defaultMeta());
 
-  // === CONSTANTES === //
+  // Opciones para cantidad de ítems por página
   public readonly itemsPerPageOptions = [
-    // 🔸 Opciones para items por página
     { value: 15, label: '15' },
     { value: 50, label: '50' },
     { value: 100, label: '100' },
     { value: 500, label: '500' },
   ];
 
-  constructor() {
-    // === EFECTOS REACTIVOS === //
-    this.setupRouteSync(); // Sincroniza parámetros de ruta
-    this.setupQueryReset(); // Resetea a página 1 al buscar
-  }
-
-  // === RECURSO REACTIVO PARA DATOS === //
+  // Recurso reactivo para obtener datos de archivos desde el backend
   public readonly filesResource = rxResource<
     File[],
     { query: string; page: number; show: number }
@@ -67,52 +57,40 @@ export class IndexFileComponent {
       page: this.page(),
       show: this.show(),
     }),
-    loader: ({ request }) => this.loadFiles(request),
+    loader: ({ request }) => this.loadFilesData(request),
   });
 
-  // === MÉTODOS PÚBLICOS === //
+  constructor() {
+    this.syncPageFromRoute(); // Inicializa el número de página desde la URL
+    this.setupQueryWatcher(); // Reinicia la página al cambiar la búsqueda
+  }
 
-  /**
-   * Elimina un archivo con confirmación visual
-   * @param id - ID del archivo a eliminar
-   */
+  /** Elimina un archivo con confirmación previa */
   public deleteItem(id: number): void {
-    this.showDeleteConfirmation().then((result) => {
+    this.confirmDelete().then((result) => {
       if (result.isConfirmed) {
         this.executeDelete(id);
       }
     });
   }
 
-  /**
-   * Navega a una página específica con validación
-   * @param page - Número de página destino
-   */
+  /** Navega a la página indicada si es válida */
   public goToPage(page: number | null): void {
-    if (this.isValidPage(page)) {
+    if (this.paginationService.isValidPage(page, this.meta().last_page)) {
       this.router.navigate(['admin/files/page', page]);
     }
   }
 
-  /**
-   * Descarga un archivo del servidor
-   * @param fileId - ID del archivo a descargar
-   * @param fileName - Nombre original del archivo
-   */
+  /** Descarga un archivo del servidor */
   public downloadFile(fileId: number, fileName: string): void {
-    this.showDownloadLoading();
+    this.showLoading('Descargando archivo...');
     this.fileService.downloadFile(fileId).subscribe({
-      next: (response) => {
-        this.handleDownloadSuccess(response, fileName);
-      },
-      error: (error) => this.handleDownloadError(error),
+      next: (response) => this.handleDownloadSuccess(response, fileName),
+      error: (error) => this.handleError('Error al descargar', error),
     });
   }
 
-  /**
-   * Copia texto al portapapeles
-   * @param text - Texto a copiar
-   */
+  /** Copia texto al portapapeles */
   public copyToClipboard(text: string): void {
     navigator.clipboard
       .writeText(text)
@@ -120,11 +98,7 @@ export class IndexFileComponent {
       .catch((err) => this.toastService.error('Error al copiar', err));
   }
 
-  /**
-   * Obtiene la ruta del icono según el tipo de archivo
-   * @param fileType - Tipo de archivo
-   * @returns Ruta del icono correspondiente
-   */
+  /** Obtiene el icono correspondiente al tipo de archivo */
   public getFileIcon(fileType: string): string {
     const iconMap: Record<string, string> = {
       PDF: '/assets/icons/files/pdf.png',
@@ -141,175 +115,86 @@ export class IndexFileComponent {
     return iconMap[fileType] || '/assets/icons/files/failure.png';
   }
 
-  // === MÉTODOS PRIVADOS === //
-
-  /**
-   * Sincroniza los parámetros de ruta con el estado interno
-   */
-  private setupRouteSync(): void {
-    effect(() => {
-      this.route.params.subscribe((params) => {
-        this.page.set(+params['page'] || 1);
-      });
-    });
+  // Establece la página inicial desde los parámetros de la ruta
+  private syncPageFromRoute(): void {
+    this.route.params
+      .pipe(
+        map((params) => +params['page'] || 1),
+        take(1),
+      )
+      .subscribe((page) => this.page.set(page));
   }
 
-  /**
-   * Configura el reset a página 1 cuando cambia la query
-   */
-  private setupQueryReset(): void {
+  // Reinicia la página si cambia la búsqueda
+  private setupQueryWatcher(): void {
     effect(() => {
-      if (this.query() && this.page() !== 1) {
-        this.resetToFirstPage();
+      const currentQuery = this.query();
+      if (currentQuery && this.page() !== 1) {
+        this.page.set(1);
       }
     });
   }
 
-  /**
-   * Carga los archivos desde el servicio
-   * @param request Parámetros de búsqueda
-   * @returns Observable con lista de archivos
-   */
-  private loadFiles(request: { query: string; page: number; show: number }) {
+  // Carga los archivos desde el backend y actualiza metadatos de paginación
+  private loadFilesData(request: {
+    query: string;
+    page: number;
+    show: number;
+  }) {
     return this.fileService
       .fetchFile(request.query, request.page, request.show)
       .pipe(
         map((response) => {
-          this.updatePaginationMeta(response.data.meta);
+          const meta = this.paginationService.parseMeta(response.data.meta);
+          this.meta.set(meta);
           return response.data.data as File[];
         }),
       );
   }
 
-  /**
-   * Actualiza los metadatos de paginación
-   * @param meta Metadatos de la API
-   */
-  private updatePaginationMeta(meta: any): void {
-    this.meta.set({
-      current_page: meta?.current_page ?? 1,
-      last_page: meta?.last_page ?? 1,
-      from: meta?.from ?? 0,
-      to: meta?.to ?? 0,
-      total: meta?.total ?? 0,
-      links: this.parsePaginationLinks(meta?.links),
-    });
-  }
-
-  /**
-   * Parsea los enlaces de paginación
-   * @param links Enlaces crudos de la API
-   * @returns Array de enlaces formateados
-   */
-  private parsePaginationLinks(links: any[]): PaginationLink[] {
-    return (
-      links?.map((link, index) => ({
-        id: `link-${index}`,
-        label: link.label ?? '',
-        page: this.extractPageFromUrl(link.url),
-        active: link.active ?? false,
-      })) ?? []
-    );
-  }
-
-  /**
-   * Extrae el número de página de una URL
-   * @param url URL a analizar
-   * @returns Número de página o null
-   */
-  private extractPageFromUrl(url: string | null): number | null {
-    if (!url) return null;
-    const match = url.match(/page=(\d+)/);
-    return match ? parseInt(match[1], 10) : null;
-  }
-
-  /**
-   * Muestra diálogo de confirmación para eliminar
-   * @returns Promise con resultado de la confirmación
-   */
-  private showDeleteConfirmation() {
+  // Muestra confirmación antes de eliminar un archivo
+  private confirmDelete() {
     return Swal.fire({
-      title: '¿Eliminar archivo?',
+      title: '¿Confirmar eliminación?',
       text: 'Esta acción no se puede deshacer',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#06048c',
-      confirmButtonText: 'Confirmar',
-      cancelButtonColor: '#d63939',
+      confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
     });
   }
 
-  /**
-   * Ejecuta el proceso de eliminación
-   * @param id ID del archivo a eliminar
-   */
+  // Ejecuta la eliminación y muestra el resultado
   private executeDelete(id: number): void {
-    this.showLoadingIndicator('Eliminando archivo...');
+    this.showLoading('Eliminando archivo...');
+
     this.fileService.deleteFile(id).subscribe({
-      next: (success) => this.handleDeleteSuccess(success),
-      error: (error) => this.handleDeleteError(error),
+      next: (success) => {
+        Swal.close();
+        this.showSuccess('¡Archivo eliminado!', success);
+        this.filesResource.reload();
+      },
+      error: (error) => this.handleError('Error al eliminar', error),
     });
   }
 
-  /**
-   * Muestra indicador de carga
-   * @param message Mensaje a mostrar
-   */
-  private showLoadingIndicator(message: string): void {
-    Swal.fire({
-      title: message,
-      html: 'Por favor espere',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
-    });
-  }
-
-  /**
-   * Muestra indicador de carga para descarga
-   */
-  private showDownloadLoading(): void {
-    this.showLoadingIndicator('Descargando archivo...');
-  }
-
-  /**
-   * Maneja eliminación exitosa
-   * @param success Mensaje de confirmación
-   */
-  private handleDeleteSuccess(success: string): void {
-    Swal.close();
-    this.showSuccessAlert('¡Archivo eliminado!', success);
-    this.filesResource.reload();
-  }
-
-  /**
-   * Maneja descarga exitosa
-   * @param response Respuesta HTTP
-   * @param fileName Nombre original del archivo
-   */
+  // Maneja la descarga exitosa del archivo
   private handleDownloadSuccess(
     response: HttpResponse<Blob>,
     fileName: string,
   ): void {
     Swal.close();
 
-    const fileExtension = this.determineFileExtension(
-      response.headers,
-      fileName,
-    );
-    this.createDownloadLink(response.body!, `${fileExtension}`);
+    const fileExtension = this.getFileExtension(response.headers, fileName);
+    this.createDownloadLink(response.body!, `${fileName}${fileExtension}`);
 
-    this.showSuccessAlert(
+    this.showSuccess(
       '¡Descarga completada!',
       'El archivo se ha descargado correctamente',
     );
   }
 
-  /**
-   * Crea enlace de descarga
-   * @param blobData Datos del archivo
-   * @param fileName Nombre completo del archivo
-   */
+  // Crea un enlace de descarga temporal
   private createDownloadLink(blobData: Blob, fileName: string): void {
     const url = window.URL.createObjectURL(blobData);
     const link = document.createElement('a');
@@ -321,18 +206,10 @@ export class IndexFileComponent {
     window.URL.revokeObjectURL(url);
   }
 
-  /**
-   * Determina la extensión del archivo
-   * @param headers Cabeceras HTTP
-   * @param fileName Nombre del archivo
-   * @returns Extensión del archivo
-   */
-  private determineFileExtension(
-    headers: HttpHeaders,
-    fileName: string,
-  ): string {
+  // Obtiene la extensión del archivo
+  private getFileExtension(headers: HttpHeaders, fileName: string): string {
     const extensionFromName = fileName.substring(fileName.lastIndexOf('.'));
-    if (extensionFromName) return extensionFromName;
+    if (extensionFromName) return '';
 
     const contentType = headers.get('Content-Type');
     const extensionMap: Record<string, string> = {
@@ -346,94 +223,34 @@ export class IndexFileComponent {
     return extensionMap[contentType || ''] || '';
   }
 
-  /**
-   * Maneja errores durante eliminación
-   * @param error Error recibido
-   */
-  private handleDeleteError(error: any): void {
-    Swal.close();
-    this.showErrorAlert('Error al eliminar', this.getErrorMessage(error));
+  // Muestra un indicador de carga
+  private showLoading(message: string): void {
+    Swal.fire({
+      title: message,
+      html: 'Por favor espere',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
   }
 
-  /**
-   * Maneja errores durante descarga
-   * @param error Error recibido
-   */
-  private handleDownloadError(error: any): void {
-    Swal.close();
-    this.showErrorAlert('Error al descargar', this.getErrorMessage(error));
-  }
-
-  /**
-   * Obtiene mensaje de error
-   * @param error Objeto de error
-   * @returns Mensaje de error
-   */
-  private getErrorMessage(error: any): string {
-    return (
-      error.error?.message || error.message || 'Ocurrió un error inesperado'
-    );
-  }
-
-  /**
-   * Muestra alerta de éxito
-   * @param title Título de la alerta
-   * @param message Mensaje de la alerta
-   */
-  private showSuccessAlert(title: string, message: string): void {
+  // Muestra un mensaje de éxito
+  private showSuccess(title: string, message: string): void {
     Swal.fire({
       title,
       text: message,
       icon: 'success',
-      confirmButtonColor: '#06048c',
     });
   }
 
-  /**
-   * Muestra alerta de error
-   * @param title Título de la alerta
-   * @param message Mensaje de la alerta
-   */
-  private showErrorAlert(title: string, message: string): void {
+  // Maneja errores
+  private handleError(title: string, error: any): void {
+    Swal.close();
+    const message =
+      error.error?.message || error.message || 'Ocurrió un error inesperado';
     Swal.fire({
       title,
       text: message,
       icon: 'error',
-      confirmButtonColor: '#d63939',
     });
   }
-
-  /**
-   * Valida si una página es navegable
-   * @param page Página a validar
-   * @returns true si la página es válida
-   */
-  private isValidPage(page: number | null): boolean {
-    return !!page && page > 0 && page <= this.meta().last_page;
-  }
-
-  /**
-   * Reinicia a la primera página
-   */
-  private resetToFirstPage(): void {
-    this.page.set(1);
-    this.router.navigate(['admin/files/page', 1]);
-  }
-}
-
-// === INTERFACES DE TIPADO === //
-interface PaginationMeta {
-  current_page: number;
-  last_page: number;
-  from: number;
-  to: number;
-  total: number;
-  links: PaginationLink[];
-}
-
-interface PaginationLink {
-  id: string;
-  label: string;
-  page: number | null;
-  active: boolean;
 }

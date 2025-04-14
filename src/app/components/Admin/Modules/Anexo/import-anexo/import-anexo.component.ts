@@ -1,14 +1,19 @@
+/** Componente para importar y exportar anexos */
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
   inject,
   signal,
+  computed,
   viewChild,
 } from '@angular/core';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { Modal, Dropdown } from 'bootstrap';
 import Swal from 'sweetalert2';
 import { saveAs } from 'file-saver';
+
 import { AnexoService } from '@services/anexo.service';
 import { ToastService } from '@app/core/services/toast.service';
 
@@ -18,70 +23,109 @@ import { ToastService } from '@app/core/services/toast.service';
   styleUrls: ['./import-anexo.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ImportAnexoComponent {
-  // === SERVICIOS INYECTADOS === //
+export class ImportAnexoComponent implements AfterViewInit {
+  // Servicios inyectados
   private readonly anexoService = inject(AnexoService);
   private readonly toastService = inject(ToastService);
 
-  // === SEÑALES REACTIVAS === //
-  readonly isUploading = signal(false);
-  readonly uploadProgress = signal(0);
-  readonly selectedFile = signal<File | null>(null);
-  readonly loading = signal(false);
-  readonly errorMessage = signal('');
-
-  // === ELEMENTOS DEL DOM === //
+  // Referencias al DOM
   public fileInput =
     viewChild.required<ElementRef<HTMLInputElement>>('fileInput');
+  public dropdownButton = viewChild.required<ElementRef>('dropdownButton');
+  public modalImport = viewChild.required<ElementRef>('modalImportRef');
 
-  // === CONSTANTES === //
-  private readonly validFileTypes = [
+  // Instancia del modal
+  public modal = signal<Modal | null>(null);
+
+  // Tipos de archivo válidos
+  private readonly validFileTypes = new Set([
     'text/csv',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel
-  ];
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ]);
 
-  // === MÉTODOS PÚBLICOS === //
+  // Estado del componente
+  public readonly state = signal({
+    selectedFile: null as File | null,
+    uploadProgress: 0,
+    isUploading: false,
+    loading: false,
+    errorMessage: '',
+  });
 
-  /**
-   * Valida y asigna el archivo seleccionado.
-   * @param event - Evento del input file
-   */
-  onFileSelected(event: Event): void {
+  // Computado: desactiva el botón de envío si no hay archivo o está cargando
+  public readonly isSubmitDisabled = computed(
+    () =>
+      this.state().isUploading ||
+      this.state().loading ||
+      !this.state().selectedFile,
+  );
+
+  // Inicializa el modal una vez renderizado el componente
+  public ngAfterViewInit(): void {
+    this.setModal();
+  }
+
+  // Inicializa la instancia del modal Bootstrap
+  private setModal(): void {
+    const instance = new Modal(this.modalImport().nativeElement, {
+      backdrop: 'static',
+      keyboard: false,
+    });
+    this.modal.set(instance);
+  }
+
+  // Abre el modal, reinicia estado y oculta dropdown
+  public openModal(event: Event): void {
+    const target = event.target as HTMLElement;
+    target.blur();
+    this.toggleDropdown();
+    this.resetState();
+    this.modal()?.show();
+  }
+
+  // Cierra el modal
+  public closeModal(): void {
+    this.modal()?.hide();
+  }
+
+  // Alterna el estado del dropdown de opciones
+  public toggleDropdown(): void {
+    const instance = new Dropdown(this.dropdownButton().nativeElement);
+    instance.toggle();
+  }
+
+  // Maneja la selección de archivo desde el input
+  public onFileSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
+
     if (!file) {
       this.toastService.error('No se seleccionó ningún archivo');
       return;
     }
 
-    if (!this.validFileTypes.includes(file.type.toLowerCase())) {
+    if (!this.validFileTypes.has(file.type.toLowerCase())) {
       this.toastService.error('Formato no válido. Use archivos Excel o CSV');
-      this.selectedFile.set(null);
+      this.setState({ selectedFile: null });
       return;
     }
 
-    this.selectedFile.set(file);
-    this.resetMessages();
+    this.setState({ selectedFile: file, errorMessage: '', uploadProgress: 0 });
     this.toastService.info('Archivo seleccionado correctamente');
   }
 
-  /**
-   * Valida y confirma la importación del archivo seleccionado.
-   */
-  onSubmit(): void {
-    if (!this.selectedFile()) {
+  // Envía el archivo seleccionado si es válido
+  public onSubmit(): void {
+    if (!this.state().selectedFile) {
       this.toastService.error('Seleccione un archivo antes de continuar');
       return;
     }
-
-    this.confirmImport(); // Muestra confirmación antes de subir
+    this.confirmImport();
   }
 
-  /**
-   * Exporta los anexos como un archivo Excel.
-   * Usa `file-saver` para descargar el blob recibido.
-   */
-  exportAnexos(): void {
-    this.loading.set(true);
+  // Exporta los anexos existentes en un archivo descargable
+  public exportAnexos(): void {
+    this.toggleDropdown();
+    this.setState({ loading: true });
 
     this.anexoService.exportAnexos().subscribe({
       next: (blob: Blob) => {
@@ -93,15 +137,11 @@ export class ImportAnexoComponent {
         const message = err?.error?.message ?? 'Error al exportar los datos';
         this.toastService.error(message);
       },
-      complete: () => this.loading.set(false),
+      complete: () => this.setState({ loading: false }),
     });
   }
 
-  // === MÉTODOS PRIVADOS (LÓGICA INTERNA) === //
-
-  /**
-   * Muestra un diálogo de confirmación antes de importar.
-   */
+  // Muestra confirmación de usuario antes de realizar la importación
   private confirmImport(): void {
     Swal.fire({
       title: 'Confirmar Importación',
@@ -115,93 +155,91 @@ export class ImportAnexoComponent {
     });
   }
 
-  /**
-   * Sube el archivo al servidor y maneja el progreso.
-   */
+  // Envía el archivo al backend y realiza seguimiento del progreso
   private uploadFile(): void {
-    const file = this.selectedFile();
+    const file = this.state().selectedFile;
     if (!file) return;
 
-    this.prepareUpload();
+    this.setState({
+      isUploading: true,
+      loading: true,
+      uploadProgress: 0,
+      errorMessage: '',
+    });
+
     this.showProgressAlert();
 
     this.anexoService.uploadAnexos(file).subscribe({
       next: (event) => this.trackUploadProgress(event),
       error: (error) => this.handleUploadError(error),
-      complete: () => this.completeUpload(),
+      complete: () => {
+        this.setState({ isUploading: false, loading: false });
+        this.showSuccessAlert();
+      },
     });
   }
 
-  /**
-   * Actualiza el progreso de la subida y maneja la respuesta final.
-   * @param event - Evento HTTP (UploadProgress o Response)
-   */
-  private trackUploadProgress(event: HttpEvent<any>): void {
-    if (event.type === HttpEventType.UploadProgress && event.total) {
-      const percent = Math.round((100 * event.loaded) / event.total);
-      this.uploadProgress.set(percent);
-    }
-
-    if (event.type === HttpEventType.Response) {
-      const msg = event.body?.message ?? 'Importación completada';
-      this.toastService.success(msg);
-      this.clearFileInput();
-      Swal.close();
-    }
+  // Muestra una alerta de progreso durante la carga
+  private showProgressAlert(): void {
+    Swal.fire({
+      title: 'Subiendo...',
+      text: 'Espere mientras se carga el archivo',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
   }
 
-  /**
-   * Maneja errores durante la subida.
-   * @param error - Error HTTP
-   */
+  // Muestra una alerta de éxito al finalizar la carga
+  private showSuccessAlert(): void {
+    Swal.fire({
+      title: '¡Importación completada!',
+      text: 'Los anexos fueron importados correctamente.',
+      icon: 'success',
+      confirmButtonColor: '#06048c',
+      confirmButtonText: 'Cerrar',
+    }).then(() => {
+      this.resetState();
+      this.closeModal();
+    });
+  }
+
+  // Muestra un error si falla la carga del archivo
   private handleUploadError(error: any): void {
-    const message =
-      error?.message ?? 'Error desconocido durante la importación';
-    this.errorMessage.set(message);
-    this.toastService.error(message);
-    this.resetUploadState();
+    const errorMessage = error ?? 'Error durante la importación';
+    this.setState({
+      errorMessage,
+      isUploading: false,
+      loading: false,
+      uploadProgress: 0,
+    });
+    this.toastService.error(errorMessage);
     Swal.close();
   }
 
-  // === HELPERS (FUNCIONES DE UTILIDAD) === //
-
-  private prepareUpload(): void {
-    this.isUploading.set(true);
-    this.loading.set(true);
-    this.uploadProgress.set(0);
-    this.errorMessage.set('');
-  }
-
-  private resetUploadState(): void {
-    this.isUploading.set(false);
-    this.loading.set(false);
-    this.uploadProgress.set(0);
-  }
-
-  private resetMessages(): void {
-    this.errorMessage.set('');
-    this.uploadProgress.set(0);
-  }
-
-  private clearFileInput(): void {
-    this.selectedFile.set(null);
-
-    if (this.fileInput()?.nativeElement) {
-      this.fileInput().nativeElement.value = '';
+  // Actualiza el progreso de la carga en base al evento HTTP
+  private trackUploadProgress(event: HttpEvent<any>): void {
+    if (event.type === HttpEventType.UploadProgress && event.total) {
+      const progress = Math.round((100 * event.loaded) / event.total);
+      this.setState({ uploadProgress: progress });
     }
   }
 
-  private showProgressAlert(): void {
-    Swal.fire({
-      title: 'Procesando archivo',
-      html: `Progreso: <b>${this.uploadProgress()}%</b>`,
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
+  // Reinicia el estado interno del componente
+  private resetState(): void {
+    this.setState({
+      selectedFile: null,
+      uploadProgress: 0,
+      isUploading: false,
+      loading: false,
+      errorMessage: '',
     });
+    this.fileInput().nativeElement.value = '';
   }
 
-  private completeUpload(): void {
-    this.isUploading.set(false);
-    this.loading.set(false);
+  // Actualiza el estado del componente
+  private setState(newState: Partial<ReturnType<typeof this.state>>): void {
+    this.state.set({ ...this.state(), ...newState });
   }
 }

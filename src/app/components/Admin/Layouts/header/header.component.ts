@@ -1,15 +1,19 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   input,
   signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-
+import { firstValueFrom } from 'rxjs';
 import { User } from '@interfaces/User';
 import { AuthService } from '@services/auth.service';
-import { firstValueFrom } from 'rxjs';
+
+const ERROR_MESSAGES = {
+  UNKNOWN_ERROR: 'Error desconocido al cerrar sesión',
+} as const;
 
 @Component({
   selector: 'app-header',
@@ -19,38 +23,52 @@ import { firstValueFrom } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  // === Inyección de dependencias ===
+  // Services
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  // === Inputs ===
-  public readonly nameAvatar = input.required<string>();
-  public readonly user = input<User | null>();
+  // Inputs
+  public avatarName = input.required<string>();
+  public user = input<User | null>();
 
-  // === Estado reactivo ===
-  public readonly loading = signal(false);
-  public readonly errorMessage = signal('');
+  // State
+  public loading = signal(false);
+  public errorMessage = signal('');
 
-  // === Métodos ===
+  // Computed
+  public isLogoutDisabled = computed(
+    () => this.loading() || this.errorMessage() !== '',
+  );
+
   /**
-   * Cierra la sesión del usuario
+   * Cierra la sesión del usuario y redirige al inicio
    */
-  public async logout(): Promise<void> {
-    this.loading.set(true);
-    this.errorMessage.set('');
+  async logout(): Promise<void> {
+    this.setInitialState();
 
     try {
       await firstValueFrom(this.authService.logout());
       await this.router.navigate(['/']);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Error desconocido al cerrar sesión';
-      this.errorMessage.set(message);
-      console.error('Logout error:', error);
+    } catch (error) {
+      this.handleError(error);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private setInitialState(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+  }
+
+  private handleError(error: unknown): void {
+    this.errorMessage.set(this.formatErrorMessage(error));
+    console.error('Logout error:', error);
+  }
+
+  private formatErrorMessage(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return ERROR_MESSAGES.UNKNOWN_ERROR;
   }
 }

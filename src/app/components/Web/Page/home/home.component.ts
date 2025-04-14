@@ -1,16 +1,16 @@
 import {
   Component,
   ElementRef,
-  ViewChild,
   AfterViewInit,
   inject,
   effect,
   signal,
   ChangeDetectionStrategy,
+  viewChild,
 } from '@angular/core';
 import { WebService } from '@services/web.service';
 import { RouterLink } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop'; 
+import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Modal } from 'bootstrap';
 
@@ -22,9 +22,10 @@ import { Modal } from 'bootstrap';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements AfterViewInit {
-  @ViewChild('modalPopUp', { static: true }) modalRef!: ElementRef;
-  private webService = inject(WebService);
+  public modalPopUp = viewChild.required<ElementRef>('modalPopUpRef');
   public modal = signal<Modal | null>(null);
+  private webService = inject(WebService);
+
 
   // Con rxResource se carga automáticamente los datos de los banners
   public bannersRx = rxResource({
@@ -37,7 +38,7 @@ export class HomeComponent implements AfterViewInit {
   });
 
   setModal() {
-    const modalInstance = new Modal(this.modalRef.nativeElement);
+    const modalInstance = new Modal(this.modalPopUp().nativeElement);
     this.modal.set(modalInstance);
   }
 
