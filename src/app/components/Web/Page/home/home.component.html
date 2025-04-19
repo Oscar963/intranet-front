@@ -1,9 +1,9 @@
 <section>
   <div class="container-xl pt-3">
     @defer {
-      @let banners = bannersRx.value();
+      @let banners = bannersResource.value();
 
-      @if (!bannersRx.isLoading() && (banners ?? []).length > 0) {
+      @if (!bannersResource.isLoading() && (banners ?? []).length > 0) {
         <div id="carousel-banners" class="carousel slide carousel-fade">
           <!-- Indicadores del carrusel -->
           <div class="carousel-indicators">
@@ -34,24 +34,32 @@
           </div>
 
           <!-- Controles del carrusel -->
-          <a
-            class="carousel-control-prev"
-            href="#carousel-banners"
-            role="button"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </a>
-          <a
-            class="carousel-control-next"
-            href="#carousel-banners"
-            role="button"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </a>
+          @if (bannersResource.value()?.length > 1) {
+            <a
+              class="carousel-control-prev"
+              href="#carousel-banners"
+              role="button"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#carousel-banners"
+              role="button"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </a>
+          }
         </div>
       } @else {
         <div class="alert alert-info mb-0 bg-white" role="alert">
@@ -121,9 +129,7 @@
                     <path d="M9 15l2 2l4 -4" />
                   </svg>
                 </p>
-                <span
-                  class="fs-2 fw-bolder text-uppercase"
-                  style="color: #0043af"
+                <span class="fw-bolder text-uppercase card-encasillamiento"
                   >Encasillamiento <br />
                   Escalafón
                 </span>
@@ -162,9 +168,7 @@
                     <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
                   </svg>
                 </p>
-                <span
-                  class="fs-2 fw-bolder text-uppercase"
-                  style="color: #0043af"
+                <span class="fw-bolder text-uppercase card-rrhh"
                   >Recursos <br />
                   Humanos</span
                 >
@@ -207,7 +211,7 @@
                     />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder text-uppercase text-white"
+                <span class="fw-bolder text-uppercase card-leykarin text-white"
                   >Ley Karin <br />
                   (Ley N°21.643)
                 </span>
@@ -247,7 +251,8 @@
                     />
                   </svg>
                 </p>
-                <span class="fs-2 fw-bolder text-uppercase text-white"
+                <span
+                  class="fw-bolder text-uppercase card-solicitudes text-white"
                   >Solicitudes <br />
                   Declaraciones
                 </span>
@@ -263,8 +268,8 @@
   <div class="container-xl">
     <div class="mt-6">
       <div class="hr-text h2 text-primary fw-bold">SECCIONES</div>
-      <div class="row pt-3">
-        <div class="col-md-3">
+      <div class="row pt-1">
+        <div class="col-md-3 pb-1">
           <a [routerLink]="['/page/secplan']" class="card card-sm card-secction"
             ><div class="card card-sm card-secction">
               <div class="card-body">
@@ -301,7 +306,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a [routerLink]="['/page/oirs']" class="card card-sm card-secction">
             <div class="card card-sm card-secction">
               <div class="card-body">
@@ -338,7 +343,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a [routerLink]="['/page/didi']" class="card card-sm card-secction">
             <div class="card card-sm card-secction">
               <div class="card-body">
@@ -378,7 +383,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/proteccion-de-datos-personales']"
             class="card card-sm card-secction"
@@ -429,8 +434,8 @@
         </div>
       </div>
 
-      <div class="row pt-3">
-        <div class="col-md-3">
+      <div class="row pt-1">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/contabilidad-y-presupuesto']"
             class="card card-sm card-secction"
@@ -479,7 +484,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/remuneraciones']"
             class="card card-sm card-secction"
@@ -527,7 +532,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/compras-publicas']"
             class="card card-sm card-secction"
@@ -571,7 +576,7 @@
             </div></a
           >
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/asesoria-juridica']"
             class="card card-sm card-secction"
@@ -619,8 +624,8 @@
         </div>
       </div>
 
-      <div class="row pt-3">
-        <div class="col-md-3">
+      <div class="row pt-1">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/fiscalia-administrativa']"
             class="card card-sm card-secction"
@@ -670,7 +675,7 @@
             </div>
           </a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/bienestar']"
             class="card card-sm card-secction"
@@ -714,8 +719,7 @@
             </div>
           </a>
         </div>
-
-        <div class="col-md-3">
+        <div class="col-md-3 pb-1">
           <a
             [routerLink]="['/page/oficina-de-bienes-e-inventario']"
             class="card card-sm card-secction"
@@ -780,11 +784,11 @@
         >
           <div class="carousel-inner">
             @defer {
-              @if (!popUpsRx.isLoading() && popUpsRx.value().length > 0) {
+              @if (!popupResource.isLoading() && popupResource.value().length > 0) {
                 <div id="carousel-popups" class="carousel slide carousel-fade">
                   <!-- Indicadores del carrusel -->
                   <div class="carousel-indicators">
-                    @for (popup of popUpsRx.value(); track $index) {
+                    @for (popup of popupResource.value(); track $index) {
                       <button
                         type="button"
                         [attr.data-bs-target]="'#carousel-popups'"
@@ -797,7 +801,7 @@
 
                   <!-- Elementos del carrusel -->
                   <div class="carousel-inner rounded-4">
-                    @for (popup of popUpsRx.value(); track $index) {
+                    @for (popup of popupResource.value(); track $index) {
                       <div
                         [class.carousel-item]="true"
                         [class.active]="$index === 0"
@@ -876,23 +880,6 @@
               <span>Cargando datos....</span>
             }
           </div>
-          <!-- Controles del carrusel -->
-          <button
-            class="carousel-control-prev"
-            type="button"
-            data-bs-target="#carouselExample"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          </button>
-          <button
-            class="carousel-control-next"
-            type="button"
-            data-bs-target="#carouselExample"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          </button>
         </div>
       </div>
     </div>

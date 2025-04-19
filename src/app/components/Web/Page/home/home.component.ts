@@ -27,11 +27,11 @@ export class HomeComponent implements AfterViewInit {
   private webService = inject(WebService);
 
   // Con rxResource se carga automáticamente los datos de los banners
-  public bannersRx = rxResource({
+  public bannersResource = rxResource({
     loader: () =>
       this.webService.fetchBanners().pipe(map((response) => response.data)),
   });
-  public popUpsRx = rxResource({
+  public popupResource = rxResource({
     loader: () =>
       this.webService.fetchPopups().pipe(map((response) => response.data)),
   });
@@ -54,7 +54,7 @@ export class HomeComponent implements AfterViewInit {
 
   constructor() {
     effect(() => {
-      if (this.popUpsRx.value() && this.popUpsRx.value().length > 0) {
+      if (this.popupResource.value() && this.popupResource.value().length > 0) {
         this.openModal(); // Abre el modal si hay popups
       }
     });
