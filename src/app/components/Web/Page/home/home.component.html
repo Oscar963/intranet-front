@@ -1,9 +1,9 @@
 <section>
   <div class="container-xl pt-3">
     @defer {
-      @let banners = bannersRx.value();
+      @let banners = bannersResource.value();
 
-      @if (!bannersRx.isLoading() && (banners ?? []).length > 0) {
+      @if (!bannersResource.isLoading() && (banners ?? []).length > 0) {
         <div id="carousel-banners" class="carousel slide carousel-fade">
           <!-- Indicadores del carrusel -->
           <div class="carousel-indicators">
@@ -34,24 +34,32 @@
           </div>
 
           <!-- Controles del carrusel -->
-          <a
-            class="carousel-control-prev"
-            href="#carousel-banners"
-            role="button"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-          </a>
-          <a
-            class="carousel-control-next"
-            href="#carousel-banners"
-            role="button"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-          </a>
+          @if (bannersResource.value()?.length > 1) {
+            <a
+              class="carousel-control-prev"
+              href="#carousel-banners"
+              role="button"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </a>
+            <a
+              class="carousel-control-next"
+              href="#carousel-banners"
+              role="button"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </a>
+          }
         </div>
       } @else {
         <div class="alert alert-info mb-0 bg-white" role="alert">
@@ -776,11 +784,11 @@
         >
           <div class="carousel-inner">
             @defer {
-              @if (!popUpsRx.isLoading() && popUpsRx.value().length > 0) {
+              @if (!popupResource.isLoading() && popupResource.value().length > 0) {
                 <div id="carousel-popups" class="carousel slide carousel-fade">
                   <!-- Indicadores del carrusel -->
                   <div class="carousel-indicators">
-                    @for (popup of popUpsRx.value(); track $index) {
+                    @for (popup of popupResource.value(); track $index) {
                       <button
                         type="button"
                         [attr.data-bs-target]="'#carousel-popups'"
@@ -793,7 +801,7 @@
 
                   <!-- Elementos del carrusel -->
                   <div class="carousel-inner rounded-4">
-                    @for (popup of popUpsRx.value(); track $index) {
+                    @for (popup of popupResource.value(); track $index) {
                       <div
                         [class.carousel-item]="true"
                         [class.active]="$index === 0"
@@ -872,23 +880,6 @@
               <span>Cargando datos....</span>
             }
           </div>
-          <!-- Controles del carrusel -->
-          <button
-            class="carousel-control-prev"
-            type="button"
-            data-bs-target="#carouselExample"
-            data-bs-slide="prev"
-          >
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          </button>
-          <button
-            class="carousel-control-next"
-            type="button"
-            data-bs-target="#carouselExample"
-            data-bs-slide="next"
-          >
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          </button>
         </div>
       </div>
     </div>
