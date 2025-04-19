@@ -54,38 +54,7 @@ jobs:
               AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css text/javascript application/javascript application/json
           </IfModule>
 
-          # Restricción por IP (Apache 2.4+)
-          <IfModule mod_authz_core.c>
-              Require ip 152.230.211.90
-              Require ip 152.230.211.158
-              Require ip 152.230.214.48
-              Require ip 152.230.211.91
-              Require ip 152.230.211.191
-              Require ip 152.230.211.192
-              Require ip 152.230.211.69
-              Require ip 152.230.211.71
-              Require ip 152.230.211.167
-              Require ip 152.230.211.101
-              Require ip 152.230.211.96
-              Require ip 152.230.211.105
-              Require ip 152.230.211.110
-              Require ip 152.230.211.112
-              Require ip 152.230.211.144
-              Require ip 152.230.211.201
-              Require ip 152.230.211.151
-              Require ip 152.230.211.181
-              Require ip 152.172.158.122
 
-              # DISAM
-              Require ip 152.230.68.146
-              Require ip 152.230.68.138
-
-              # Permitir acceso a IP home
-              Require ip 152.173.156.187
-
-              # Denegar el acceso a todos los demás
-              Require all denied
-          </IfModule>
 
           # Configurar redirección a la página 403.html en caso de denegación de acceso
           ErrorDocument 403 /403.html
