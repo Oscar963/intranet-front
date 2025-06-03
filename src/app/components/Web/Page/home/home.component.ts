@@ -50,6 +50,12 @@ export class HomeComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setModal(); // Inicializa el modal después de que la vista esté completamente inicializada
+    // Mostrar modal de capacitación Gmail al cargar la página
+    const gmailModalEl = document.getElementById('gmailTrainingModal');
+    if (gmailModalEl) {
+      const gmailModal = new Modal(gmailModalEl);
+      gmailModal.show();
+    }
   }
 
   constructor() {
