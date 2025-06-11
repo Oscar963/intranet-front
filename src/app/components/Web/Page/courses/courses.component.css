@@ -1,0 +1,136 @@
+.banner-title {
+  width: 100%;
+  min-height: 30vh;
+  height: 240px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-title img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.banner-title:before {
+  content: "";
+  background: color-mix(in srgb, var(--background-color), transparent 50%);
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.banner-title .container {
+  position: relative;
+  z-index: 3;
+}
+
+.banner-title h2 {
+  margin: 0;
+  font-size: 44px;
+  font-weight: bold;
+}
+
+.banner-title p {
+  color: color-mix(in srgb, var(--default-color), transparent 20%);
+  margin: 5px 0 0 0;
+  font-size: 20px;
+}
+
+@media (max-width: 768px) {
+  .banner-title h2 {
+    font-size: 32px;
+  }
+
+  .banner-title p {
+    font-size: 18px;
+  }
+}
+
+.dark-background {
+  --background-color: #060606;
+}
+
+.img-logo {
+  position: absolute;
+  width: 20%;
+  margin-left: 10px;
+  margin-top: 70px;
+}
+
+@media (max-width: 768px) {
+  .img-logo {
+    width: 50%;
+    margin-top: 90px;
+  }
+}
+
+@media (max-width: 991px) {
+  .img-logo {
+    width: 40%;
+    margin-top: 70px;
+    margin-left: 10px;
+  }
+}
+
+/* cursos */
+.modal-blur {
+  backdrop-filter: blur(8px);
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+}
+
+.modal-content {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  padding: 1rem;
+}
+
+.btn-close {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+.ratio-16x9 {
+  border-radius: 0.25rem;
+  overflow: hidden;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.modal-dialog {
+  transition: transform 0.3s ease-out;
+}
+
+.modal.fade .modal-dialog {
+  transform: scale(0.95);
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1);
+}
