@@ -68,6 +68,15 @@ export const routes: Routes = [
             (m) => m.ContactComponent,
           ),
       },
+
+      {
+        path: 'learning',
+        title: 'Aprendizaje',
+        loadComponent: () =>
+          import('@components/Web/Page/courses/courses.component').then(
+            (m) => m.CoursesComponent,
+          ),
+      },
     ],
   },
 
